@@ -44,12 +44,18 @@ Photos via Wikimedia Commons, cropped:
 In 1975, a Kodak engineer built the first digital camera. In 2012, Kodak filed for bankruptcy. How did the company that defined photography miss its own revolution? The story of the innovator's dilemma.
 
 Chapters:
-0:00 The gadget nobody wanted
-0:40 The Kodak empire
-1:40 The invention
-2:40 The trap
-4:00 Bankruptcy
-5:00 Lessons
+0:00 The invention they buried
+0:24 The empire
+0:51 The invention
+1:32 The dilemma
+2:06 The collapse
+2:49 The lessons
+3:19 Doing nothing
+
+**Photo credits (paste into the description):**
+- George Eastman: George Grantham Bain Collection, Library of Congress, via Wikimedia Commons (no known copyright restrictions)
+- Steve Sasson: PHOTOGRAPHER NAME (fill in), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), via Wikimedia Commons, cropped
+- Other images: original AI-generated illustrations (no real people depicted)
 
 **Tags:** kodak, kodak bankruptcy, digital camera, why kodak failed, innovator's dilemma, steve sasson, business case study, business stories, company collapse, disruption
 
