@@ -162,11 +162,14 @@ scene('netflix1997', T0(16), T0(20), (t, a) => {
   // left column text
   const nm = seg(t, CW(16, 'reed') - .1, CW(16, 'randolph') + .8);
   txt('NETFLIX', 100, 500, { size: 150, color: ORANGE, sp: 8, glow: 30, alpha: seg(t, T0(16) + .5, T0(16) + 1.2) });
-  const hasP = IMG.hastings || IMG.randolph;
-  if (IMG.hastings) portrait('hastings', 100, 570, 130, 150, seg(nm, 0, .4), t - a);
-  if (IMG.randolph) portrait('randolph', 250, 570, 130, 150, seg(nm, .4, .8), t - a);
-  const nx = hasP ? 420 : 104;
-  bigLine('REED HASTINGS', nx, 630, nm, { size: 54, sp: 5 }); bigLine('MARC RANDOLPH', nx, 690, seg(nm, .5, 1), { size: 54, sp: 5 });
+  const hasP = IMG.hastings || IMG.randolph, gf = 1 - seg(t, T0(17) - .35, T0(17) + .05);
+  ctx.save(); ctx.globalAlpha *= gf;
+  if (hasP) {
+    if (IMG.hastings) portrait('hastings', 100, 540, 190, 230, seg(nm, 0, .5), t - a);
+    if (IMG.randolph) portrait('randolph', 330, 540, 190, 230, seg(nm, .3, .8), t - a);
+    txt('REED HASTINGS', 195, 850, { size: 30, color: CREAM, align: 'center', sp: 3, alpha: seg(nm, .1, .6) }); txt('MARC RANDOLPH', 425, 850, { size: 30, color: CREAM, align: 'center', sp: 3, alpha: seg(nm, .4, .9) });
+  } else { bigLine('REED HASTINGS', 104, 630, nm, { size: 54, sp: 5 }); bigLine('MARC RANDOLPH', 104, 690, seg(nm, .5, 1), { size: 54, sp: 5 }); }
+  ctx.restore();
   const mo = seg(t, T0(17) - .1, T0(17) + 2.2);
   bigLine('RENT ONLINE.', 104, 800, mo, { size: 66, sp: 5, color: '#fff' }); bigLine('DELIVER BY MAIL.', 104, 870, seg(mo, .5, 1), { size: 66, sp: 5, color: ORANGE });
   // NO STORE / NO LATE FEES overlay
