@@ -28,25 +28,14 @@ scene('fifty', T0(1), T0(2), (t, a) => {
 scene('executives', T0(2), T0(3), (t, a) => {
   const lt = t - a, sT = CW(2, 'no') - .05, sp = t - sT;
   const [sx, sy] = shakeAt(sp); ctx.save(); ctx.translate(sx, sy);
-  // backdrop: lit window + skyline
-  const wg = ctx.createLinearGradient(0, 260, 0, 700); wg.addColorStop(0, 'rgba(255,150,70,.0)'); wg.addColorStop(1, 'rgba(255,150,70,.38)'); ctx.fillStyle = wg; ctx.fillRect(200, 260, 1520, 440);
-  const rs = rngf(5); ctx.fillStyle = 'rgba(30,60,120,.55)'; for (let i = 0; i < 26; i++) { const bw = 40 + rs() * 50, bh = 90 + rs() * 260; ctx.fillRect(200 + i * 60, 700 - bh, bw, bh); }
-  ctx.fillStyle = 'rgba(255,220,150,.5)'; for (let i = 0; i < 90; i++) { ctx.fillRect(210 + rs() * 1480, 440 + rs() * 250, 5, 7); }
-  // table
-  const g = ctx.createLinearGradient(0, 690, 0, 780); g.addColorStop(0, '#22407F'); g.addColorStop(1, '#0B1B3A'); ctx.fillStyle = g; rr(260, 700, 1400, 70, 16); ctx.fill();
   const dim = 1 - .55 * cl(sp / .3);
-  [[520, 1], [770, .9], [1020, 1], [1270, .92], [1500, .85]].forEach(([x, s], i) => { const br = Math.sin(t * 1.5 + i) * 3; person(x, 705 + br, 220 * s, `rgba(7,14,34,${.95})`, seg(lt, i * .08, .6 + i * .08) * dim);
-    ctx.save(); ctx.globalAlpha *= .5 * dim; ctx.strokeStyle = 'rgba(255,107,26,.5)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, 705 - 220 * s * 1.55 + br, 220 * s * .26, Math.PI * 1.1, Math.PI * 1.6); ctx.stroke(); ctx.restore(); });
-  // document
-  const dx = lerp(260, 900, E.outC(seg(lt, .1, 1.0)));
-  ctx.save(); ctx.globalAlpha *= dim; ctx.fillStyle = CREAM; ctx.translate(dx, 690); ctx.rotate(-.06); rr(0, -34, 200, 44, 4); ctx.fill(); ctx.restore();
-  txt('OFFER · $50M', dx + 100, 692, { size: 28, color: NAVY, align: 'center', sp: 2, rot: -.06, alpha: dim });
-  // "..." typing at 'listened'
+  framed(IMG.offer, 250, 250, 600, 640, seg(lt, 0, .7), lt, { rot: -.018, a: dim });
+  framed(IMG.chair, 1070, 250, 600, 640, seg(lt, .25, .95), lt, { rot: .018, a: dim });
   const lp = seg(t, CW(2, 'listened'), CW(2, 'listened') + .9);
-  txt('LISTENED' + '.'.repeat(Math.floor(lp * 3)), W / 2, 250, { size: 110, color: CREAM, align: 'center', sp: 10, alpha: (1 - cl(sp / .15)) * seg(lt, .1, .5) });
+  txt('LISTENED' + '.'.repeat(Math.floor(lp * 3)), W / 2, 190, { size: 110, color: CREAM, align: 'center', sp: 10, alpha: (1 - cl(sp / .15)) * seg(lt, .1, .5) });
   ctx.restore();
   flash(sp);
-  if (sp > 0) { ctx.save(); ctx.translate(sx, sy); stamp('NO.', W / 2, 360, sp, RED, 340, -.1); ctx.restore(); }
+  if (sp > 0) { ctx.save(); ctx.translate(sx, sy); stamp('NO.', W / 2, 560, sp, RED, 340, -.1); ctx.restore(); }
 });
 scene('chart', T0(3), T0(6), (t, a) => {
   const bx = 330, by = 280, bw = 1260, bh = 560, P = E.io(seg(t, a + .15, T0(5) - .1));
@@ -116,7 +105,7 @@ scene('friday', T0(11), T0(12), (t, a) => {
   txt('FRIDAY NIGHT', W / 2, 470, { size: 300, color: '#FFB27A', align: 'center', sp: 14, glow: 70, glowColor: ORANGE, alpha: fl });
   txt('FRIDAY NIGHT', W / 2, 470, { size: 300, color: '#fff', align: 'center', sp: 14, glow: 10, glowColor: '#fff', alpha: fl * .55 });
   txt('A RITUAL FOR A WHOLE GENERATION', W / 2, 560, { size: 64, color: CREAM, align: 'center', sp: 10, alpha: seg(lt, 1, 1.8) });
-  for (let i = 0; i < 9; i++) { const x = ((i * 230 + 1900 - lt * 90) % 2300) - 180; person(x, 930, 150 + (i % 3) * 22, 'rgba(8,16,38,.95)', seg(lt, .2, .8)); }
+  for (let i = 0; i < 10; i++) { const x = ((i * 230 + 1900 - lt * 150) % 2300) - 180, al = seg(lt, .2, .8); if (i % 2) disc(x, 880, 62, lt * 3 + i, al); else tape(x, 880, 150, al); }
 });
 
 // --- THE HIDDEN PROBLEM ---
@@ -173,9 +162,13 @@ scene('netflix1997', T0(16), T0(20), (t, a) => {
   // left column text
   const nm = seg(t, CW(16, 'reed') - .1, CW(16, 'randolph') + .8);
   txt('NETFLIX', 100, 500, { size: 150, color: ORANGE, sp: 8, glow: 30, alpha: seg(t, T0(16) + .5, T0(16) + 1.2) });
-  bigLine('REED HASTINGS', 104, 580, nm, { size: 54, sp: 5 }); bigLine('MARC RANDOLPH', 104, 640, seg(nm, .5, 1), { size: 54, sp: 5 });
+  const hasP = IMG.hastings || IMG.randolph;
+  if (IMG.hastings) portrait('hastings', 100, 570, 130, 150, seg(nm, 0, .4), t - a);
+  if (IMG.randolph) portrait('randolph', 250, 570, 130, 150, seg(nm, .4, .8), t - a);
+  const nx = hasP ? 420 : 104;
+  bigLine('REED HASTINGS', nx, 630, nm, { size: 54, sp: 5 }); bigLine('MARC RANDOLPH', nx, 690, seg(nm, .5, 1), { size: 54, sp: 5 });
   const mo = seg(t, T0(17) - .1, T0(17) + 2.2);
-  bigLine('RENT ONLINE.', 104, 780, mo, { size: 66, sp: 5, color: '#fff' }); bigLine('DELIVER BY MAIL.', 104, 850, seg(mo, .5, 1), { size: 66, sp: 5, color: ORANGE });
+  bigLine('RENT ONLINE.', 104, 800, mo, { size: 66, sp: 5, color: '#fff' }); bigLine('DELIVER BY MAIL.', 104, 870, seg(mo, .5, 1), { size: 66, sp: 5, color: ORANGE });
   // NO STORE / NO LATE FEES overlay
   const o1 = seg(t, T0(18) - .15, T0(18) + .3), o2 = seg(t, T0(19) - .15, T0(19) + .3);
   if (o1 > 0) { ctx.save(); ctx.fillStyle = 'rgba(7,14,34,' + .9 * o1 + ')'; ctx.fillRect(0, 0, W, H); ctx.restore();
@@ -216,7 +209,7 @@ scene('declined', T0(22), T0(27), (t, a) => {
   if (t < T0(24) - .1) { ctx.save(); ctx.globalAlpha *= f * (1 - seg(t, T0(24) - .35, T0(24) - .1)); txt('“', 300, 440, { size: 380, color: ORANGE, alpha: .8 });
     bigLine('THE IDEA WASN\'T TAKEN SERIOUSLY.', 420, 470, seg(t, T0(23), T0(23) + 2.2), { size: 100, sp: 4 });
     txt('ACCORDING TO ACCOUNTS FROM PEOPLE IN THE ROOM', 420, 560, { size: 44, color: STEEL, sp: 5, alpha: seg(t, T0(23) + 1.8, T0(23) + 2.6) });
-    [[560, 1], [860, .95], [1160, 1], [1460, .9]].forEach(([x, s], i) => { person(x, 960, 200 * s, 'rgba(6,12,30,.95)', seg(lt, 3 + i * .1, 3.6 + i * .1)); txt('?', x, 700 - Math.sin(t * 2 + i) * 10, { size: 120, color: ORANGE, align: 'center', alpha: .8 }); });
+    [560, 860, 1160, 1460].forEach((x, i) => { txt('?', x, 760 - Math.sin(t * 2 + i) * 14, { size: 200, color: ORANGE, align: 'center', alpha: .85 * seg(lt, 3 + i * .15, 3.8 + i * .15), glow: 24 }); });
     ctx.restore(); return; }
   if (t < T0(25) - .1) { const p = E.outB(seg(t, T0(24), T0(24) + .6)); txt('A NICHE?', W / 2, H / 2 + 110, { size: 360, color: '#fff', align: 'center', glow: 40, glowColor: ORANGE, scale: p, alpha: Math.min(1, p) * (1 - seg(t, T0(25) - .35, T0(25) - .1)) }); txt('ONLINE RENTAL', W / 2, 330, { size: 90, color: STEEL, align: 'center', sp: 14, alpha: seg(t, T0(24), T0(24) + .5) }); return; }
   // stores grid + tiny envelope

@@ -4,6 +4,7 @@ window.ready = (async () => {
   await Promise.all([
     loadImg('logo', 'assets/logo.png'), loadImg('chair', 'assets/chair.png'), loadImg('offer', 'assets/offer.png'),
     loadImg('envelope', 'assets/envelope.png'), loadImg('closed', 'assets/closed.png'), loadImg('kodak', 'assets/kodak.png'),
+    loadImg('hastings', 'assets/people/hastings.jpg'), loadImg('randolph', 'assets/people/randolph.jpg'), loadImg('icahn', 'assets/people/icahn.jpg'), loadImg('antioco', 'assets/people/antioco.jpg'),
   ]);
   initLook();
   window.ok = true;

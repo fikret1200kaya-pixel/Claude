@@ -57,10 +57,16 @@ scene('catch', T0(33), T0(37), (t, a) => {
     bars.forEach(([l1, l2, col, h0, h1], i) => { const x = 360 + i * 640, p = E.io(seg(t, T0(34) + .8 + i * 2.6, T0(34) + 2.6 + i * 2.6)); const hh = lerp(h0, h1, p) * 560; ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 20; rr(x, 800 - hh, 300, hh, 10); ctx.fill(); ctx.shadowBlur = 0; txt(l1, x + 150, 850, { size: 40, color: CREAM, align: 'center', sp: 3 }); txt(l2, x + 150, 895, { size: 40, color: col === RED ? RED : CREAM, align: 'center', sp: 3 }); });
     txt('REVENUE ↓', 510, 300, { size: 90, color: STEEL, align: 'center', sp: 6, alpha: seg(t, T0(34) + 1.5, T0(34) + 2.5) }); txt('DEBT ↑', 1150, 300, { size: 90, color: RED, align: 'center', sp: 6, alpha: seg(t, T0(34) + 3.5, T0(34) + 4.2) });
     ctx.restore(); return; }
-  if (t < T0(36) - .2) { const p = E.outC(seg(t, T0(35) - .1, T0(35) + .6)); spot(520, 560, 520, p); person(520, 940, 400, 'rgba(6,12,30,.97)', p);
-    txt('INVESTOR', 980, 420, { size: 60, color: ORANGE, sp: 12, alpha: p }); txt('CARL ICAHN', 980, 560, { size: 170, color: '#fff', sp: 6, alpha: p }); bigLine('PUSHED BACK HARD.', 984, 650, seg(t, T0(35) + .6, T0(35) + 1.8), { size: 72, sp: 4, color: CREAM }); return; }
-  const p = E.outC(seg(t, T0(36) - .1, T0(36) + .6)); spot(520, 560, 520, p); person(520, 940, 400, 'rgba(6,12,30,.97)', p);
-  txt('CEO', 980, 400, { size: 60, color: ORANGE, sp: 12, alpha: p }); txt('JOHN ANTIOCO', 980, 540, { size: 150, color: '#fff', sp: 6, alpha: p }); bigLine('CLASHED WITH THE BOARD', 984, 620, seg(t, CW(36, 'clashed') - .1, CW(36, 'clashed') + 1.2), { size: 64, sp: 4, color: CREAM });
+  if (t < T0(36) - .2) { const p = E.outC(seg(t, T0(35) - .1, T0(35) + .6)); const has = !!IMG.icahn; spot(has ? 520 : W / 2, 540, 620, p);
+    if (has) portrait('icahn', 280, 220, 480, 580, p, t - T0(35));
+    const tx = has ? 900 : W / 2, al = has ? 'left' : 'center';
+    txt('INVESTOR', tx, has ? 420 : 330, { size: 60, color: ORANGE, sp: 12, align: al, alpha: p }); txt('CARL ICAHN', tx, 580, { size: has ? 170 : 230, color: '#fff', sp: 6, align: al, alpha: p, glow: 24, glowColor: ORANGE });
+    bigLine('PUSHED BACK HARD.', tx + (has ? 4 : 0), 680, seg(t, T0(35) + .6, T0(35) + 1.8), { size: 76, sp: 4, color: CREAM, align: al }); return; }
+  const p = E.outC(seg(t, T0(36) - .1, T0(36) + .6)); const has = !!IMG.antioco; spot(has ? 520 : W / 2, 540, 620, p);
+  if (has) portrait('antioco', 280, 220, 480, 580, p, t - T0(36));
+  const tx = has ? 900 : W / 2, al = has ? 'left' : 'center';
+  txt('CEO', tx, has ? 400 : 330, { size: 60, color: ORANGE, sp: 12, align: al, alpha: p }); txt('JOHN ANTIOCO', tx, 550, { size: has ? 150 : 210, color: '#fff', sp: 6, align: al, alpha: p, glow: 24, glowColor: ORANGE });
+  bigLine('CLASHED WITH THE BOARD', tx + (has ? 4 : 0), 640, seg(t, CW(36, 'clashed') - .1, CW(36, 'clashed') + 1.2), { size: 70, sp: 4, color: CREAM, align: al });
   const sv = seg(t, CW(36, 'seven') - .1, CW(36, 'seven') + .6); if (sv > 0) { ctx.save(); ctx.fillStyle = 'rgba(7,14,34,' + .9 * sv + ')'; ctx.fillRect(0, 0, W, H); ctx.restore(); framed(IMG.chair, 1130, 250, 560, 600, sv, t - CW(36, 'seven'), { a: sv }); txt('2007', 160, 520, { size: 340, color: '#fff', sp: 6, glow: 40, glowColor: ORANGE, alpha: sv }); bigLine('HE LEFT.', 168, 640, seg(t, CW(36, 'left') - .2, CW(36, 'left') + .6), { size: 120, sp: 6, color: ORANGE }); }
 });
 scene('replacement', T0(37), T0(39), (t, a) => {
@@ -153,10 +159,10 @@ scene('reinvent', T0(59), T0(62), (t, a) => {
 });
 scene('comfortable', T0(62), T0(64), (t, a) => {
   tag('08 · THE DIFFERENCE', t, a);
-  framed(IMG.chair, 1160, 230, 520, 600, seg(t, a, a + .8), t - a, { a: .55 });
+  framed(IMG.chair, 1330, 230, 440, 560, seg(t, a, a + .8), t - a, { a: .6 });
   const dm = seg(t, T0(63) - .1, T0(63) + .4);
   txt('NOT STUPID.', 100, 480, { size: 220, color: '#fff', sp: 6, glow: 30, glowColor: ORANGE, alpha: (1 - .55 * dm) * seg(t, a + .1, a + .6) });
-  if (dm > 0) { const sp = t - (CW(63, 'comfortable') - .1); const p = E.outB(seg(t, T0(63), T0(63) + .6)); txt('COMFORTABLE.', 100, 720, { size: 260, color: ORANGE, sp: 6, glow: 40, glowColor: ORANGE, alpha: p, scale: .85 + .15 * p }); }
+  if (dm > 0) { const sp = t - (CW(63, 'comfortable') - .1); const p = E.outB(seg(t, T0(63), T0(63) + .6)); txt('COMFORTABLE.', 100, 720, { size: 220, color: ORANGE, sp: 6, glow: 40, glowColor: ORANGE, alpha: p, scale: .85 + .15 * p }); }
   const cp = E.outC(seg(t, T0(62) + 1.2, T0(62) + 1.7)); if (cp > 0) { ctx.save(); ctx.fillStyle = RED; ctx.shadowColor = RED; ctx.shadowBlur = 20; ctx.fillRect(100, 270, 1000 * cp, 10); ctx.restore(); }
 });
 scene('question', T0(64), T0(65), (t, a) => {

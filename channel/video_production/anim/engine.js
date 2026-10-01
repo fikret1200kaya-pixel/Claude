@@ -164,11 +164,20 @@ const CITY = { dallas: [-96.8, 32.8], bend: [-121.3, 44.06], losgatos: [-121.98,
 let MAPDOTS = null;
 function usPath(dx = 0, dy = 0, sc = 1) { const p = new Path2D(); US.forEach(([lo, la], i) => { const [x, y] = mp(lo, la); i ? p.lineTo(dx + x, dy + y) : p.moveTo(dx + x, dy + y); }); p.closePath(); return p; }
 function buildMapDots() {
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);   // identity: dots must match the outline exactly
   const path = usPath(); const dots = []; const r = rngf(7);
   for (let y = MAP.y; y < MAP.y + MAP.h; y += 15) for (let x = MAP.x; x < MAP.x + MAP.w; x += 15) {
-    if (ctx.isPointInPath(path, x, y)) dots.push([x + (y / 15 % 2 ? 7 : 0), y, r()]);
+    const px = x + ((y - MAP.y) / 15 % 2 ? 7 : 0);
+    if (ctx.isPointInPath(path, px, y)) dots.push([px, y, r()]);
   }
-  MAPDOTS = dots;
+  ctx.restore(); MAPDOTS = dots;
+}
+// optional real photo of a person (licensed, supplied by the user); returns true if drawn
+function portrait(key, x, y, w, h, p, t = 0) {
+  const im = IMG[key]; if (!im) return false;
+  framed(im, x, y, w, h, p, t, { push: .04 });
+  const cr = (window.PEOPLE_CREDITS || {})[key]; if (cr) txt(cr, x + w / 2, y + h + 38, { size: 22, color: STEEL, align: 'center', sp: 1, font: 'Liberation Sans', alpha: p });
+  return true;
 }
 function drawMap(alpha = 1, t = 0, tint = 'rgba(111,134,179,') {
   if (!MAPDOTS) buildMapDots();
