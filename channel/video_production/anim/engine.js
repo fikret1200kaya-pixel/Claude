@@ -173,10 +173,10 @@ function buildMapDots() {
   ctx.restore(); MAPDOTS = dots;
 }
 // optional real photo of a person (licensed, supplied by the user); returns true if drawn
-function portrait(key, x, y, w, h, p, t = 0) {
+function portrait(key, x, y, w, h, p, t = 0, credit = true) {
   const im = IMG[key]; if (!im) return false;
   framed(im, x, y, w, h, p, t, { push: .04 });
-  const cr = (window.PEOPLE_CREDITS || {})[key]; if (cr) txt(cr, x + w / 2, y + h + 38, { size: 22, color: STEEL, align: 'center', sp: 1, font: 'Liberation Sans', alpha: p });
+  const cr = (window.PEOPLE_CREDITS || {})[key]; if (cr && credit) txt(cr, x + w / 2, y + h + 38, { size: 20, color: STEEL, align: 'center', sp: 1, font: 'Liberation Sans', alpha: p });
   return true;
 }
 function drawMap(alpha = 1, t = 0, tint = 'rgba(111,134,179,') {

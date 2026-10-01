@@ -22,6 +22,13 @@ Chapters:
 4:00 The collapse
 5:00 Three lessons
 
+**Photo credits (paste into the description):**
+Photos via Wikimedia Commons, cropped:
+- Carl Icahn: AviateHistory, CC0 (https://creativecommons.org/publicdomain/zero/1.0/)
+- Reed Hastings: Walter J. Palacios Rebaza / O'Reilly Media, CC BY 2.0 (https://creativecommons.org/licenses/by/2.0/)
+- Marc Randolph: Gage Skidmore, CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/)
+- John F. Antioco: Glen E. Ellman, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+
 **Tags:** blockbuster, netflix, blockbuster bankruptcy, why blockbuster failed, business case study, business stories, rise and fall, company collapse, reed hastings, innovation, disruption
 
 ---

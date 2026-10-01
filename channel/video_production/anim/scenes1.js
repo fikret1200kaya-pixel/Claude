@@ -165,8 +165,9 @@ scene('netflix1997', T0(16), T0(20), (t, a) => {
   const hasP = IMG.hastings || IMG.randolph, gf = 1 - seg(t, T0(17) - .35, T0(17) + .05);
   ctx.save(); ctx.globalAlpha *= gf;
   if (hasP) {
-    if (IMG.hastings) portrait('hastings', 100, 540, 190, 230, seg(nm, 0, .5), t - a);
-    if (IMG.randolph) portrait('randolph', 330, 540, 190, 230, seg(nm, .3, .8), t - a);
+    if (IMG.hastings) portrait('hastings', 100, 540, 190, 230, seg(nm, 0, .5), t - a, false);
+    if (IMG.randolph) portrait('randolph', 330, 540, 190, 230, seg(nm, .3, .8), t - a, false);
+    const PC = window.PEOPLE_CREDITS || {}; txt('HASTINGS: ' + (PC.hastings || '') + '   ·   RANDOLPH: ' + (PC.randolph || ''), 100, 1030, { size: 19, color: STEEL, font: 'Liberation Sans', alpha: seg(nm, .3, .9) });
     txt('REED HASTINGS', 195, 850, { size: 30, color: CREAM, align: 'center', sp: 3, alpha: seg(nm, .1, .6) }); txt('MARC RANDOLPH', 425, 850, { size: 30, color: CREAM, align: 'center', sp: 3, alpha: seg(nm, .4, .9) });
   } else { bigLine('REED HASTINGS', 104, 630, nm, { size: 54, sp: 5 }); bigLine('MARC RANDOLPH', 104, 690, seg(nm, .5, 1), { size: 54, sp: 5 }); }
   ctx.restore();
