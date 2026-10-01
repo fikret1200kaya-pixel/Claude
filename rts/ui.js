@@ -20,7 +20,7 @@ function centerOn(x, y) { cam.x = (x - y) - viewW() / 2; cam.y = (x + y) / 2 - v
 
 /* ---------- görev başında hazırlık ---------- */
 function buildTerrain() {
-  SPR.clear(); BSPR.clear(); ICONS.clear();
+  SPR.clear(); BSPR.clear(); ICONS.clear(); BL.cache.clear();
   terrainCv = bakeTerrain();
   fogSmall = mkCanvas(G.W, G.H); fogBig = mkCanvas(G.W * 4, G.H * 4); isoFog = mkCanvas((G.W + G.H) * 4, (G.W + G.H) * 2); chunks = new Map();
   mmTile = mkCanvas(G.W, G.H);
@@ -30,7 +30,7 @@ function buildTerrain() {
 function updateFog() {
   if (G.m.noFog) return; const W = G.W, H = G.H, fc = fogSmall.getContext('2d'), id = fc.createImageData(W, H), d = id.data;
   for (let i = 0; i < W * H; i++) { d[i * 4] = 8; d[i * 4 + 1] = 6; d[i * 4 + 2] = 4; d[i * 4 + 3] = G.vis[i] ? 0 : G.exp[i] ? 125 : 255; }
-  fc.putImageData(id, 0, 0); const bc = fogBig.getContext('2d'); bc.clearRect(0, 0, fogBig.width, fogBig.height); bc.filter = 'blur(3px)'; bc.imageSmoothingEnabled = true; bc.drawImage(fogSmall, 0, 0, fogBig.width, fogBig.height); bc.filter = 'none';
+  fc.putImageData(id, 0, 0); const bc = fogBig.getContext('2d'); bc.clearRect(0, 0, fogBig.width, fogBig.height); if (!LITE) bc.filter = 'blur(3px)'; bc.imageSmoothingEnabled = true; bc.drawImage(fogSmall, 0, 0, fogBig.width, fogBig.height); bc.filter = 'none';
   const ic = isoFog.getContext('2d'); ic.setTransform(1, 0, 0, 1, 0, 0); ic.clearRect(0, 0, isoFog.width, isoFog.height); ic.fillStyle = '#080604'; ic.fillRect(0, 0, isoFog.width, isoFog.height); ic.globalCompositeOperation = 'destination-out';
   // önce harita elmasını tamamen aç, sonra sis dokusunu tekrar çiz
   ic.setTransform(1 / 8, 1 / 16, -1 / 8, 1 / 16, G.H * TILE / 8, 0); ic.fillRect(0, 0, G.W * TILE, G.H * TILE); ic.globalCompositeOperation = 'source-over'; ic.imageSmoothingEnabled = true; ic.drawImage(fogBig, 0, 0, G.W * TILE, G.H * TILE); ic.setTransform(1, 0, 0, 1, 0, 0);
@@ -44,9 +44,11 @@ function visBounds() {
 }
 const CH = 512;
 function chunk(i, j) {
-  const k = i + ',' + j; let ch = chunks.get(k); if (ch) return ch;
+  const k = i + ',' + j; let ch = chunks.get(k); if (ch) { chunks.delete(k); chunks.set(k, ch); return ch; }
   ch = mkCanvas(CH, CH); const c = ch.getContext('2d'), ox = -G.H * TILE + i * CH, oy = j * CH;
-  c.setTransform(1, .5, -1, .5, -ox, -oy); c.imageSmoothingEnabled = true; c.drawImage(terrainCv, 0, 0); chunks.set(k, ch); return ch;
+  c.setTransform(1, .5, -1, .5, -ox, -oy); c.imageSmoothingEnabled = true; c.drawImage(terrainCv, 0, 0, G.W * TILE, G.H * TILE); chunks.set(k, ch);
+  if (chunks.size > (LITE ? 24 : 90)) chunks.delete(chunks.keys().next().value);
+  return ch;
 }
 function drawTerrain(c) {
   const z = cam.z, minX = -G.H * TILE, maxX = G.W * TILE, maxY = (G.W + G.H) * TILE / 2;
@@ -160,7 +162,7 @@ function render() {
   for (const b of G.blds) if (!b.dead && b.d.farm && (b.owner === 0 || expAt(b.x, b.y))) drawBuilding(c, b);
   for (const f of G.fx) if (f.k === 'rubble' || f.k === 'corpse') drawFx(c, f);
   // seçim halkaları (birimlerin altında)
-  for (const e of G.sel) { if (e.dead) continue; const col = e.owner === 0 ? '#7dff8a' : '#ff6a5a'; if (e.kind === 'u') { const [sx, sy] = w2s(e.x, e.y), pr = 1 + Math.sin(G.t * 6) * .06; c.strokeStyle = col; c.lineWidth = 2; c.shadowColor = col; c.shadowBlur = 8; c.beginPath(); c.ellipse(sx, sy, (e.r + 7) * z * pr, (e.r + 7) * z * .5 * pr, 0, 0, 7); c.stroke(); c.shadowBlur = 0; } else diamond(c, e.tx, e.ty, e.w, e.h, col, 'rgba(120,255,140,.08)', 2); }
+  for (const e of G.sel) { if (e.dead) continue; const col = e.owner === 0 ? '#7dff8a' : '#ff6a5a'; if (e.kind === 'u') { const [sx, sy] = w2s(e.x, e.y), pr = 1 + Math.sin(G.t * 6) * .06; c.strokeStyle = col; c.lineWidth = 2; if (!LITE) { c.shadowColor = col; c.shadowBlur = 8; } c.beginPath(); c.ellipse(sx, sy, (e.r + 7) * z * pr, (e.r + 7) * z * .5 * pr, 0, 0, 7); c.stroke(); c.shadowBlur = 0; } else diamond(c, e.tx, e.ty, e.w, e.h, col, 'rgba(120,255,140,.08)', 2); }
   // derinliğe göre sırala
   const L = [];
   for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) { const i = idx(tx, ty), r = G.res[i]; if (!r || (!G.exp[i] && !G.m.noFog)) continue; L.push({ k: (tx + ty + 1) * TILE, t: 0, tx, ty, r }); }

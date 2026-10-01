@@ -6,6 +6,7 @@ import os, sys, json, math
 from PIL import Image, ImageChops
 
 USCALE = 1.2
+LITE = .6
 UNIT_ANCHOR = (64, 64 + .45 * math.cos(math.radians(30)) * 32 / math.cos(math.radians(45)) * USCALE)
 
 
@@ -51,7 +52,7 @@ def pack_group(entries, width, out_png, out_mask):
         if m is not None:
             matlas.paste(mask_rgba(m), (x, y))
         meta[k] = [x, y, c.width, c.height, round(ax, 1), round(ay, 1)]
-    atlas.save(out_png, optimize=True); matlas.save(out_mask, optimize=True)
+    atlas.save(out_png, optimize=True); matlas.resize((max(1, width // 2), max(1, H // 2)), Image.LANCZOS).save(out_mask, optimize=True)
     return meta
 
 
@@ -93,9 +94,14 @@ def main(udir, sdir, out):
         at = Image.new('RGBA', (1024, H), (0, 0, 0, 0)); mt = Image.new('RGBA', (1024, H), (255, 255, 255, 0)); meta = {}
         for k, (c, m, _, _) in entries.items():
             x, y = pos[k]; at.paste(c, (x, y)); mt.paste(mask_rgba(m), (x, y)); meta[k] = [x, y, c.width, c.height]
-        at.save(os.path.join(out, 'portraits.png'), optimize=True); mt.save(os.path.join(out, 'portraits_m.png'), optimize=True)
+        at.save(os.path.join(out, 'portraits.png'), optimize=True); mt.resize((512, max(1, H // 2)), Image.LANCZOS).save(os.path.join(out, 'portraits_m.png'), optimize=True)
         S['portraits'] = {'img': 'portraits.png', 'mask': 'portraits_m.png', 'f': meta}
         print('portraits', len(meta))
+    # telefon için %60 ölçekli ana atlaslar (<ad>_l.png)
+    for f in os.listdir(out):
+        if f.endswith('.png') and not f.endswith('_m.png') and not f.endswith('_l.png') and not f.startswith('portraits'):
+            im = Image.open(os.path.join(out, f)); im.resize((max(1, round(im.width * LITE)), max(1, round(im.height * LITE))), Image.LANCZOS).save(os.path.join(out, f[:-4] + '_l.png'), optimize=True)
+    S['lite'] = LITE
     with open(os.path.join(out, 'sprites.js'), 'w') as fh:
         fh.write('/* Blender ile üretildi (rts/blender) */\nwindow.SPRITES = ' + json.dumps(S, separators=(',', ':')) + ';\n')
 

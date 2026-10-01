@@ -213,7 +213,7 @@ function berrySprite(v) {
 function vnoise(x, y, s) { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf); const a = hash2(xi, yi, s), b = hash2(xi + 1, yi, s), c = hash2(xi, yi + 1, s), d = hash2(xi + 1, yi + 1, s); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; }
 const fbm = (x, y, s) => vnoise(x, y, s) * .55 + vnoise(x * 2.1, y * 2.1, s + 1) * .3 + vnoise(x * 4.3, y * 4.3, s + 2) * .15;
 function bakeTerrain() {
-  const W = G.W, H = G.H, T = 32, cv = mkCanvas(W * T, H * T), c = cv.getContext('2d'), seed = G.m.seed, r = makeRng(seed + 5);
+  const W = G.W, H = G.H, T = LITE ? 16 : 32, cv = mkCanvas(W * T, H * T), c = cv.getContext('2d'), seed = G.m.seed, r = makeRng(seed + 5);
   // 1) kara renk haritası (W×H) -> pürüzsüz büyütme
   const base = mkCanvas(W, H), bc = base.getContext('2d'), id = bc.createImageData(W, H);
   const grass = [[92, 132, 52], [112, 148, 58], [78, 118, 48]], dirtc = [168, 132, 84], sandc = [214, 192, 140];
@@ -418,55 +418,78 @@ function iconCanvas(kind, type, colIdx) { // buton portreleri
 }
 
 /* ======================  BLENDER SPRITE'LARI  ======================
-   assets/sprites.js (window.SPRITES) + atlas PNG'leri. Takım rengi: maske atlası
-   renge boyanır ve 'multiply' ile birimin açık gri takım bölgelerine uygulanır. */
-const BL = { ok: false, imgs: {}, tint: new Map() };
-function loadBlender(cb) {
+   assets/sprites.js (window.SPRITES) + atlas PNG'leri. Atlaslar ilk kullanıldıklarında yüklenir.
+   Takım rengi: (yarı çözünürlüklü) maske renge boyanıp 'multiply' ile karenin kendisine uygulanır;
+   sonuç kare başına küçük bir tuvalde, boyutu sınırlı bir önbellekte (LRU) tutulur.            */
+const LITE = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) || /[?&]lite/.test(location.search);
+const BL = { ok: false, imgs: {}, cache: new Map(), cap: LITE ? 700 : 2500 };
+const LS = () => (LITE && window.SPRITES && SPRITES.lite) || 1;                 // telefonda küçük atlaslar
+const lsrc = src => LS() < 1 ? src.replace('.png', '_l.png') : src;
+const lrect = f => { const s = LS(); return s === 1 ? f : [f[0] * s, f[1] * s, Math.max(1, Math.round(f[2] * s)), Math.max(1, Math.round(f[3] * s))]; };
+function blImg(src) {
+  let im = BL.imgs[src];
+  if (!im) { im = new Image(); im.decoding = 'async'; im.src = 'assets/' + src; BL.imgs[src] = im; }
+  return im.complete && im.naturalWidth ? im : null;
+}
+function loadBlender(cb) {           // yalnızca statik atlas ve portreler önceden yüklenir; birimler gerektikçe
   const S = window.SPRITES; if (!S) { cb(); return; }
-  const list = []; for (const u of Object.values(S.units)) list.push(u.img, u.mask); list.push(S.statics.img, S.statics.mask); if (S.portraits) list.push(S.portraits.img, S.portraits.mask);
+  const list = [lsrc(S.statics.img), S.statics.mask]; if (S.portraits) list.push(S.portraits.img, S.portraits.mask);
   let n = list.length, fail = false;
   const done = () => { if (--n === 0) { BL.ok = !fail; cb(); } };
-  list.forEach(src => { const im = new Image(); im.onload = done; im.onerror = () => { fail = true; done(); }; im.src = 'assets/' + src; BL.imgs[src] = im; });
+  for (const src of list) { const im = new Image(); im.onload = done; im.onerror = () => { fail = true; done(); }; im.src = 'assets/' + src; BL.imgs[src] = im; }
 }
-function tintAtlas(src, col) {
-  const k = src + col; let t = BL.tint.get(k); if (t) return t;
-  const im = BL.imgs[src]; t = mkCanvas(im.width, im.height); const c = t.getContext('2d');
-  c.drawImage(im, 0, 0); c.globalCompositeOperation = 'source-in'; c.fillStyle = col; c.fillRect(0, 0, t.width, t.height);
-  BL.tint.set(k, t); return t;
+function blCached(key, img, mask, f, col, ms) {   // f: [x,y,w,h]; ms: maske ölçeği
+  let c = BL.cache.get(key);
+  if (c) { BL.cache.delete(key); BL.cache.set(key, c); return c; }
+  const [x, y, w, h] = f; c = mkCanvas(w, h); const cx = c.getContext('2d');
+  cx.drawImage(img, x, y, w, h, 0, 0, w, h);
+  if (mask && col) {
+    const t = blCached.tmp || (blCached.tmp = mkCanvas(256, 256)); if (t.width < w || t.height < h) { t.width = Math.max(t.width, w); t.height = Math.max(t.height, h); }
+    const tc = t.getContext('2d'); tc.globalCompositeOperation = 'source-over'; tc.clearRect(0, 0, w, h);
+    tc.drawImage(mask, x * ms, y * ms, w * ms, h * ms, 0, 0, w, h); tc.globalCompositeOperation = 'source-in'; tc.fillStyle = col; tc.fillRect(0, 0, w, h);
+    cx.globalCompositeOperation = 'multiply'; cx.drawImage(t, 0, 0, w, h, 0, 0, w, h);
+    cx.globalCompositeOperation = 'destination-in'; cx.drawImage(img, x, y, w, h, 0, 0, w, h);
+    cx.globalCompositeOperation = 'source-over';
+  }
+  BL.cache.set(key, c);
+  if (BL.cache.size > BL.cap) BL.cache.delete(BL.cache.keys().next().value);
+  return c;
 }
 function blFrame(look, dir, act, fr) { const U = SPRITES.units[look]; if (!U) return null; return U.f[dir + '_' + act + '_' + fr] || U.f[dir + '_idle_0']; }
 function blUnit(c, look, owner, dir, act, fr, sx, sy, z, alpha) {
-  const U = SPRITES.units[look], f = U && blFrame(look, dir, act, fr); if (!f) return false;
-  const [x, y, w, h, ax, ay] = f, dx = sx - ax * z, dy = sy - ay * z, dw = w * z, dh = h * z;
+  const U = SPRITES.units[look]; if (!U) return false;
+  const img = blImg(lsrc(U.img)), mask = blImg(U.mask); if (!img || !mask) return false;
+  let k = dir + '_' + act + '_' + fr, f = U.f[k]; if (!f) { k = dir + '_idle_0'; f = U.f[k]; } if (!f) return false;
+  const cv = blCached(look + G.colors[owner] + k, img, mask, lrect(f), G.colors[owner], mask.width / img.width);
   if (alpha != null) c.globalAlpha = alpha;
-  c.drawImage(BL.imgs[U.img], x, y, w, h, dx, dy, dw, dh);
-  c.globalCompositeOperation = 'multiply'; c.drawImage(tintAtlas(U.mask, G.colors[owner]), x, y, w, h, dx, dy, dw, dh); c.globalCompositeOperation = 'source-over';
+  c.drawImage(cv, sx - f[4] * z, sy - f[5] * z, f[2] * z, f[3] * z);
   c.globalAlpha = 1; return true;
 }
 function blHas(name) { return BL.ok && !!SPRITES.statics.f[name]; }
 function blStatic(c, name, owner, sx, sy, z, alpha, reveal, light) {
   const S = SPRITES.statics, f = S.f[name]; if (!f) return false;
-  const k = z / S.scale; let [x, y, w, h, ax, ay] = f; let dy = sy - ay * k;
-  if (reveal != null && reveal < 1) { const cut = h * (1 - reveal); y += cut; h -= cut; dy += cut * k; }
-  const dx = sx - ax * k;
+  const img = BL.imgs[lsrc(S.img)], mask = BL.imgs[S.mask];
+  const cv = blCached('S' + name + (owner == null ? '' : G.colors[owner]), img, owner == null ? null : mask, lrect(f), owner == null ? null : G.colors[owner], mask.width / img.width);
+  const k = z / S.scale, w = f[2], h = f[3], ax = f[4], ay = f[5];
+  let sy0 = 0, hh = h; if (reveal != null && reveal < 1) { sy0 = h * (1 - reveal); hh = h - sy0; }
   if (alpha != null) c.globalAlpha = alpha;
-  c.drawImage(BL.imgs[S.img], x, y, w, h, dx, dy, w * k, h * k);
-  if (owner != null) { c.globalCompositeOperation = 'multiply'; c.drawImage(tintAtlas(S.mask, G.colors[owner]), x, y, w, h, dx, dy, w * k, h * k); }
-  if (light) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = light; c.drawImage(BL.imgs[S.img], x, y, w, h, dx, dy, w * k, h * k); }
-  c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1; return true;
+  const q = cv.width / w;
+  c.drawImage(cv, 0, sy0 * q, cv.width, hh * q, sx - ax * k, sy - ay * k + sy0 * k, w * k, hh * k);
+  if (light) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = light; c.drawImage(cv, 0, sy0 * q, cv.width, hh * q, sx - ax * k, sy - ay * k + sy0 * k, w * k, hh * k); c.globalCompositeOperation = 'source-over'; }
+  c.globalAlpha = 1; return true;
 }
 function blPortrait(look, owner) {
   const P = SPRITES.portraits, f = P && P.f[look]; if (!f) return null;
+  const img = BL.imgs[P.img], mask = BL.imgs[P.mask]; if (!img || !mask || !img.naturalWidth) return null;
+  const pc = blCached('P' + look + G.colors[owner], img, mask, f, G.colors[owner], mask.width / img.width);
   const cv = mkCanvas(96, 96), c = cv.getContext('2d'), gr = c.createRadialGradient(48, 38, 6, 48, 48, 70);
   gr.addColorStop(0, '#6a4a2a'); gr.addColorStop(1, '#140b05'); c.fillStyle = gr; c.fillRect(0, 0, 96, 96);
-  const [x, y, w, h] = f; c.drawImage(BL.imgs[P.img], x, y, w, h, 0, 0, 96, 96);
-  c.globalCompositeOperation = 'multiply'; c.drawImage(tintAtlas(P.mask, G.colors[owner]), x, y, w, h, 0, 0, 96, 96); c.globalCompositeOperation = 'source-over';
-  return cv;
+  c.drawImage(pc, 0, 0, 96, 96); return cv;
 }
 function blIcon(kind, type, owner) {
   if (kind === 'u') { const p = blPortrait(UNITS[type].look, owner); if (p) return p; }
   const cv = mkCanvas(48, 48), c = cv.getContext('2d'); c.fillStyle = '#2a1c10'; c.fillRect(0, 0, 48, 48);
-  if (kind === 'u') { const look = UNITS[type].look, f = blFrame(look, 1, 'idle', 0); if (!f) return null; const [, , w, h, ax, ay] = f; const big = UNITS[type].cls === 'cav' || UNITS[type].cls === 'hero' || UNITS[type].cls === 'sie'; const z = big ? .8 : 1.05; blUnit(c, look, owner, 1, 'idle', 0, 24, big ? 50 : 54, z); }
+  if (kind === 'u') { const look = UNITS[type].look, big = UNITS[type].cls === 'cav' || UNITS[type].cls === 'hero' || UNITS[type].cls === 'sie'; if (!blUnit(c, look, owner, 1, 'idle', 0, 24, big ? 50 : 54, big ? .8 : 1.05)) return null; }
   else { const nm = type === 'ayasofya' && G.flags.captured ? 'ayasofya_cap' : type, f = SPRITES.statics.f[nm]; if (!f) return null; const [, , w, h, ax, ay] = f; const k = Math.min(44 / w, 44 / h) * SPRITES.statics.scale; blStatic(c, nm, owner, 24 - (w / 2 - ax) * k / SPRITES.statics.scale, 46 - (h - ay) * k / SPRITES.statics.scale, k); }
   return cv;
 }

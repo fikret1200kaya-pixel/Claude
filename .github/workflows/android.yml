@@ -32,6 +32,10 @@ jobs:
           mkdir -p android/app/src/main/assets/rts
           cp rts/index.html rts/*.js android/app/src/main/assets/rts/
           cp -r rts/assets android/app/src/main/assets/rts/
+          # Telefonda yalnızca %60 ölçekli (_l) atlaslar kullanılır; tam boyutluları APK'ya koyma
+          cd android/app/src/main/assets/rts/assets
+          for f in u_*.png static.png; do case "$f" in *_m.png|*_l.png) ;; *) rm -f "$f" ;; esac; done
+          ls -la
 
       - name: APK derle
         working-directory: android
