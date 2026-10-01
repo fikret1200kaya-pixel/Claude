@@ -5,9 +5,9 @@ const mini = $('mini'), mctx = mini.getContext('2d');
 let cam = { x: 0, y: 0, z: 1 }, mouse = { x: 0, y: 0, in: false, down: false, sx: 0, sy: 0, drag: false };
 let place = null, amovePending = false, keys = {}, lastClick = { t: 0, id: 0 };
 let terrainCv = null, fogSmall = null, fogBig = null, isoFog = null, chunks = new Map(), mmTile = null, cardSig = '', cardT = 0, running = false, lastT = 0, acc = 0;
-const BAR_H = 168, MF = 4 / 32;
+let BAR_H = 168; const MF = 4 / 32;
 
-function resize() { cv.width = innerWidth; cv.height = innerHeight; ctx.imageSmoothingEnabled = true; }
+function resize() { cv.width = innerWidth; cv.height = innerHeight; ctx.imageSmoothingEnabled = true; const b = $('bar'); if (b && b.offsetHeight) BAR_H = b.offsetHeight; }
 addEventListener('resize', resize); resize();
 const viewW = () => cv.width / cam.z, viewH = () => (cv.height - BAR_H) / cam.z;
 const w2s = (x, y, z) => [((x - y) - cam.x) * cam.z, ((x + y) / 2 - (z || 0) - cam.y) * cam.z];
@@ -287,15 +287,28 @@ cv.addEventListener('mousemove', e => { mouse.x = e.offsetX; mouse.y = e.offsetY
 cv.addEventListener('mouseleave', () => { mouse.in = false; mouse.down = false; });
 addEventListener('mouseup', e => {
   if (!G || e.button !== 0 || !mouse.down) return; mouse.down = false;
-  if (G.done) return; const shift = e.shiftKey;
-  if (place) { if (!mouse.drag) tryPlace(shift); mouse.drag = false; return; }
+  if (G.done) return; leftUp(e.shiftKey, false);
+});
+function leftUp(shift, touch) {
+  if (place) {
+    if (!mouse.drag) {
+      if (touch && (!place.armed || Math.hypot(mouse.x - place.armed.x, mouse.y - place.armed.y) > 40)) { place.armed = { x: mouse.x, y: mouse.y }; msg('Yerleştirmek için aynı yere tekrar dokun.'); }
+      else tryPlace(shift);
+    }
+    mouse.drag = false; return;
+  }
   if (amovePending && !mouse.drag) { const w = s2w(mouse.x, mouse.y); moveGroup(mySel().filter(u => u.kind === 'u'), w.x, w.y); amovePending = false; fxPing(w.x, w.y, '#ff7a5c'); return; }
   if (mouse.drag) {
     const x0 = Math.min(mouse.sx, mouse.x), x1 = Math.max(mouse.sx, mouse.x), y0 = Math.min(mouse.sy, mouse.y), y1 = Math.max(mouse.sy, mouse.y);
     const us = G.ents.filter(u => { if (u.kind !== 'u' || u.dead || u.owner !== 0) return false; const [sx, sy] = w2s(u.x, u.y, 14); return sx >= x0 && sx <= x1 && sy >= y0 && sy <= y1; });
-    if (us.length) { const mil = us.filter(u => !u.d.worker); selectUnits(mil.length && mil.length < us.length && !shift ? us : us, shift); }
+    if (us.length) selectUnits(us, shift);
   } else {
     const t = entAtScreen(mouse.x, mouse.y, false);
+    if (touch) {   // dokunmatik: birim seçiliyken boş yere, düşmana veya kaynağa dokunmak emir verir
+      const hasUnits = mySel().some(e => e.kind === 'u'), own = t && t.owner === 0;
+      const site = own && t.kind === 'b' && (!t.built || t.d.farm) && mySel().some(e => e.d && e.d.worker);
+      if (hasUnits && (!own || site)) { commandAt(mouse.x, mouse.y); mouse.drag = false; return; }
+    }
     if (t) {
       if (t.owner === 0 && t.kind === 'u' && lastClick.id === t.id && performance.now() - lastClick.t < 400) selectUnits(G.ents.filter(u => { if (u.kind !== 'u' || u.dead || u.owner !== 0 || u.type !== t.type) return false; const [sx, sy] = w2s(u.x, u.y); return sx > 0 && sx < cv.width && sy > 0 && sy < cv.height - BAR_H; }), shift);
       else if (shift && t.owner === 0) selectUnits([t], true); else selectUnits([t]);
@@ -303,7 +316,44 @@ addEventListener('mouseup', e => {
     } else if (!shift) selectUnits([]);
   }
   mouse.drag = false;
-});
+}
+/* ---------- dokunmatik ---------- */
+let tch = null;
+const tpts = e => { const r = cv.getBoundingClientRect(); return [...e.touches].map(t => ({ x: t.clientX - r.left, y: t.clientY - r.top })); };
+cv.addEventListener('touchstart', e => {
+  e.preventDefault(); if (!G || G.done) return; const T = tpts(e);
+  if (tch && tch.lp) clearTimeout(tch.lp);
+  if (T.length === 1) {
+    tch = { mode: 'one', sx: T[0].x, sy: T[0].y, moved: false };
+    Object.assign(mouse, { x: T[0].x, y: T[0].y, in: true, down: true, sx: T[0].x, sy: T[0].y, drag: false });
+    tch.lp = setTimeout(() => {   // basılı tut = sağ tık
+      if (!tch || tch.mode !== 'one' || tch.moved) return; tch.mode = 'done'; mouse.down = false;
+      if (place) place = null; else if (amovePending) amovePending = false; else commandAt(tch.sx, tch.sy);
+      if (navigator.vibrate) try { navigator.vibrate(25); } catch (er) { }
+    }, 450);
+  } else if (T.length >= 2) {
+    mouse.down = false; mouse.drag = false;
+    const mx = (T[0].x + T[1].x) / 2, my = (T[0].y + T[1].y) / 2, w = s2w(mx, my);
+    tch = { mode: 'two', d: Math.hypot(T[0].x - T[1].x, T[0].y - T[1].y) || 1, z: cam.z, wx: w.x, wy: w.y };
+  }
+}, { passive: false });
+cv.addEventListener('touchmove', e => {
+  e.preventDefault(); if (!G || !tch) return; const T = tpts(e);
+  if (tch.mode === 'one' && T.length === 1) {
+    mouse.x = T[0].x; mouse.y = T[0].y;
+    if (Math.hypot(mouse.x - tch.sx, mouse.y - tch.sy) > 14) { tch.moved = true; if (!place) mouse.drag = true; }
+  } else if (tch.mode === 'two' && T.length >= 2) {
+    const mx = (T[0].x + T[1].x) / 2, my = (T[0].y + T[1].y) / 2, d = Math.hypot(T[0].x - T[1].x, T[0].y - T[1].y) || 1;
+    cam.z = clamp(tch.z * d / tch.d, .6, 1.6);
+    cam.x = (tch.wx - tch.wy) - mx / cam.z; cam.y = (tch.wx + tch.wy) / 2 - my / cam.z; clampCam();
+  }
+}, { passive: false });
+cv.addEventListener('touchend', e => {
+  e.preventDefault(); if (!G || !tch) return;
+  if (tch.lp) clearTimeout(tch.lp);
+  if (tch.mode === 'one' && e.touches.length === 0) { mouse.down = false; if (!G.done) leftUp(false, true); mouse.in = !!place; tch = null; }
+  else if (tch.mode !== 'one' && e.touches.length === 0) { tch = null; mouse.down = false; mouse.drag = false; }
+}, { passive: false });
 cv.addEventListener('wheel', e => { e.preventDefault(); const before = s2w(e.offsetX, e.offsetY); cam.z = clamp(cam.z * (e.deltaY < 0 ? 1.1 : .91), .6, 1.6); const ix = before.x - before.y, iy = (before.x + before.y) / 2; cam.x = ix - e.offsetX / cam.z; cam.y = iy - e.offsetY / cam.z; clampCam(); }, { passive: false });
 addEventListener('keydown', e => {
   keys[e.key.toLowerCase()] = true; if (!G || !running) return;
@@ -326,6 +376,8 @@ function miniPos(e) { const r = mini.getBoundingClientRect(), mx = (e.clientX - 
 mini.addEventListener('mousedown', e => { if (!G || e.button !== 0) return; mini._d = true; const p = miniPos(e); centerOn(p.x, p.y); });
 mini.addEventListener('mousemove', e => { if (mini._d) { const p = miniPos(e); centerOn(p.x, p.y); } });
 addEventListener('mouseup', () => { mini._d = false; });
+mini.addEventListener('touchstart', e => { e.preventDefault(); if (!G) return; const t = e.touches[0]; const p = miniPos(t); if (e.touches.length > 1 || (tch && tch.mini)) return; centerOn(p.x, p.y); }, { passive: false });
+mini.addEventListener('touchmove', e => { e.preventDefault(); if (!G) return; const p = miniPos(e.touches[0]); centerOn(p.x, p.y); }, { passive: false });
 mini.addEventListener('contextmenu', e => { e.preventDefault(); const sel = mySel().filter(u => u.kind === 'u'); if (sel.length) { const p = miniPos(e); moveGroup(sel, p.x, p.y); } });
 
 function findIdle(workers) {
@@ -361,7 +413,7 @@ function updateTop() {
   $('iw').textContent = G.idleW || 0; $('iwb').classList.toggle('alert', !!G.idleW); $('im').textContent = G.idleM || 0;
 }
 function btn(label, key, fn, cost, tip, dis, img) { cardBtns.push({ label, key, fn, cost, tip, dis, img }); }
-const GLYPH = { amove: '⚔', stop: '■', hold: '⛨' };
+const GLYPH = { amove: '⚔', stop: '■', hold: '⛨', clear: '✕', del: '☠' };
 function buildCard() {
   cardBtns = []; const s = mySel(), p = G.players[0];
   const units = s.filter(e => e.kind === 'u'), blds = s.filter(e => e.kind === 'b'), av = G.m.avail;
@@ -374,6 +426,7 @@ function buildCard() {
     btn('Dur', 's', () => { units.forEach(orderStop); }, null, 'Tüm emirleri iptal et', false, 'stop');
     btn('Mevzi', 'g', () => { units.forEach(u => { orderStop(u); u.hold = true; }); msg('Mevzi alındı: birlikler yerinde durup menzildekilere saldırır.'); }, null, 'Yerinde dur, kovalamadan saldır', false, 'hold');
   } else if (units.length) btn('Dur', 's', () => { units.forEach(orderStop); }, null, 'Emirleri iptal et', false, 'stop');
+  if (s.length) { btn('Bırak', '', () => selectUnits([]), null, 'Seçimi bırak', false, 'clear'); btn('Yok et', '', () => { const x = mySel().filter(e => !e.d.landmark); if (!x.length) return; if (!G.delArm || G.t - G.delArm > 3) { G.delArm = G.t; msg('Yok etmek için tekrar bas (Delete).', 'warn'); return; } for (const e of x) kill(e); G.sel = []; cardSig = ''; }, null, 'Seçili kendi birim/binanı yok et (iki kez bas)', false, 'del'); }
   if (blds.length === 1 && blds[0].built && blds[0].d.techs) {
     const b = blds[0], hk = ['q', 'w', 'e', 'r']; let i = 0;
     for (const id of b.d.techs) { const T = TECHS[id]; if (hasTech(0, id)) continue; const busy = G.blds.some(x => x.owner === 0 && x.queue.some(q => q.type === 'T:' + id)); btn(T.name, hk[i++], () => { queueTech(b, id); cardSig = ''; }, T.cost, T.desc + ' (' + T.time + ' sn)', busy || !afford(p, T.cost), 't|' + id); }

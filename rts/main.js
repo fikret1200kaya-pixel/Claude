@@ -37,7 +37,7 @@ function startMission(i) {
   updVis(); popAndCap();
   cam = { x: 0, y: 0, z: 1 }; if (G.hero) centerOn(G.hero.x, G.hero.y); else centerOn(G.W * TILE / 2, G.H * TILE / 2);
   G.sel = G.hero ? [G.hero] : []; place = null; amovePending = false; cardSig = '';
-  show('game'); uiSpeed(); uiObjectives(); msg(m.date + ' — ' + m.title, 'good');
+  show('game'); resize(); if (G.hero) centerOn(G.hero.x, G.hero.y); uiSpeed(); uiObjectives(); msg(m.date + ' — ' + m.title, 'good');
   lastT = performance.now(); acc = 0; if (!running) { running = true; requestAnimationFrame(frame); }
 }
 function restartMission() { $('pause').style.display = 'none'; startMission(curMission); }
