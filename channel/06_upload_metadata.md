@@ -4,7 +4,7 @@ Common description footer (paste at the end of every description):
 
 > This video is for information and entertainment only and is not financial or investment advice.
 > Narration is AI-generated. Script based on public reporting and company filings.
-> Subscribe to Boardroom Tales for new business stories every week.
+> Subscribe to Rise & Ruin for new business stories every week.
 
 ---
 

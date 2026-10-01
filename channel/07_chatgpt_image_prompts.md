@@ -1,14 +1,14 @@
-# ChatGPT image prompts — Boardroom Tales
+# ChatGPT image prompts — Rise & Ruin
 
 Use these in ChatGPT (image generation). Ask for 16:9 unless noted. Generate 3-4 variations and pick one.
 General rule for all prompts: no real brand logos, no real people, no real product/film names.
 Palette: navy #0B1B3A, orange #FF6B1A, off-white #F5F1E8. Font feel: bold condensed (Bebas Neue style).
 
 ## Channel logo (square, 1:1)
-Square channel logo for "Boardroom Tales": minimal emblem of a boardroom chair silhouette combined with an open book, off-white and orange on a deep navy rounded-square background. Flat vector style, bold and legible at very small sizes. Wordmark "BOARDROOM TALES" below in clean bold condensed sans-serif. No gradients, no photos, no extra text.
+Square channel logo for "Rise & Ruin": minimal emblem of a boardroom chair silhouette combined with an open book, off-white and orange on a deep navy rounded-square background. Flat vector style, bold and legible at very small sizes. Wordmark "RISE & RUIN" below in clean bold condensed sans-serif. No gradients, no photos, no extra text.
 
 ## Channel banner (16:9, keep text in the central third)
-YouTube channel banner, ultra-wide. Deep navy background with a subtle skyline of corporate towers and a faint rising-then-falling stock chart line in orange. Centered text: "BOARDROOM TALES" in large bold condensed white letters, and below it "How giants rise. How empires fall." in off-white serif. Keep all text inside the central third. Premium documentary style, flat vector, no photos, no real brands.
+YouTube channel banner, ultra-wide. Deep navy background with a subtle skyline of corporate towers and a faint rising-then-falling stock chart line in orange. Centered text: "RISE & RUIN" in large bold condensed white letters, and below it "How giants rise. How empires fall." in off-white serif. Keep all text inside the central third. Premium documentary style, flat vector, no photos, no real brands.
 
 ## Thumbnail 1 — Blockbuster (REPLACEMENT, brand-free)
 YouTube thumbnail, 16:9. A generic neon-lit video rental store at night on a wet street, with a large cracked red "NO" stamp across the frame and a stack of blank DVD cases plus a single red mailing envelope in the foreground. The store sign must be generic and unreadable (no real brand, no film titles). Deep navy background, orange accents, high contrast. Big bold condensed white text on the left: "THE $50M NO" with "$50M" in orange. Cinematic documentary style.

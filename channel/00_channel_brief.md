@@ -1,15 +1,11 @@
-# Channel Brief — "Boardroom Tales" (working name)
+# Channel Brief — "Rise & Ruin"
 
 ## Concept
 Faceless English-language YouTube channel telling business stories: how giants collapsed, how simple ideas built empires.
 Tone: cinematic, clear, calm-but-gripping narrator. No financial advice, only storytelling and analysis.
 
-## Name candidates (check availability on YouTube before registering)
-1. Boardroom Tales  (working name)
-2. Fallen Giants
-3. The Money Narrative
-4. Rise & Ruin
-5. Corporate Autopsy
+## Name
+**Rise & Ruin** — handle @Rise-Ruintv (Brand Account, created). Alternatives considered: Fallen Giants, The Money Narrative, Corporate Autopsy. ("Boardroom Tales" was the first choice but its handle was taken.)
 
 ## Positioning
 - Audience: 18-44, English-speaking (US/UK/CA/AU), interested in business, investing, career, entrepreneurship.
