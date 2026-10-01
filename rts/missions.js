@@ -1,12 +1,12 @@
 'use strict';
 /* ====== FATİH — Kampanya: Tahta çıkıştan ölüme ====== */
-function crew(type, owner, n, tx, ty, o, cols) { cols = cols || 6; for (let i = 0; i < n; i++) U(type, owner, tx + i % cols, ty + ((i / cols) | 0), Object.assign({}, o)); }
-function houses(owner, tx, ty, cols, rows) { for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) B('ev', owner, tx + c * 3, ty + r * 3); }
+function crew(type, owner, n, tx, ty, o, cols) { cols = cols || 6; const bx = sc(tx), by = sc(ty); for (let i = 0; i < n; i++) { const [x, y] = freeTileNear(bx + i % cols, by + ((i / cols) | 0)); addUnit(type, owner, x * TILE + TILE / 2, y * TILE + TILE / 2, Object.assign({}, o)); } }
+function houses(owner, tx, ty, cols, rows) { const bx = sc(tx), by = sc(ty); for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) addBuilding('ev', owner, bx + c * 3, by + r * 3); }
 function setupAI(cfg) { G.ai = Object.assign({ n: 0, next: cfg.wave ? cfg.wave.first : 0 }, cfg); Object.assign(G.players[1], cfg.res || {}); G.players[1].cap = cfg.popCap; }
 const wallCount = () => G.blds.filter(b => b.owner === 1 && (b.type === 'sur' || b.type === 'kapi')).length;
 const alive = (owner, type, label) => G.blds.some(b => b.owner === owner && b.type === type && (!label || b.name === label));
 const spawnWave = (owner, list, tx, ty, target) => { list.forEach(([t, n, o]) => { for (let i = 0; i < n; i++) { const u = U(t, owner, tx + (Math.random() * 4 | 0), ty + (Math.random() * 6 | 0), Object.assign({ ai: 'wave' }, o)); if (target) orderAmove(u, target.x, target.y); } }); };
-const BUILD_ALL = ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'ocak', 'dokum', 'kule'];
+const BUILD_ALL = ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'ocak', 'dokum', 'kule', 'cami', 'medrese'];
 
 const MISSIONS = [
   /* ---------------- 1 ---------------- */
@@ -15,7 +15,7 @@ const MISSIONS = [
     colors: ['#c0392b', '#2e8b57'], enemy: 'Karamanoğulları',
     brief: `II. Murad'ın vefatıyla 19 yaşındaki Şehzade Mehmed, Edirne'de ikinci kez tahta çıkıyor. İlk saltanatı (1444–1446) çocuk yaşta ve kısa sürmüştü; bu kez dünya onu tecrübesiz bir genç olarak görüyor.\n\nFırsatı kaçırmayan Karamanoğlu İbrahim Bey, Anadolu'daki sınır boylarına akın düzenliyor. Genç Sultan'ın ilk işi, otoritesini kanıtlamak.\n\nÖnce ekonomini kur: Reayaları ağaçlara, altın madenine ve yaban meyvesine gönder. Sonra bir Kışla kurup ordunu topla ve Karaman Kampı'nı yık.`,
     after: `Karaman tehdidi bastırıldı. Genç Sultan, ilk sınavını geçti; gözünü artık çok daha büyük bir hedefe dikmişti: Doğu Roma'nın başkenti Konstantiniyye.`,
-    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'kule'], train: ['reaya', 'azap', 'okcu'] },
+    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'kule', 'cami', 'medrese'], train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'molla'] },
     start: { f: 350, w: 300, g: 100 }, winText: 'Karaman Kampı yıkıldı. Sultan\'ın otoritesi sağlandı!',
     setup() {
       setWater(28, 26, 33, 31); forest(4, 40, 4); forest(20, 36, 5); forest(22, 52, 4); forest(44, 6, 3); forest(58, 22, 4); forest(36, 44, 4); forest(10, 22, 4);
@@ -36,6 +36,7 @@ const MISSIONS = [
       { t: 3, fn: () => msg('Hoş geldin Sultanım! Reayaları seç, sağ tıkla: ağaç=odun, sarı kaya=altın, çalı=yiyecek.', 'good') },
       { t: 40, fn: () => msg('Sarayı seçip "Reaya" butonuyla işçi yetiştir. Nüfus dolarsa Ev inşa et.') },
       { t: 120, fn: () => msg('Reaya seçip Kışla\'yı seç, yerleştir. Askerlerle Sultan\'ı (H tuşu) yan yana tut: +%20 güç.') },
+      { t: 200, fn: () => msg('İpucu: Cami inşa et, Molla yetiştir: yaralıları iyileştirir ve geniş alanı görür. Medrese\'de İlm-i Coğrafya haritanın tamamını açar.') },
       { t: 270, fn: () => msg('Karaman akıncıları toplanıyor! Hazırlıklı ol.', 'warn') },
     ],
   },
@@ -45,7 +46,7 @@ const MISSIONS = [
     colors: ['#c0392b', '#6c3fa0'], enemy: 'Bizans', sym: '✚',
     brief: `İstanbul'u fethetmek için önce Boğaz'ın kontrolü şart. Anadolu yakasında atası Yıldırım Bayezid'in yaptırdığı Anadoluhisarı var; Sultan Mehmed tam karşısına, Rumeli yakasına bir hisar inşa etmeye karar veriyor.\n\nHisar yaklaşık dört buçuk ayda tamamlanacak ve Karadeniz'den gelen yardımı kesecek; adı "Boğazkesen" olacak.\n\nAltın ve odun topla, işaretli alana Rumeli Hisarı'nı kur. Bizans akıncıları inşaatı bozmaya çalışacak: işçileri koru. Hisar bitince Bizans karakolunu yık.`,
     after: `Rumeli Hisarı 31 Ağustos 1452'de tamamlandı. Boğaz artık Osmanlı'nın elindeydi; ilk gemi geçişi denemesinde top ateşiyle batırılan bir Venedik gemisi, İstanbul'a yardımın yolunun kapandığını gösterdi.`,
-    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'kule', 'hisar'], train: ['reaya', 'azap', 'okcu'] },
+    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'kule', 'cami', 'medrese', 'hisar'], train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'molla'] },
     start: { f: 450, w: 700, g: 350 }, winText: 'Boğaz Osmanlı\'nın! Rumeli Hisarı ayakta, Bizans karakolu yıkıldı.',
     zone: { x0: 50, y0: 25, x1: 57, y1: 35 },
     setup() {
@@ -75,7 +76,7 @@ const MISSIONS = [
     colors: ['#c0392b', '#6c3fa0'], enemy: 'Bizans İmparatorluğu', sym: '✚',
     brief: `21 yaşındaki Sultan Mehmed, bin yıldır ayakta duran Theodosius Surları'nın önünde. Şehirde yaklaşık 7.000 savunmacı var; Haliç ağzı zincirle kapalı.\n\nMacar usta Orban'ın döktüğü Şahi Topu ve balyemez toplarla surları dövmek, kapıları zorlamak gerek. Haliç zincirini aşmak için donanma karadan yürütülecek.\n\nTopçularını surların menziline getir, gedik aç, sonra ordunu şehre sok ve Ayasofya'nın çevresini düşmandan temizleyip ele geçir.\n\nİpucu: Okçu ve piyade surlara neredeyse hasar veremez. Surları top yıkar!`,
     after: `29 Mayıs 1453 sabahı şehir fethedildi. Son Bizans imparatoru XI. Konstantinos surlarda savaşarak öldü. Fatih, İstanbul'u başkent yaptı, Ayasofya'yı camiye çevirdi ve "Fatih" unvanını aldı. Bir çağ kapanmış, bir çağ açılmıştı.`,
-    avail: { build: BUILD_ALL, train: ['reaya', 'azap', 'okcu', 'sipahi', 'yeniceri', 'top', 'sahi'] },
+    avail: { build: BUILD_ALL, train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'yeniceri', 'top', 'sahi', 'molla'] },
     start: { f: 900, w: 1100, g: 900 }, winText: 'Ayasofya\'ya Osmanlı sancağı dikildi. İstanbul fethedildi!',
     setup() {
       setWater(0, 0, 103, 6); setWater(0, 64, 103, 71); setWater(0, 7, 4, 63);
@@ -86,6 +87,7 @@ const MISSIONS = [
       B('saray', 0, 88, 34, { label: 'Otağ-ı Hümayun' }); B('kamp', 0, 84, 38, { label: 'Ordugâh' }); houses(0, 92, 28, 4, 2); houses(0, 92, 40, 4, 2);
       crew('reaya', 0, 12, 85, 33, {}, 4); crew('azap', 0, 20, 79, 30, {}, 5); crew('okcu', 0, 12, 76, 36, {}, 6); crew('sipahi', 0, 8, 79, 40, {}, 8); crew('yeniceri', 0, 10, 74, 31, {}, 5); U('fatih', 0, 80, 35);
       crew('top', 0, 3, 70, 26, {}, 3);
+      U('molla', 0, 84, 36, { name: 'Akşemseddin', heal: 10, hp: 160, maxhp: 160, desc: 'Fatih\'in hocası. Askerleri hem bedenen hem manen güçlendirir; güçlü şifa verir.' });
       // Surlar
       for (const y of [9, 17, 25, 33, 41, 49, 57]) B('burc', 1, 52, y, { label: 'Sur Burcu' });
       B('kapi', 1, 52, 28, { label: 'Topkapı' }); B('kapi', 1, 52, 29, { label: 'Topkapı' }); B('kapi', 1, 52, 44, { label: 'Edirnekapı' }); B('kapi', 1, 52, 45, { label: 'Edirnekapı' });
@@ -102,12 +104,15 @@ const MISSIONS = [
       setupAI({ income: { f: 3, w: 3, g: 2 }, res: { f: 400, w: 400, g: 300 }, popCap: 110, comp: { azap: 3, okcu: 2, sovalye: 1 }, wave: { first: 420, interval: 300, size: 8, grow: 2 } });
     },
     tick(dt) {
-      const cx = 22.5 * TILE, cy = 34.5 * TILE; let mine = 0, en = 0;
+      const ay = G.blds.find(b => b.type === 'ayasofya'); if (!ay) return; const cx = ay.x, cy = ay.y; let mine = 0, en = 0;
       for (const e of G.ents) { if (e.kind !== 'u' || e.dead) continue; const d = Math.hypot(e.x - cx, e.y - cy); if (e.owner === 0 && isMil(e) && d < 7 * TILE) mine++; else if (e.owner === 1 && d < 9 * TILE) en++; }
       if (G.flags.captured) return;
       if (mine >= 3 && en === 0) G.capture += dt; else G.capture = Math.max(0, G.capture - dt * .5);
       if (G.capture >= 8) { G.flags.captured = true; msg('Ayasofya\'ya Ay-yıldızlı sancak dikildi!', 'good'); }
     },
+    triggers: [
+      { cond: () => wallCount() < G.flags.walls0, fn: () => { const h = G.hero || { x: G.W * TILE / 2, y: G.H * TILE / 2 }, ay = G.blds.find(b => b.type === 'ayasofya'); const u = addUnit('azap', 0, h.x + 30, h.y + 10, { name: 'Ulubatlı Hasan', hp: 300, maxhp: 300, atk: 15, desc: 'Sancağı ilk diken yiğit. Rivayete göre surlara ilk Osmanlı sancağını o dikti.' }); if (ay) orderAmove(u, ay.x, ay.y); msg('Ulubatlı Hasan sancağı kaptı ve gediğe atıldı!', 'good'); } },
+    ],
     objectives: [
       { text: 'Surlarda gedik aç (kapı veya sur yık)', done: () => wallCount() < G.flags.walls0 },
       { text: 'Ayasofya çevresini temizle: en az 3 askerle düşmansız 8 sn tut', done: () => G.flags.captured, prog: () => G.capture > 0 ? '%' + Math.floor(G.capture / 8 * 100) : '' },
@@ -126,7 +131,7 @@ const MISSIONS = [
     colors: ['#c0392b', '#1e5fb3'], enemy: 'Macar Krallığı', sym: '✚',
     brief: `İstanbul'dan sonra Fatih'in gözü Orta Avrupa'nın kapısı Belgrad'da. Tuna ve Sava'nın birleştiği yerdeki kale, Macar tarafının en önemli müstahkem noktası.\n\nAma Macar komutan Hunyadi János yardım ordusuyla yaklaşıyor. Kaleyi yıkmak için zamanın sınırlı: yaklaşık 14 dakika.\n\nTopları kaleye yaklaştır, Hunyadi gelince ordunu ikiye bölmeden savun. Sultan'ı koru: tarihte bu kuşatmada Fatih yaralanmıştı.`,
     after: `Belgrad kuşatması tarihte başarısızlıkla sonuçlandı: Hunyadi'nin yardımı ve kalede çıkan sonraki çatışmalarda Osmanlı ordusu ağır kayıp verdi; Sultan yaralandı ve ordu geri çekildi. Hunyadi kısa süre sonra salgında hayatını kaybetti. Fatih hiçbir yenilgiyi unutmadı; bir sonraki seferine çok daha iyi hazırlandı.`,
-    avail: { build: BUILD_ALL, train: ['reaya', 'azap', 'okcu', 'sipahi', 'yeniceri', 'top', 'sahi'] },
+    avail: { build: BUILD_ALL, train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'yeniceri', 'top', 'sahi', 'molla'] },
     start: { f: 600, w: 800, g: 600 }, winText: 'Belgrad Kalesi düştü! Tarihin akışını değiştirdin.', timeLimit: 840, timeoutText: 'Süre doldu. Tarihte olduğu gibi ordu Belgrad önünden geri çekildi.',
     setup() {
       setWater(0, 0, 87, 5); forest(10, 40, 5); forest(70, 44, 5); forest(20, 56, 4); forest(62, 28, 4); forest(10, 22, 4); forest(76, 14, 4);
@@ -137,7 +142,7 @@ const MISSIONS = [
       // kale
       B('burc', 1, 31, 7, { label: 'Kale Burcu' }); B('burc', 1, 52, 7, { label: 'Kale Burcu' }); B('burc', 1, 31, 22, { label: 'Kale Burcu' }); B('burc', 1, 52, 22, { label: 'Kale Burcu' });
       B('kapi', 1, 42, 23, { label: 'Kale Kapısı' }); B('kapi', 1, 43, 23, { label: 'Kale Kapısı' });
-      wallLine(1, 33, 7, 51, 7, 'sur', 'Kale Suru'); wallLine(1, 33, 23, 51, 23, 'sur', 'Kale Suru'); wallLine(1, 31, 9, 31, 21, 'sur', 'Kale Suru'); wallLine(1, 53, 9, 53, 21, 'sur', 'Kale Suru');
+      wallLine(1, 31, 7, 53, 7, 'sur', 'Kale Suru'); wallLine(1, 31, 23, 53, 23, 'sur', 'Kale Suru'); wallLine(1, 31, 7, 31, 23, 'sur', 'Kale Suru'); wallLine(1, 53, 7, 53, 23, 'sur', 'Kale Suru');
       setTerrain(32, 8, 52, 22, 4);
       B('kale', 1, 40, 11, { label: 'Belgrad Kalesi' }); B('ev', 1, 35, 11); B('ev', 1, 47, 11); B('kisla', 1, 35, 16); B('ev', 1, 47, 16);
       crew('azap', 1, 14, 36, 20, { guard: true }, 14); crew('okcu', 1, 14, 36, 9, { guard: true }, 14); crew('sovalye', 1, 8, 44, 17, { guard: true }, 8);
@@ -162,7 +167,7 @@ const MISSIONS = [
     colors: ['#c0392b', '#d0d0d0'], enemy: 'Akkoyunlular',
     brief: `Akkoyunlu hükümdarı Uzun Hasan, Venedik ile ittifak kurarak Osmanlı'ya meydan okuyor. Doğu'da kaderi belirleyecek büyük savaş Otlukbeli'nde.\n\nUzun Hasan'ın ordusu süvari ağırlıklı ve çok kalabalık. Sizde ise tüfekli Yeniçeriler ve toplar var.\n\nİpucu: Süvarilere karşı Azaplar, mızraklarıyla çok etkilidir. Yeniçeri ve toplar menzilli güçtür. Sultan'ın yakınında savaşan askerler +%20 güç kazanır.\n\nOğlu Zeynel Bey'i etkisiz hale getir ve Ordugâh'ı yık.`,
     after: `Otlukbeli'nde Osmanlı topları ve Yeniçeri tüfekleri Akkoyunlu süvarisini dağıttı; Uzun Hasan'ın oğlu Zeynel Bey savaşta öldü. Doğu cephesi güvene alındı; Fatih artık Anadolu'da hâkim güçtü.`,
-    avail: { build: BUILD_ALL, train: ['reaya', 'azap', 'okcu', 'sipahi', 'yeniceri', 'top'] },
+    avail: { build: BUILD_ALL, train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'yeniceri', 'top', 'molla'] },
     start: { f: 600, w: 700, g: 600 }, winText: 'Otlukbeli kazanıldı! Akkoyunlu ordusu bozguna uğradı.',
     setup() {
       setWater(46, 0, 48, 17); setWater(46, 25, 48, 37); setWater(46, 45, 48, 63);
@@ -172,9 +177,9 @@ const MISSIONS = [
       B('saray', 0, 8, 30, { label: 'Ordu Karargâhı' }); B('kamp', 0, 12, 34, { label: 'Ordugâh' }); houses(0, 2, 11, 4, 3);
       crew('reaya', 0, 10, 12, 29, {}, 5); crew('azap', 0, 24, 18, 26, {}, 8); crew('okcu', 0, 18, 22, 29, {}, 9); crew('sipahi', 0, 10, 18, 35, {}, 10); crew('yeniceri', 0, 14, 21, 32, {}, 7); crew('top', 0, 4, 24, 28, {}, 4); U('fatih', 0, 16, 31);
       B('kamp', 1, 84, 30, { label: 'Uzun Hasan Ordugâhı' }); B('kamp', 1, 80, 12, { label: 'Akkoyunlu Kanadı' }); B('kamp', 1, 80, 48, { label: 'Akkoyunlu Kanadı' }); B('burc', 1, 76, 26); B('burc', 1, 76, 36);
-      U('komutan', 1, 83, 34, { name: 'Uzun Hasan', guard: true, desc: 'Akkoyunlu hükümdarı.' });
-      G.flags.zeynel = U('komutan', 1, 76, 31, { name: 'Zeynel Bey', ai: 'army', rally: { x: 76 * TILE, y: 31 * TILE }, desc: 'Uzun Hasan\'ın oğlu. Öldürülürse Akkoyunlu ordusu sarsılır.' });
-      crew('sipahi', 1, 24, 74, 24, { ai: 'army', rally: { x: 74 * TILE, y: 30 * TILE } }, 5); crew('okcu', 1, 22, 78, 24, { ai: 'army', rally: { x: 76 * TILE, y: 30 * TILE } }, 6); crew('azap', 1, 14, 80, 38, { ai: 'army', rally: { x: 76 * TILE, y: 33 * TILE } }, 6);
+      U('bey', 1, 83, 34, { name: 'Uzun Hasan', guard: true, desc: 'Akkoyunlu hükümdarı.' });
+      G.flags.zeynel = U('bey', 1, 76, 31, { name: 'Zeynel Bey', ai: 'army', rally: TP(76, 31), desc: 'Uzun Hasan\'ın oğlu. Öldürülürse Akkoyunlu ordusu sarsılır.' });
+      crew('sipahi', 1, 24, 74, 24, { ai: 'army', rally: TP(74, 30) }, 5); crew('okcu', 1, 22, 78, 24, { ai: 'army', rally: TP(76, 30) }, 6); crew('azap', 1, 14, 80, 38, { ai: 'army', rally: TP(76, 33) }, 6);
       setupAI({ income: { f: 4, w: 4, g: 3 }, res: { f: 400, w: 400, g: 400 }, popCap: 130, comp: { sipahi: 3, okcu: 2, azap: 1 }, wave: { first: 100, interval: 140, size: 24, grow: 4 } });
     },
     objectives: [
@@ -192,7 +197,7 @@ const MISSIONS = [
     colors: ['#c0392b', '#c9a227'], enemy: 'Napoli Krallığı', sym: '✚',
     brief: `Fatih'in son büyük hamlesi: "Roma'yı almak." Gedik Ahmed Paşa komutasındaki donanma, Temmuz 1480'de Adriyatik'i geçip İtalya'nın Otranto kıyısına asker çıkarıyor. Aynı yıl Mesih Paşa Rodos'u da kuşatıyor, ama o kale direnecek.\n\nBu görevde Gedik Ahmed Paşa'yı yönetiyorsun. Kıyıya ulaştın: Otranto surların ardında. Napoli kralının yardım ordusu yolda.\n\nTopları sur önüne getir, kaleyi düşür ve gelen takviyeyi karşıla.`,
     after: `Otranto 11 Ağustos 1480'de düştü; Osmanlı'nın İtalya'daki ilk kalıcı üssü oldu. Fatih, bir sonraki seferini hazırlarken tarihe geçecek son yolculuğuna çıkıyordu...`,
-    avail: { build: BUILD_ALL, train: ['reaya', 'azap', 'okcu', 'sipahi', 'yeniceri', 'top'] },
+    avail: { build: BUILD_ALL, train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'yeniceri', 'top', 'molla'] },
     start: { f: 500, w: 700, g: 500 }, winText: 'Otranto Kalesi düştü! İtalya\'da Osmanlı bayrağı dalgalanıyor.',
     setup() {
       setWater(0, 0, 8, 63); setTerrain(9, 0, 12, 63, 3); forest(16, 8, 5); forest(18, 56, 5); forest(28, 22, 4); forest(28, 44, 4); forest(66, 8, 5); forest(68, 56, 5); forest(70, 30, 3);
@@ -200,10 +205,10 @@ const MISSIONS = [
       clearArea(16, 32, 8);
       B('saray', 0, 14, 30, { label: 'Kıyı Karargâhı' }); B('kamp', 0, 14, 35, { label: 'Çıkarma Kampı' }); houses(0, 17, 17, 4, 2);
       crew('reaya', 0, 10, 18, 31, {}, 5); crew('azap', 0, 20, 24, 29, {}, 10); crew('okcu', 0, 16, 24, 32, {}, 8); crew('sipahi', 0, 8, 22, 36, {}, 8); crew('yeniceri', 0, 12, 26, 28, {}, 6); crew('top', 0, 5, 27, 33, {}, 5);
-      U('komutan', 0, 20, 31, { name: 'Gedik Ahmed Paşa', desc: 'Osmanlı vezir-i âzamı ve kaptan-ı derya. Ölürse görev kaybedilir.' });
+      U('pasa', 0, 20, 31, { name: 'Gedik Ahmed Paşa', desc: 'Osmanlı vezir-i âzamı ve kaptan-ı derya. Ölürse görev kaybedilir.' });
       for (const [x, y] of [[35, 15], [60, 15], [35, 46], [60, 46]]) B('burc', 1, x, y, { label: 'Otranto Burcu' });
       B('kapi', 1, 36, 31, { label: 'Batı Kapısı' }); B('kapi', 1, 36, 32, { label: 'Batı Kapısı' }); B('kapi', 1, 60, 31, { label: 'Doğu Kapısı' }); B('kapi', 1, 60, 32, { label: 'Doğu Kapısı' });
-      wallLine(1, 37, 16, 59, 16, 'sur', 'Otranto Suru'); wallLine(1, 37, 46, 59, 46, 'sur', 'Otranto Suru'); wallLine(1, 36, 17, 36, 45, 'sur', 'Otranto Suru'); wallLine(1, 60, 17, 60, 45, 'sur', 'Otranto Suru');
+      wallLine(1, 36, 16, 60, 16, 'sur', 'Otranto Suru'); wallLine(1, 36, 46, 60, 46, 'sur', 'Otranto Suru'); wallLine(1, 36, 16, 36, 46, 'sur', 'Otranto Suru'); wallLine(1, 60, 16, 60, 46, 'sur', 'Otranto Suru');
       setTerrain(37, 17, 59, 45, 4); setTerrain(30, 31, 36, 32, 2); setTerrain(61, 31, 70, 32, 2);
       B('kale', 1, 48, 28, { label: 'Otranto Kalesi' }); B('kisla', 1, 41, 22); B('kisla', 1, 41, 38); B('ev', 1, 54, 20); B('ev', 1, 54, 38); B('ev', 1, 44, 41); B('ev', 1, 38, 28); B('burc', 1, 54, 28);
       for (const [hx, hy] of [[39, 18], [44, 18], [50, 18], [56, 22], [39, 42], [50, 42], [56, 42], [46, 36], [52, 34]]) if (![0, 1].some(a => [0, 1].some(b2 => G.occ[idx(hx + a, hy + b2)]))) B('ev', 1, hx, hy);

@@ -5,6 +5,7 @@ Her bakış için 8 yön × (1 bekleme + 8 yürüme + 6 saldırı + 1 ölü) kar
 import bpy, math, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from kit import *
+from mathutils import Vector
 
 PI = math.pi
 WALK, ATK = 8, 6
@@ -12,18 +13,23 @@ WALK, ATK = 8, 6
 
 def mats():
     return dict(
-        skin=M('skin', (.86, .62, .45), .6),
-        team=M('team', (.86, .86, .86), .6, noise=30, nf=.15, team=True),
-        team_d=M('team_d', (.62, .62, .62), .7, noise=30, nf=.15, team=True),
-        white=M('white', (.93, .9, .82), .7, noise=25, nf=.15),
-        cream=M('cream', (.88, .82, .68), .7, noise=25, nf=.15),
+        skin=M('skin', (.86, .62, .45), .55, noise=40, nf=.08),
+        eyew=M('eyew', (.95, .93, .9), .3),
+        lip=M('lip', (.55, .22, .18), .5),
+        grayb=M('grayb', (.75, .73, .7), .8),
+        green2=M('green2', (.12, .42, .25), .6, noise=20, nf=.12, bump=.02),
+        fur=M('fur', (.25, .16, .09), .95, noise=60, nf=.4),
+        team=M('team', (.86, .86, .86), .6, noise=30, nf=.12, bump=.02, team=True),
+        team_d=M('team_d', (.62, .62, .62), .7, noise=30, nf=.12, bump=.02, team=True),
+        white=M('white', (.93, .9, .82), .7, noise=25, nf=.12, bump=.02),
+        cream=M('cream', (.88, .82, .68), .7, noise=25, nf=.12, bump=.02),
         brown=M('brown', (.42, .27, .14), .7, noise=20),
         leather=M('leather', (.33, .2, .1), .6, noise=20),
         dark=M('dark', (.08, .06, .05), .6),
-        pants=M('pants', (.32, .26, .2), .8, noise=20, nf=.15),
-        green=M('green', (.25, .4, .2), .8, noise=20, nf=.15),
-        blue=M('blue', (.16, .3, .5), .7, noise=20, nf=.15),
-        red=M('red', (.62, .1, .07), .6, noise=20, nf=.15),
+        pants=M('pants', (.32, .26, .2), .8, noise=20, nf=.12, bump=.02),
+        green=M('green', (.25, .4, .2), .8, noise=20, nf=.12, bump=.02),
+        blue=M('blue', (.16, .3, .5), .7, noise=20, nf=.12, bump=.02),
+        red=M('red', (.62, .1, .07), .6, noise=20, nf=.12, bump=.02),
         straw=M('straw', (.85, .72, .38), .8, noise=40),
         steel=M('steel', (.7, .72, .76), .3, .9),
         iron=M('iron', (.25, .25, .27), .4, .8),
@@ -59,10 +65,20 @@ def human(root, S, X, seated_z=None):
     cyl(.165, .07, (0, 0, .03), X.get('sash', S['brown']), pel, v=20)
     chest = joint('chest', (0, 0, .36), pel); J['chest'] = chest
     ball(.075, (0, 0, .05), X.get('skin', S['skin']), chest)            # boyun
-    ball(.11, (0, 0, .15), X.get('skin', S['skin']), chest, sc=(1, .95, 1.08)); J['head'] = (0, 0, .15)
-    ball(.025, (.1, 0, .14), X.get('skin', S['skin']), chest)            # burun
+    sk = X.get('skin', S['skin'])
+    ball(.11, (0, 0, .15), sk, chest, sc=(1, .93, 1.1), seg=24); J['head'] = (0, 0, .15)
+    ball(.024, (.108, 0, .145), sk, chest, sc=(1.4, .8, 1.25))           # burun
+    for s in (1, -1):
+        ball(.026, (0, s * .104, .15), sk, chest, sc=(.6, 1, 1.2))          # kulak
+        if X.get('eyes', True):
+            ball(.021, (.09, s * .041, .17), S['eyew'], chest, seg=12)       # göz akı
+            ball(.012, (.106, s * .041, .17), S['dark'], chest, seg=8)       # göz bebeği
+            box(.014, .05, .013, (.1, s * .043, .198), X.get('beard', S['mane']), chest, rot=(s * -.18, 0, 0))   # kaş
+        if X.get('mustache', True):
+            box(.022, .075, .02, (.109, s * .036, .118), X.get('beard', S['mane']), chest, rot=(s * .45, 0, 0))   # bıyık
+    box(.012, .03, .008, (.11, 0, .103), S['lip'], chest)                  # ağız
     if X.get('beard'):
-        ball(.06, (.075, 0, .09), X['beard'], chest, sc=(1, 1.4, 1))
+        ball(.05, (.07, 0, .07), X['beard'], chest, sc=(.8, 1.25, 1.1))
     for s, n in ((1, 'L'), (-1, 'R')):
         sh = joint('sh' + n, (0, s * .2, -.02), chest); J['sh' + n] = sh
         ball(.06, (0, 0, 0), X.get('sleeve', X['tunic']), sh)
@@ -88,6 +104,10 @@ def human(root, S, X, seated_z=None):
         box(.02, .16, .025, (.124, 0, .17), S['dark'], chest)
         if X.get('plume'):
             cyl(.025, .22, (-.03, 0, .42), X['plume'], chest, rot=(0, -.6, 0))
+    elif hat == 'kavuk':
+        cyl(.12, .2, (0, 0, .3), S['white'], chest, v=20); ball(.165, (0, 0, .24), S['white'], chest, sc=(1, 1, .6)); cyl(.168, .035, (0, 0, .25), S['green2'], chest, v=24)
+    elif hat == 'kalpak':
+        cyl(.13, .2, (-.01, 0, .27), S['fur'], chest, r2=.115, v=16); ball(.11, (-.01, 0, .37), X.get('hatc', S['red']), chest, sc=(1, 1, .4))
     elif hat == 'kettle':
         ball(.12, (0, 0, .2), S['steel'], chest, sc=(1, 1, .8)); cyl(.2, .02, (0, 0, .19), S['steel'], chest)
     return J
@@ -186,6 +206,18 @@ def build(look, root, S):
     elif look == 'yeniceri':
         J = human(root, S, dict(tunic=S['blue'], skirt=S['blue'], vest=S['red'], sash=S['team'], boots=S['red'], hat='bork', beard=S['mane']))
         musket(J['handR'], S); kind = 'musket'
+    elif look == 'molla':
+        J = human(root, S, dict(tunic=S['white'], skirt=S['white'], vest=S['green2'], sash=S['team'], hat='kavuk', beard=S['grayb'], boots=S['dark']))
+        cyl(.24, .5, (0, 0, -.32), S['white'], J['pel'], r2=.2, v=20)
+        b = joint('book', (0, 0, 0), J['handL']); box(.1, .14, .03, (.05, 0, .02), S['red'], b, rot=(0, -.6, 0)); box(.09, .13, .032, (.05, 0, .021), S['white'], b, rot=(0, -.6, 0))
+        st = joint('staff', (0, 0, 0), J['handR']); cyl(.016, 1.3, (0, 0, .25), S['wood'], st, v=8); ball(.03, (0, 0, .9), S['gold'], st)
+        kind = 'pray'
+    elif look == 'akinci':
+        H = horse(root, S, S['horse_b'], S['team'], S['fur'])
+        Jh = human(root, S, dict(tunic=S['team'], vest=S['fur'], sash=S['gold'], pants=S['pants'], hat='kalpak', hatc=S['team'], beard=S['mane']), seated_z=1.15)
+        sword(Jh['handR'], S); shield(Jh['shL'], S, 1, .15, S['team_d'])
+        q = joint('q', (-.17, .05, .1), Jh['chest']); cyl(.05, .35, (0, 0, 0), S['leather'], q, rot=(.3, -.25, 0))
+        J = dict(Jh); J.update({'h_' + k: v for k, v in H.items()}); J['rider'] = True; kind = 'swing'
     elif look in ('sipahi', 'sovalye', 'fatih', 'komutan'):
         if look == 'sipahi':
             H = horse(root, S, S['horse'], S['team'], S['gold'])
@@ -195,7 +227,7 @@ def build(look, root, S):
             shield(Jh['shL'], S, 1, .17, S['team_d']); kind = 'thrust'
         elif look == 'sovalye':
             H = horse(root, S, S['horse_g'], S['team'], S['white'])
-            Jh = human(root, S, dict(tunic=S['steel'], sleeve=S['steel'], vest=S['team'], sash=S['iron'], pants=S['steel'], boots=S['iron'], gloves=S['iron'], hat='helm', plume=S['team']), seated_z=1.15)
+            Jh = human(root, S, dict(tunic=S['steel'], sleeve=S['steel'], vest=S['team'], sash=S['iron'], pants=S['steel'], boots=S['iron'], gloves=S['iron'], hat='helm', plume=S['team'], mustache=False, eyes=False), seated_z=1.15)
             spear(Jh['handR'], S, 2.1)
             shield(Jh['shL'], S, 1, .22, S['team']); kind = 'thrust'
         elif look == 'fatih':
@@ -341,6 +373,8 @@ def pose(look, kind, J, act, f, root):
             J['shR'].rotation_euler = (0, a, 0)
         elif rider:
             J['shR'].rotation_euler = (0, -.5, 0)
+    if kind == 'pray' and act == 'atk':
+        t = math.sin(f / (ATK - 1) * PI); J['shL'].rotation_euler = (-.5 * t, -1.6 * t, 0); J['shR'].rotation_euler = (.5 * t, -1.6 * t, 0)
     if act == 'dead':
         root.rotation_euler.x = PI / 2 * (1 if not rider else .95); root.location.z = .16 if not rider else .35
         if not rider:
@@ -348,8 +382,9 @@ def pose(look, kind, J, act, f, root):
 
 
 # ------------------------------------------------------------ render
-FRAME = {'sahi': 208, 'top': 160, 'sipahi': 176, 'sovalye': 176, 'fatih': 160, 'komutan': 160}
-LOOKS = ['reaya', 'azap', 'okcu', 'yeniceri', 'sipahi', 'sovalye', 'fatih', 'komutan', 'top', 'sahi']
+USCALE = 1.2
+FRAME = {k: int(v * USCALE) // 2 * 2 for k, v in {'sahi': 208, 'top': 160, 'sipahi': 176, 'sovalye': 176, 'fatih': 160, 'komutan': 160, 'akinci': 160, 'reaya': 128, 'azap': 128, 'okcu': 128, 'yeniceri': 128, 'molla': 128}.items()}
+LOOKS = ['reaya', 'azap', 'okcu', 'yeniceri', 'sipahi', 'sovalye', 'fatih', 'komutan', 'top', 'sahi', 'molla', 'akinci']
 
 
 def frames():
@@ -360,8 +395,8 @@ def frames():
 def render_look(look, outdir, dirs=range(8), only=None):
     reset()
     S = mats()
-    fs = FRAME.get(look, 128)
-    setup_scene(fs, fs, 1., target=(0, 0, .45), samples=20)
+    fs = FRAME.get(look, 154)
+    setup_scene(fs, fs, USCALE, target=(0, 0, .45), samples=28)
     root = joint('root')
     J, kind = build(look, root, S)
     os.makedirs(os.path.join(outdir, look), exist_ok=True)
@@ -375,10 +410,40 @@ def render_look(look, outdir, dirs=range(8), only=None):
             render_to(os.path.join(outdir, look, '%d_%s_%d%s.png' % (d, act, f, '_m' if mask else '')))
 
 
+
+def render_portrait(look, outdir, size=160):
+    reset(); S = mats()
+    setup_scene(size, size, 1., samples=64)
+    sc = bpy.context.scene
+    root = joint('root')
+    J, kind = build(look, root, S)
+    pose(look, kind, J, 'idle', 0, root)
+    bpy.data.objects['catcher'].hide_render = True
+    bpy.context.view_layer.update()
+    if kind == 'cannon':
+        head = J['g_chest'].matrix_world @ Vector((0, 0, .15))
+    else:
+        head = J['chest'].matrix_world @ Vector((0, 0, .15))
+    cam = sc.camera; cam.data.type = 'PERSP'; cam.data.lens = 85; cam.data.sensor_fit = 'AUTO'
+    cam.location = head + Vector((1.45, .8, .22))
+    d = head + Vector((0, 0, .06)) - cam.location; cam.rotation_euler = d.to_track_quat('-Z', 'Y').to_euler()
+    bpy.ops.object.light_add(type='AREA', location=head + Vector((.8, -.6, .5))); L = bpy.context.object; L.data.energy = 25; L.data.size = .6
+    L.rotation_euler = (head - L.location).to_track_quat('-Z', 'Y').to_euler()
+    bpy.ops.object.light_add(type='AREA', location=head + Vector((-.6, .5, .3))); L = bpy.context.object; L.data.energy = 18; L.data.size = .5; L.data.color = (1, .8, .55)
+    L.rotation_euler = (head - L.location).to_track_quat('-Z', 'Y').to_euler()
+    os.makedirs(outdir, exist_ok=True)
+    mask_mode(False); bpy.data.objects['catcher'].hide_render = True
+    render_to(os.path.join(outdir, 'p_%s.png' % look))
+    mask_mode(True); render_to(os.path.join(outdir, 'p_%s_m.png' % look))
+
+
 if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('-')]
     out = args[0] if args else 'out/units'
     looks = args[1:] or LOOKS
+    only_p = '--portraits' in sys.argv
     for lk in looks:
-        render_look(lk, out)
+        render_portrait(lk, out + '_portraits')
+        if not only_p:
+            render_look(lk, out)
         print('DONE', lk, flush=True)

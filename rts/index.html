@@ -28,7 +28,8 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 .mi:hover{border-color:var(--gold-hi);background:linear-gradient(90deg,rgba(70,36,16,.95),rgba(30,16,8,.85))}
 .mi.lock{opacity:.4;pointer-events:none}.mi b{font-family:var(--f-disp);color:var(--gold);letter-spacing:.04em}.mi small{opacity:.75;display:block;font-style:italic}
 .card{max-width:780px;width:100%;max-height:70vh;overflow:auto;background:linear-gradient(#f1e3c2,#e3cfa2);color:#2a1a0c;border:3px double var(--gold-lo);box-shadow:0 0 0 6px rgba(20,10,4,.9),0 20px 50px rgba(0,0,0,.6);padding:22px 30px;text-align:left;line-height:1.6;font-size:18px}
-.card p{margin:.5em 0;white-space:pre-line;max-width:68ch}.card ul{margin:.3em 0;padding-left:22px}.card b{font-family:var(--f-disp);color:#6d1c15;letter-spacing:.04em}
+.card p{margin:.5em 0;white-space:pre-line;max-width:68ch}.card ul{margin:.3em 0;padding-left:22px}#bpor{float:right;width:140px;height:140px;margin:0 0 10px 16px;border:3px double var(--gold-lo);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.card b{font-family:var(--f-disp);color:#6d1c15;letter-spacing:.04em}
 .card p:first-of-type::first-letter{font-family:var(--f-disp);font-size:3em;float:left;line-height:.9;margin:4px 8px 0 0;color:#8e2a22}
 /* ---- oyun arayüzü ---- */
 #vig{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 55%,rgba(10,5,0,.45))}
@@ -36,7 +37,7 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 #hud.on{display:block}
 .wood{background:linear-gradient(180deg,#5a3c22,#3a2616 40%,#2a1a0e);border:2px solid #1a0d05;box-shadow:inset 0 0 0 1px rgba(243,214,138,.35),inset 0 2px 6px rgba(255,220,160,.12)}
 #top{position:absolute;left:0;right:0;top:0;height:38px;display:flex;align-items:center;gap:20px;padding:0 16px;pointer-events:auto;font-family:var(--f-disp);font-size:16px;font-variant-numeric:tabular-nums;border-bottom:3px solid var(--gold-lo)}
-#top .i{display:flex;align-items:center;gap:6px;white-space:nowrap}#top .sp{flex:1}
+#top .i{display:flex;align-items:center;gap:6px;white-space:nowrap}#top .btnlike{cursor:pointer;padding:2px 8px;border:1px solid var(--gold-lo);background:rgba(0,0,0,.3)}#top .btnlike:hover{border-color:var(--gold-hi)}#top .btnlike.alert{border-color:#ff8a5c;color:#ffcfb5;box-shadow:0 0 8px rgba(255,120,60,.6)}#top .sp{flex:1}
 .ri{display:inline-block;width:20px;height:20px;background-size:contain;background-repeat:no-repeat;filter:drop-shadow(0 1px 0 #000)}
 .rf{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 19V6' stroke='%237a5a20' stroke-width='1.6'/%3E%3Cg fill='%23f0c94a' stroke='%237a5a20' stroke-width='.7'%3E%3Cellipse cx='10' cy='4' rx='1.8' ry='3'/%3E%3Cellipse cx='7.4' cy='8' rx='1.6' ry='2.8' transform='rotate(-35 7.4 8)'/%3E%3Cellipse cx='12.6' cy='8' rx='1.6' ry='2.8' transform='rotate(35 12.6 8)'/%3E%3Cellipse cx='7.4' cy='12' rx='1.6' ry='2.8' transform='rotate(-35 7.4 12)'/%3E%3Cellipse cx='12.6' cy='12' rx='1.6' ry='2.8' transform='rotate(35 12.6 12)'/%3E%3C/g%3E%3C/svg%3E")}
 .rw{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='2' y='6' width='14' height='9' rx='2' fill='%238a5a2a' stroke='%23321a08'/%3E%3Cellipse cx='16' cy='10.5' rx='3' ry='4.5' fill='%23d9b27a' stroke='%23321a08'/%3E%3Cellipse cx='16' cy='10.5' rx='1.4' ry='2.2' fill='none' stroke='%238a5a2a'/%3E%3C/svg%3E")}
@@ -52,7 +53,7 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 #minibox{width:196px;flex:none;display:flex;align-items:center;justify-content:center;background:radial-gradient(#1a120a,#0b0805);border:2px solid var(--gold-lo);box-shadow:inset 0 0 12px #000}
 #mini{cursor:pointer}
 #info{flex:1;min-width:0;display:flex;gap:12px;font-size:15px;line-height:1.35;overflow:auto;padding:4px 10px;background:rgba(10,6,3,.45);border:1px solid rgba(217,178,94,.25)}
-#info .por{flex:none;width:84px;height:84px;border:2px solid var(--gold);background:#1a120a;box-shadow:inset 0 0 10px #000}#info .por img,#info .por canvas{width:100%;height:100%;display:block}
+#info .por{flex:none;width:96px;height:96px;border:2px solid var(--gold);background:#1a120a;box-shadow:inset 0 0 10px #000}#info .por img,#info .por canvas{width:100%;height:100%;display:block}
 #info .tx{min-width:0;flex:1}#info h3{margin:0 0 2px;font-family:var(--f-disp);color:var(--gold);font-size:18px;letter-spacing:.04em}
 #info .hint{opacity:.75;align-self:center}#info .d{opacity:.75;font-style:italic;margin-top:3px}#info .g{color:#9be09b}
 #info .hp{height:8px;background:#3a0c08;border:1px solid #000;margin:3px 0;max-width:260px}#info .hp i{display:block;height:100%;background:linear-gradient(#6fdc6f,#2f9a3a)}
@@ -82,6 +83,7 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 <div id="hud">
   <div id="top" class="wood">
     <span class="i" title="Yiyecek"><i class="ri rf"></i><b id="rf">0</b></span><span class="i" title="Odun"><i class="ri rw"></i><b id="rw">0</b></span><span class="i" title="Altın"><i class="ri rg"></i><b id="rg">0</b></span><span class="i" title="Nüfus"><i class="ri rp"></i><b id="rp">0/0</b></span>
+    <span class="i btnlike" id="iwb" title="Boştaki reayalar — tıkla veya B" onclick="findIdle(true)">⚒ <b id="iw">0</b></span><span class="i btnlike" title="Boştaki askerler — tıkla veya N" onclick="findIdle(false)">⚔ <b id="im">0</b></span>
     <span class="sp"></span><span class="i">⏱ <b id="rt">0:00</b></span><span class="i">Hız <b id="spd">1x</b></span>
   </div>
   <div id="objs"></div>
@@ -98,7 +100,7 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
   <button class="btn" onclick="togglePause()">Devam</button>
   <button class="btn" onclick="restartMission()">Görevi Yeniden Başlat</button>
   <button class="btn" onclick="toMenu()">Ana Menü</button>
-  <div class="sub" style="max-width:560px;font-size:16px">Sol tık: seç / kutu seç · Sağ tık: hareket, saldır, kaynak topla · V: saldırarak ilerle · S: dur · G: mevzi · H: Sultan'a git · Ctrl+1..9: grup · Ok tuşları / ekran kenarı: kaydır · Tekerlek: yakınlaş · P / Esc: duraklat · . ve ,: hız</div>
+  <div class="sub" style="max-width:560px;font-size:16px">Sol tık: seç / kutu seç · Sağ tık: hareket, saldır, kaynak topla · V: saldırarak ilerle · S: dur · G: mevzi · H: Sultan'a git · B: boştaki reaya · N: boştaki askerler · Delete: seçileni yok et · Ctrl+1..9: grup · Ok tuşları / ekran kenarı: kaydır · Tekerlek: yakınlaş · P / Esc: duraklat · . ve ,: hız</div>
 </div>
 
 <div id="menu" class="screen on">
@@ -110,7 +112,7 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 
 <div id="brief" class="screen">
   <h2 id="bt"></h2><div class="sub" id="bd"></div>
-  <div class="card"><p id="bx"></p><b>Hedefler</b><ul id="bo"></ul><b>Dikkat:</b> <span id="bw"></span></div>
+  <div class="card"><canvas id="bpor" width="160" height="160" hidden></canvas><p id="bx"></p><b>Hedefler</b><ul id="bo"></ul><b>Dikkat:</b> <span id="bw"></span></div>
   <div><button class="btn" id="bgo">Göreve Başla</button> <button class="btn" onclick="toMenu()">Menü</button></div>
 </div>
 

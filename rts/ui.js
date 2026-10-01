@@ -142,6 +142,7 @@ function drawFx(c, f) {
   else if (f.k === 'rubble') { for (let i = 0; i < 6 * f.w * f.h; i++) { const wx = (f.tx + hash2(f.id, i, 1) * f.w) * TILE, wy = (f.ty + hash2(f.id, i, 2) * f.h) * TILE, [sx, sy] = w2s(wx, wy), r = (3 + hash2(f.id, i, 3) * 6) * z; c.fillStyle = `rgba(${110 + hash2(f.id, i, 4) * 50 | 0},${100 + hash2(f.id, i, 4) * 40 | 0},85,${Math.min(1, a * 4)})`; c.beginPath(); c.moveTo(sx - r, sy); c.lineTo(sx - r * .3, sy - r * .8); c.lineTo(sx + r, sy - r * .3); c.lineTo(sx + r * .6, sy + r * .4); c.closePath(); c.fill(); } }
   else if (f.k === 'puff') { const [sx, sy] = w2s(f.x, f.y, 10 + f.t * 40); c.fillStyle = `rgba(110,100,90,${.6 * a})`; c.beginPath(); c.arc(sx, sy, f.r * (1 + f.t) * z, 0, 7); c.fill(); }
   else if (f.k === 'boom') { const [sx, sy] = w2s(f.x, f.y); const R = f.r * (.4 + f.t * 2) * z; const g = c.createRadialGradient(sx, sy - 8 * z, 1, sx, sy - 8 * z, R); g.addColorStop(0, `rgba(255,245,180,${a})`); g.addColorStop(.35, `rgba(255,140,30,${.85 * a})`); g.addColorStop(1, 'rgba(120,40,0,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(sx, sy - 6 * z, R, R * .75, 0, 0, 7); c.fill(); c.strokeStyle = `rgba(255,255,255,${.4 * a})`; c.lineWidth = 2; c.beginPath(); c.ellipse(sx, sy, R * 1.3, R * .65, 0, 0, 7); c.stroke(); for (let k = 0; k < 4; k++) { c.fillStyle = `rgba(70,60,55,${.5 * a})`; c.beginPath(); c.arc(sx + (k - 1.5) * 9 * z, sy - (16 + f.t * 60 + k * 4) * z, (8 + f.t * 16) * z, 0, 7); c.fill(); } }
+  else if (f.k === 'heal') { const [sx, sy] = w2s(f.x, f.y, 20 + f.t * 40); c.fillStyle = `rgba(140,255,150,${a})`; c.font = `bold ${14 * z}px sans-serif`; c.textAlign = 'center'; c.fillText('+', sx, sy); c.fillText('+', sx - 9 * z, sy + 8 * z); c.textAlign = 'left'; }
   else if (f.k === 'ping') { const [sx, sy] = w2s(f.x, f.y); c.strokeStyle = f.col; c.globalAlpha = a; c.lineWidth = 2; c.beginPath(); c.ellipse(sx, sy, (8 + (1 - a) * 16) * cam.z, (4 + (1 - a) * 8) * cam.z, 0, 0, 7); c.stroke(); c.globalAlpha = 1; }
 }
 function bar(c, x, y, w, f, col) { c.fillStyle = 'rgba(0,0,0,.7)'; c.fillRect(x - w / 2 - 1, y - 1, w + 2, 5); c.fillStyle = col || (f > .5 ? '#3fbf4f' : f > .25 ? '#e0b020' : '#d83a3a'); c.fillRect(x - w / 2, y, w * clamp(f, 0, 1), 3); }
@@ -159,24 +160,36 @@ function render() {
   for (const b of G.blds) if (!b.dead && b.d.farm && (b.owner === 0 || expAt(b.x, b.y))) drawBuilding(c, b);
   for (const f of G.fx) if (f.k === 'rubble' || f.k === 'corpse') drawFx(c, f);
   // seçim halkaları (birimlerin altında)
-  for (const e of G.sel) { if (e.dead) continue; const col = e.owner === 0 ? '#7dff8a' : '#ff6a5a'; if (e.kind === 'u') { const [sx, sy] = w2s(e.x, e.y); c.strokeStyle = col; c.lineWidth = 2; c.beginPath(); c.ellipse(sx, sy, (e.r + 6) * z, (e.r + 6) * z * .5, 0, 0, 7); c.stroke(); } else diamond(c, e.tx, e.ty, e.w, e.h, col, 'rgba(120,255,140,.08)', 2); }
+  for (const e of G.sel) { if (e.dead) continue; const col = e.owner === 0 ? '#7dff8a' : '#ff6a5a'; if (e.kind === 'u') { const [sx, sy] = w2s(e.x, e.y), pr = 1 + Math.sin(G.t * 6) * .06; c.strokeStyle = col; c.lineWidth = 2; c.shadowColor = col; c.shadowBlur = 8; c.beginPath(); c.ellipse(sx, sy, (e.r + 7) * z * pr, (e.r + 7) * z * .5 * pr, 0, 0, 7); c.stroke(); c.shadowBlur = 0; } else diamond(c, e.tx, e.ty, e.w, e.h, col, 'rgba(120,255,140,.08)', 2); }
   // derinliğe göre sırala
   const L = [];
   for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) { const i = idx(tx, ty), r = G.res[i]; if (!r || (!G.exp[i] && !G.m.noFog)) continue; L.push({ k: (tx + ty + 1) * TILE, t: 0, tx, ty, r }); }
   for (const b of G.blds) { if (b.dead || b.d.farm) continue; if (b.owner !== 0 && !expAt(b.x, b.y)) continue; L.push({ k: b.x + b.y + (b.w + b.h) * 6, t: 1, e: b }); }
+  if (BL.ok) for (const dc of G.decor) { if (dc.tx < tx0 || dc.tx > tx1 || dc.ty < ty0 || dc.ty > ty1) continue; if (!G.m.noFog && !G.exp[idx(dc.tx, dc.ty)]) continue; if (G.occ[idx(dc.tx, dc.ty)]) continue; L.push({ k: (dc.tx + dc.ty) * TILE, t: 3, e: null, dc }); }
   for (const u of G.ents) { if (u.kind !== 'u' || u.dead) continue; if (u.owner !== 0 && !visAt(u.x, u.y)) continue; const [sx, sy] = w2s(u.x, u.y); if (!onScr(sx, sy, 80)) continue; L.push({ k: u.x + u.y, t: 2, e: u }); }
   L.sort((a, b) => a.k - b.k);
-  for (const it of L) { if (it.t === 0) drawRes(c, it.tx, it.ty, it.r); else if (it.t === 1) drawBuilding(c, it.e); else drawUnit(c, it.e); }
+  for (const it of L) { if (it.t === 0) drawRes(c, it.tx, it.ty, it.r); else if (it.t === 1) drawBuilding(c, it.e); else if (it.t === 3) { const [dx, dy] = w2s(it.dc.tx * TILE + 16 + it.dc.ox, it.dc.ty * TILE + 16 + it.dc.oy); blStatic(c, 'decor' + it.dc.v, null, dx, dy, z); } else drawUnit(c, it.e); }
   // mermiler ve efektler
   for (const p of G.proj) { if (p.owner !== 0 && !visAt(p.x, p.y)) continue; drawProj(c, p); }
   for (const f of G.fx) if (f.k !== 'rubble' && f.k !== 'corpse') drawFx(c, f);
+  // bulut gölgeleri
+  for (let k = 0; k < 4; k++) {
+    const wx = ((G.t * 9 + k * 977) % (G.W * TILE + 1200)) - 600 + hash2(k, 1, 7) * 300, wy = (hash2(k, 2, 7) * G.H * TILE + G.t * 4) % (G.H * TILE);
+    const [sx, sy] = w2s(wx, wy), R0 = (260 + hash2(k, 3, 7) * 200) * z;
+    if (sx < -R0 * 1.6 || sx > W + R0 * 1.6 || sy < -R0 || sy > H + R0) continue;
+    const g = c.createRadialGradient(sx, sy, R0 * .1, sx, sy, R0); g.addColorStop(0, 'rgba(20,30,40,.16)'); g.addColorStop(1, 'rgba(20,30,40,0)');
+    c.fillStyle = g; c.beginPath(); c.ellipse(sx, sy, R0 * 1.5, R0 * .75, 0, 0, 7); c.fill();
+  }
   drawFog(c);
   // sağlık çubukları
   for (const it of L) { const e = it.e; if (!e || e.d.landmark) continue; const sel = G.sel.includes(e); if (e.hp >= e.maxhp && !sel && !(e.kind === 'b' && !e.built)) continue; if (e.kind === 'u') { const [sx, sy] = w2s(e.x, e.y, unitTop(e)); bar(c, sx, sy, 24 * z, e.hp / e.maxhp); } else { const [sx, sy] = w2s(e.x, e.y, (BH[e.type] || 30) + 14); bar(c, sx, sy, Math.min(e.w * 30, 80) * z, e.hp / e.maxhp); if (!e.built) bar(c, sx, sy + 6, Math.min(e.w * 30, 80) * z, e.prog, '#e8b030'); } }
-  for (const b of G.blds) if (b.owner === 0 && b.queue.length && !b.dead) { const [sx, sy] = w2s(b.x, b.y, (BH[b.type] || 30) + 22); bar(c, sx, sy, 44 * z, b.queue[0].t / UNITS[b.queue[0].type].time, '#4aa3ff'); }
+  c.font = `600 ${Math.round(12 * Math.max(.8, z))}px Cinzel, Georgia, serif`; c.textAlign = 'center';
+  for (const it of L) { const e = it.e; if (!e || e.kind !== 'u' || !(e.d.hero || e.name !== e.d.name)) continue; const [sx, sy] = w2s(e.x, e.y, unitTop(e) + 12); const tw = c.measureText(e.name).width + 10; c.fillStyle = 'rgba(15,8,3,.72)'; c.fillRect(sx - tw / 2, sy - 12, tw, 16); c.fillStyle = e.owner === 0 ? '#f3d68a' : '#ffb0a0'; c.fillText(e.name, sx, sy); }
+  c.textAlign = 'left';
+  for (const b of G.blds) if (b.owner === 0 && b.queue.length && !b.dead) { const [sx, sy] = w2s(b.x, b.y, (BH[b.type] || 30) + 22); bar(c, sx, sy, 44 * z, b.queue[0].t / qTime(b.queue[0]), '#4aa3ff'); }
   for (const e of G.sel) if (e.kind === 'b' && e.owner === 0 && e.rally && !e.dead) { const [sx, sy] = w2s(e.rally.x, e.rally.y); c.save(); c.translate(sx, sy); flagDraw(c, 0, 0, '#7dff8a', G.t, false, ''); c.restore(); }
   // inşaat alanı
-  if (G.m.zone && !G.blds.some(b => b.type === 'hisar' && b.owner === 0)) { const zn = G.m.zone; c.setLineDash([10, 8]); diamond(c, zn.x0, zn.y0, zn.x1 - zn.x0 + 1, zn.y1 - zn.y0 + 1, 'rgba(255,215,90,.95)', 'rgba(255,215,90,.12)', 3); c.setLineDash([]); const [sx, sy] = w2s((zn.x0 + zn.x1) / 2 * TILE, (zn.y0 + zn.y1) / 2 * TILE); c.font = `bold ${14 * z}px Cinzel, Georgia, serif`; c.textAlign = 'center'; c.fillStyle = '#000'; c.fillText('HİSAR İNŞAAT ALANI', sx + 1, sy + 1); c.fillStyle = '#ffe08a'; c.fillText('HİSAR İNŞAAT ALANI', sx, sy); c.textAlign = 'left'; }
+  if (G.zone && !G.blds.some(b => b.type === 'hisar' && b.owner === 0)) { const zn = G.zone; c.setLineDash([10, 8]); diamond(c, zn.x0, zn.y0, zn.x1 - zn.x0 + 1, zn.y1 - zn.y0 + 1, 'rgba(255,215,90,.95)', 'rgba(255,215,90,.12)', 3); c.setLineDash([]); const [sx, sy] = w2s((zn.x0 + zn.x1) / 2 * TILE, (zn.y0 + zn.y1) / 2 * TILE); c.font = `bold ${14 * z}px Cinzel, Georgia, serif`; c.textAlign = 'center'; c.fillStyle = '#000'; c.fillText('HİSAR İNŞAAT ALANI', sx + 1, sy + 1); c.fillStyle = '#ffe08a'; c.fillText('HİSAR İNŞAAT ALANI', sx, sy); c.textAlign = 'left'; }
   // yerleştirme hayaleti
   if (place && mouse.in) {
     const w = s2w(mouse.x, mouse.y), d = BUILDS[place.type], tx = Math.floor(w.x / TILE - d.w / 2 + .5), ty = Math.floor(w.y / TILE - d.h / 2 + .5); place.tx = tx; place.ty = ty; place.ok = canPlace(place.type, tx, ty);
@@ -212,7 +225,7 @@ function drawMini() {
 function canPlace(type, tx, ty) {
   const d = BUILDS[type];
   for (let y = ty; y < ty + d.h; y++) for (let x = tx; x < tx + d.w; x++) { if (!inb(x, y)) return false; const i = idx(x, y); if (G.blkT[i] || G.occ[i] || !G.exp[i] && !G.m.noFog) return false; }
-  if (d.zone) { const z = G.m.zone; if (!z || tx < z.x0 || ty < z.y0 || tx + d.w - 1 > z.x1 || ty + d.h - 1 > z.y1) return false; }
+  if (d.zone) { const z = G.zone; if (!z || tx < z.x0 || ty < z.y0 || tx + d.w - 1 > z.x1 || ty + d.h - 1 > z.y1) return false; }
   return true;
 }
 function tryPlace(shift) {
@@ -298,6 +311,9 @@ addEventListener('keydown', e => {
   if (k.startsWith('arrow')) e.preventDefault();
   if (k === 'escape') { if (place) place = null; else if (amovePending) amovePending = false; else togglePause(); return; }
   if (k === 'p') { togglePause(); return; }
+  if (k === 'delete') { const s = mySel().filter(e => !e.d.landmark); if (s.length) { for (const e of s) kill(e); msg(s.length + ' seçili öğe yok edildi.'); G.sel = []; cardSig = ''; } return; }
+  if (k === 'b' && !cardBtns.some(x => x.key === 'b' && !x.dis)) { findIdle(true); return; }
+  if (k === 'n') { findIdle(false); return; }
   if (k === 'h' && G.hero && !G.hero.dead) { selectUnits([G.hero]); centerOn(G.hero.x, G.hero.y); return; }
   if (k === ' ') { e.preventDefault(); const s = mySel(); if (s.length) centerOn(s[0].x, s[0].y); else if (G.hero) centerOn(G.hero.x, G.hero.y); return; }
   if (k === '.' || k === '>') { G.speed = Math.min(4, G.speed + 1); uiSpeed(); return; }
@@ -312,6 +328,12 @@ mini.addEventListener('mousemove', e => { if (mini._d) { const p = miniPos(e); c
 addEventListener('mouseup', () => { mini._d = false; });
 mini.addEventListener('contextmenu', e => { e.preventDefault(); const sel = mySel().filter(u => u.kind === 'u'); if (sel.length) { const p = miniPos(e); moveGroup(sel, p.x, p.y); } });
 
+function findIdle(workers) {
+  const list = G.ents.filter(u => u.kind === 'u' && u.owner === 0 && !u.dead && u.order.t === 'idle' && (workers ? u.d.worker : (!u.d.worker && !u.d.hero && u.d.atk && !u.hold)));
+  if (!list.length) { msg(workers ? 'Boşta reaya yok.' : 'Boşta asker yok.'); return; }
+  G.idleIdx = ((G.idleIdx || 0) + 1) % list.length; const u = list[G.idleIdx];
+  if (workers) selectUnits([u]); else selectUnits(list); centerOn(u.x, u.y);
+}
 function scrollCam(dt) {
   const sp = 800 * dt / cam.z; let dx = 0, dy = 0;
   if (keys['arrowleft']) dx -= 1; if (keys['arrowright']) dx += 1; if (keys['arrowup']) dy -= 1; if (keys['arrowdown']) dy += 1;
@@ -322,9 +344,11 @@ function scrollCam(dt) {
 /* ---------- HUD ---------- */
 let cardBtns = [];
 const ICONS = new Map();
-function icon(kind, type) { const k = kind + type + (type === 'ayasofya' && G.flags.captured ? 'c' : ''); if (!ICONS.has(k)) ICONS.set(k, (BL.ok && blIcon(kind, type, 0)) || iconCanvas(kind, type, 0)); return ICONS.get(k); }
-const icH = (kind, type) => `<canvas class="ic" width="48" height="48" data-ic="${kind}|${type}"></canvas>`;
-function fillIcons(root) { root.querySelectorAll('canvas[data-ic]').forEach(cv => { const [k, t] = cv.dataset.ic.split('|'); cv.getContext('2d').drawImage(icon(k, t), 0, 0); }); }
+function icon(kind, type, owner) { owner = owner || 0; const k = kind + type + owner + (type === 'ayasofya' && G.flags.captured ? 'c' : ''); if (!ICONS.has(k)) ICONS.set(k, kind === 't' ? techIcon(type) : (BL.ok && blIcon(kind, type, owner)) || iconCanvas(kind, type, owner)); return ICONS.get(k); }
+const TGLYPH = { cografya: '🧭', tip: '⚕', topcu: '💣', zirh: '🛡' };
+function techIcon(id) { const cv = mkCanvas(48, 48), c = cv.getContext('2d'); const g = c.createRadialGradient(24, 20, 4, 24, 24, 30); g.addColorStop(0, '#5a3c22'); g.addColorStop(1, '#1a0f07'); c.fillStyle = g; c.fillRect(0, 0, 48, 48); c.strokeStyle = '#d9b25e'; c.lineWidth = 2; c.strokeRect(3, 3, 42, 42); c.font = '24px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#f3d68a'; c.fillText(TGLYPH[id] || '✦', 24, 25); return cv; }
+const icH = (kind, type, owner) => `<canvas class="ic" width="48" height="48" data-ic="${kind}|${type}|${owner || 0}"></canvas>`;
+function fillIcons(root) { root.querySelectorAll('canvas[data-ic]').forEach(cv => { const [k, t, o] = cv.dataset.ic.split('|'); const im = icon(k, t, +o || 0); cv.getContext('2d').drawImage(im, 0, 0, im.width, im.height, 0, 0, cv.width, cv.height); }); }
 function uiMsg() { $('log').innerHTML = G.msgs.map(m => `<div class="m ${m.cls}">${m.text}</div>`).join(''); }
 function uiObjectives() {
   const m = G.m; $('objs').innerHTML = `<h4>${m.title}</h4>` + m.objectives.filter(o => !o.hidden || o.ok).map(o => `<div class="${o.ok ? 'ok' : ''}">${o.ok ? '✔' : '◇'} ${o.text}${!o.ok && o.prog ? ' <b>' + o.prog() + '</b>' : ''}</div>`).join('') + (m.timeLimit ? `<div class="tl">⏳ Kalan: ${fmtT(Math.max(0, m.timeLimit - G.t))}</div>` : '');
@@ -334,6 +358,7 @@ function uiSpeed() { $('spd').textContent = G.speed + 'x'; }
 function updateTop() {
   const p = G.players[0]; $('rf').textContent = Math.floor(p.f); $('rw').textContent = Math.floor(p.w); $('rg').textContent = Math.floor(p.g); $('rp').textContent = p.pop + '/' + p.cap; $('rt').textContent = fmtT(G.t);
   $('rp').style.color = p.pop >= p.cap ? '#ff7a5c' : '';
+  $('iw').textContent = G.idleW || 0; $('iwb').classList.toggle('alert', !!G.idleW); $('im').textContent = G.idleM || 0;
 }
 function btn(label, key, fn, cost, tip, dis, img) { cardBtns.push({ label, key, fn, cost, tip, dis, img }); }
 const GLYPH = { amove: '⚔', stop: '■', hold: '⛨' };
@@ -349,9 +374,13 @@ function buildCard() {
     btn('Dur', 's', () => { units.forEach(orderStop); }, null, 'Tüm emirleri iptal et', false, 'stop');
     btn('Mevzi', 'g', () => { units.forEach(u => { orderStop(u); u.hold = true; }); msg('Mevzi alındı: birlikler yerinde durup menzildekilere saldırır.'); }, null, 'Yerinde dur, kovalamadan saldır', false, 'hold');
   } else if (units.length) btn('Dur', 's', () => { units.forEach(orderStop); }, null, 'Emirleri iptal et', false, 'stop');
+  if (blds.length === 1 && blds[0].built && blds[0].d.techs) {
+    const b = blds[0], hk = ['q', 'w', 'e', 'r']; let i = 0;
+    for (const id of b.d.techs) { const T = TECHS[id]; if (hasTech(0, id)) continue; const busy = G.blds.some(x => x.owner === 0 && x.queue.some(q => q.type === 'T:' + id)); btn(T.name, hk[i++], () => { queueTech(b, id); cardSig = ''; }, T.cost, T.desc + ' (' + T.time + ' sn)', busy || !afford(p, T.cost), 't|' + id); }
+  }
   if (blds.length === 1 && blds[0].built && blds[0].d.trains) {
     const b = blds[0], hk = ['q', 'w', 'e', 'r']; let i = 0;
-    for (const t of b.d.trains) { if (!av.train.includes(t)) continue; const d = UNITS[t]; const dis = !afford(p, d.cost) || p.pop + d.pop > p.cap; btn(d.name, hk[i++], () => { queueTrain(b, t); cardSig = ''; }, d.cost, d.desc + ' (' + d.pop + ' nüfus, ' + d.time + ' sn)', dis, 'u|' + t); }
+    for (const t of b.d.trains || []) { if (!av.train.includes(t)) continue; const d = UNITS[t]; const dis = !afford(p, d.cost) || p.pop + d.pop > p.cap; btn(d.name, hk[i++], () => { queueTrain(b, t); cardSig = ''; }, d.cost, d.desc + ' (' + d.pop + ' nüfus, ' + d.time + ' sn)', dis, 'u|' + t); }
   }
 }
 function updateCard() {
@@ -364,11 +393,11 @@ function updateCard() {
   if (!G.sel.length) info.innerHTML = '<div class="hint">Birim seç: tıkla veya kutu çiz.<br>Sağ tık: hareket · saldırı · kaynak topla.<br><b>H</b>: Sultan\'a git — <b>Boşluk</b>: seçime git — <b>Tekerlek</b>: yakınlaş</div>';
   else if (one) {
     const d = one.d;
-    let h = `<div class="por">${icH(one.kind === 'u' ? 'u' : 'b', one.type)}</div><div class="tx"><h3>${one.name}</h3><div class="hp"><i style="width:${Math.max(0, one.hp / one.maxhp * 100)}%"></i></div><div>Can: ${Math.ceil(one.hp)} / ${one.maxhp}</div>`;
+    let h = `<div class="por"><canvas class="ic" width="96" height="96" data-ic="${one.kind === 'u' ? 'u' : 'b'}|${one.type}|${one.owner}"></canvas></div><div class="tx"><h3>${one.name}</h3><div class="hp"><i style="width:${Math.max(0, one.hp / one.maxhp * 100)}%"></i></div><div>Can: ${Math.ceil(one.hp)} / ${one.maxhp}</div>`;
     if (one.kind === 'u') { h += `<div>⚔ ${d.atk}${d.bonus ? ' (+' + Object.entries(d.bonus).map(([k, v]) => v + ' ' + { cav: 'atlı', arc: 'okçu' }[k]).join(',') + ')' : ''} · ⛨ ${d.armor} · ➶ ${d.range ? Math.round(d.range / TILE) + ' kare' : 'yakın'}</div>`; if (one.carry && one.carry.amt) h += `<div>Taşıyor: ${one.carry.amt}</div>`; if (one.aura) h += '<div class="g">Komutan etkisi: +%20 saldırı</div>'; h += `<div class="d">${one.desc || d.desc || ''}</div>`; }
-    else { if (!one.built) h += `<div>İnşaat: %${Math.floor(one.prog * 100)}</div>`; else if (one.queue.length) h += '<div>Üretim: ' + one.queue.map((q, i) => `<span class="q" data-i="${i}" title="İptal et">${icH('u', q.type)}${i === 0 ? '%' + Math.floor(q.t / UNITS[q.type].time * 100) : ''}</span>`).join(' ') + '</div>'; if (one.owner === 0 && one.d.trains) h += '<div class="d">Sağ tık: toplanma noktası</div>'; if (one.d.desc) h += `<div class="d">${one.d.desc}</div>`; }
+    else { if (!one.built) h += `<div>İnşaat: %${Math.floor(one.prog * 100)}</div>`; else if (one.queue.length) h += '<div>Üretim: ' + one.queue.map((q, i) => `<span class="q" data-i="${i}" title="${qName(q)} — iptal et">${q.type.startsWith('T:') ? icH('b', 'medrese') : icH('u', q.type)}${i === 0 ? '%' + Math.floor(q.t / qTime(q) * 100) : ''}</span>`).join(' ') + '</div>'; if (one.owner === 0 && one.d.trains) h += '<div class="d">Sağ tık: toplanma noktası</div>'; if (one.d.techs) h += '<div class="d">İlimler: ' + one.d.techs.map(t => (hasTech(0, t) ? '✔ ' : '') + TECHS[t].name).join(' · ') + '</div>'; if (one.d.desc) h += `<div class="d">${one.d.desc}</div>`; }
     info.innerHTML = h + '</div>'; fillIcons(info);
-    info.querySelectorAll('.q').forEach(q => q.onclick = () => { const i = +q.dataset.i, it = one.queue[i]; if (!it) return; one.queue.splice(i, 1); const c = UNITS[it.type].cost; G.players[0].f += c.f || 0; G.players[0].w += c.w || 0; G.players[0].g += c.g || 0; });
+    info.querySelectorAll('.q').forEach(q => q.onclick = () => { const i = +q.dataset.i, it = one.queue[i]; if (!it) return; one.queue.splice(i, 1); const c = qCost(it); G.players[0].f += c.f || 0; G.players[0].w += c.w || 0; G.players[0].g += c.g || 0; });
   } else {
     const cnt = {}; G.sel.forEach(e => { const k = e.type; cnt[k] = cnt[k] || { n: 0, e }; cnt[k].n++; });
     info.innerHTML = `<div class="tx"><h3>${G.sel.length} birim</h3><div class="grid">` + Object.values(cnt).map(({ n, e }) => `<span class="gi" title="${e.name}">${icH(e.kind, e.type)}<b>${n}</b></span>`).join('') + '</div></div>'; fillIcons(info);

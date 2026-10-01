@@ -14,8 +14,12 @@ const UNITS = {
   sovalye: { name: 'Şövalye', look: 'sovalye', cls: 'cav', hp: 130, atk: 13, range: 0, speed: 92, rate: 1.3, armor: 3, cost: { f: 90, g: 60 }, pop: 2, time: 24, vision: 6, r: 11, bonus: { arc: 5 }, bm: .3, desc: 'Ağır zırhlı süvari.' },
   top: { name: 'Balyemez Topu', look: 'top', cls: 'sie', hp: 120, atk: 85, range: 256, speed: 32, rate: 5, armor: 1, cost: { w: 150, g: 120 }, pop: 3, time: 40, vision: 6, r: 12, proj: 'ball', splash: 44, bm: 3, desc: 'Kuşatma topu. Surlara ve binalara ağır hasar verir.' },
   sahi: { name: 'Şahi Topu', look: 'sahi', cls: 'sie', hp: 160, atk: 230, range: 352, speed: 24, rate: 9, armor: 1, cost: { w: 350, g: 350 }, pop: 5, time: 70, vision: 6, r: 15, proj: 'ball', splash: 60, bm: 3.5, desc: 'Orban\'ın döktüğü dev top. Sur yıkıcı.' },
-  fatih: { name: 'Fatih Sultan Mehmed', look: 'hero', cls: 'hero', hp: 700, atk: 22, range: 0, speed: 98, rate: 1.0, armor: 3, cost: {}, pop: 0, vision: 8, r: 12, bm: .5, hero: true, bonus: { arc: 6 }, desc: 'Komutan. Çevresindeki askerlere +%20 saldırı gücü verir. Ölürse görev kaybedilir.' },
-  komutan: { name: 'Komutan', look: 'hero', cls: 'hero', hp: 380, atk: 18, range: 0, speed: 94, rate: 1.1, armor: 3, cost: {}, pop: 0, vision: 8, r: 12, bm: .5, hero: true, desc: 'Düşman komutanı.' },
+  fatih: { name: 'Fatih Sultan Mehmed', look: 'fatih', cls: 'hero', hp: 700, atk: 22, range: 0, speed: 98, rate: 1.0, armor: 3, cost: {}, pop: 0, vision: 8, r: 12, bm: .5, hero: true, bonus: { arc: 6 }, desc: 'Komutan. Çevresindeki askerlere +%20 saldırı gücü verir. Ölürse görev kaybedilir.' },
+  pasa: { name: 'Paşa', look: 'sipahi', cls: 'hero', hp: 520, atk: 20, range: 0, speed: 100, rate: 1.0, armor: 3, cost: {}, pop: 0, vision: 8, r: 12, bm: .5, hero: true, bonus: { arc: 6 }, desc: 'Osmanlı komutanı. Çevresindeki askerlere +%20 saldırı gücü verir.' },
+  bey: { name: 'Bey', look: 'akinci', cls: 'hero', hp: 420, atk: 18, range: 0, speed: 104, rate: 1.0, armor: 2, cost: {}, pop: 0, vision: 8, r: 12, bm: .5, hero: true, desc: 'Türkmen beyi.' },
+  akinci: { name: 'Akıncı', look: 'akinci', cls: 'cav', hp: 75, atk: 8, range: 0, speed: 128, rate: 1.1, armor: 1, cost: { f: 60, g: 25 }, pop: 1, time: 15, vision: 11, r: 11, bonus: { arc: 4, civ: 4 }, bm: .25, desc: 'Hızlı keşif süvarisi. Çok geniş görüş: haritayı keşfetmek için ideal.' },
+  molla: { name: 'Molla', look: 'molla', cls: 'civ', hp: 45, atk: 0, range: 0, speed: 56, rate: 1, armor: 0, cost: { f: 40, g: 80 }, pop: 1, time: 24, vision: 12, r: 9, healer: true, heal: 4, desc: 'Yakındaki yaralı askerleri iyileştirir. Çok geniş görüş alanıyla haritayı açar.' },
+  komutan: { name: 'Komutan', look: 'komutan', cls: 'hero', hp: 380, atk: 18, range: 0, speed: 94, rate: 1.1, armor: 3, cost: {}, pop: 0, vision: 8, r: 12, bm: .5, hero: true, desc: 'Düşman komutanı.' },
 };
 
 const BUILDS = {
@@ -24,7 +28,9 @@ const BUILDS = {
   ambar: { name: 'Ambar', w: 2, h: 2, hp: 450, cost: { w: 60 }, time: 16, drop: true, vision: 4, desc: 'Kaynak teslim noktası.' },
   tarla: { name: 'Tarla', w: 2, h: 2, hp: 250, cost: { w: 60 }, time: 12, farm: true, vision: 3, desc: 'Sınırsız yiyecek kaynağı.' },
   kisla: { name: 'Kışla', w: 3, h: 3, hp: 1000, cost: { w: 150 }, time: 30, trains: ['azap', 'okcu'], vision: 5, desc: 'Azap ve okçu yetiştirir.' },
-  ahir: { name: 'Ahır', w: 3, h: 3, hp: 1000, cost: { w: 150, g: 30 }, time: 30, trains: ['sipahi'], vision: 5, desc: 'Sipahi yetiştirir.' },
+  ahir: { name: 'Ahır', w: 3, h: 3, hp: 1000, cost: { w: 150, g: 30 }, time: 30, trains: ['sipahi', 'akinci'], vision: 5, desc: 'Sipahi ve Akıncı yetiştirir.' },
+  cami: { name: 'Cami', w: 3, h: 3, hp: 1600, cost: { w: 200, g: 150 }, time: 45, trains: ['molla'], vision: 8, healAura: 1, desc: 'Molla yetiştirir. Çevresindeki birimleri yavaşça iyileştirir.' },
+  medrese: { name: 'Medrese', w: 3, h: 3, hp: 1400, cost: { w: 220, g: 180 }, time: 50, techs: ['cografya', 'tip', 'topcu', 'zirh'], req: 'cami', vision: 6, desc: 'İlim merkezi: teknoloji araştırır. (Cami gerekir)' },
   ocak: { name: 'Yeniçeri Ocağı', w: 3, h: 3, hp: 1200, cost: { w: 200, g: 100 }, time: 40, trains: ['yeniceri'], req: 'kisla', vision: 5, desc: 'Yeniçeri yetiştirir. (Kışla gerekir)' },
   dokum: { name: 'Dökümhane', w: 3, h: 3, hp: 1200, cost: { w: 250, g: 150 }, time: 45, trains: ['top', 'sahi'], req: 'kisla', vision: 5, desc: 'Kuşatma topları döker. (Kışla gerekir)' },
   kule: { name: 'Gözcü Kulesi', w: 2, h: 2, hp: 800, cost: { w: 100, g: 40 }, time: 25, atk: 11, range: 224, rate: 1.6, vision: 8, tower: true, desc: 'Yakındaki düşmanlara ok atar.' },
@@ -37,6 +43,22 @@ const BUILDS = {
   ayasofya: { name: 'Ayasofya', w: 5, h: 5, hp: 99999, landmark: true, vision: 4 },
 };
 
+const TECHS = {
+  cografya: { name: 'İlm-i Coğrafya', cost: { f: 150, g: 150 }, time: 35, desc: 'Haritanın tamamını açar.' },
+  tip: { name: 'Tıp İlmi', cost: { f: 150, g: 200 }, time: 40, desc: 'Tüm birimler yavaşça iyileşir; mollalar iki kat iyileştirir.' },
+  topcu: { name: 'Dökümcülük', cost: { w: 200, g: 250 }, time: 45, desc: 'Topların hasarı +%25, menzili +%10.' },
+  zirh: { name: 'Zırh Demirciliği', cost: { f: 150, g: 200 }, time: 40, desc: 'Tüm askerlere +1 zırh.' },
+};
+const qTime = q => q.type.startsWith('T:') ? TECHS[q.type.slice(2)].time : UNITS[q.type].time;
+const qPop = q => q.type.startsWith('T:') ? 0 : UNITS[q.type].pop;
+const qCost = q => q.type.startsWith('T:') ? TECHS[q.type.slice(2)].cost : UNITS[q.type].cost;
+const qName = q => q.type.startsWith('T:') ? TECHS[q.type.slice(2)].name : UNITS[q.type].name;
+const hasTech = (o, id) => !!(G.players[o].tech && G.players[o].tech[id]);
+const armorOf = t => t.d.armor + (t.kind === 'u' && t.d.atk && !t.d.worker && hasTech(t.owner, 'zirh') ? 1 : 0);
+const rangeOf = u => u.d.range * (u.d.cls === 'sie' && hasTech(u.owner, 'topcu') ? 1.1 : 1);
+let MS = 1;                       // harita ölçeği: görev koordinatları bununla büyütülür
+const sc = v => Math.round(v * MS);
+const sc1 = v => Math.round((v + 1) * MS) - 1;
 const sfmt = c => Object.entries(c).map(([k, v]) => v + ' ' + RESN[k]).join(', ') || 'Ücretsiz';
 
 /* ---------- durum ---------- */
@@ -44,7 +66,8 @@ let G = null;
 const PF = {};
 
 function newGame(m) {
-  const W = m.W, H = m.H, n = W * H;
+  MS = m.scale || 1.45;
+  const W = Math.round(m.W * MS), H = Math.round(m.H * MS), n = W * H;
   G = {
     m, W, H, t: 0, nid: 0, ents: [], byId: new Map(), blds: [],
     terrain: new Uint8Array(n), res: new Uint8Array(n), amt: new Uint16Array(n),
@@ -53,11 +76,12 @@ function newGame(m) {
     colors: m.colors, proj: [], fx: [], navVer: 0, sel: [], groups: {}, speed: 1, paused: false,
     msgs: [], done: false, flags: {}, evDone: {}, trDone: {}, ai: null, ctick: 0, vtick: 0, otick: 0, atick: 0,
     cells: null, cw: Math.ceil(W * TILE / 64), ch: Math.ceil(H * TILE / 64), alert: null, hero: null,
-    stats: { kills: 0, lost: 0 }, dirtyMini: true, capture: 0,
+    stats: { kills: 0, lost: 0 }, dirtyMini: true, capture: 0, decor: [], idleT: -99, readyT: -99, ltick: 0,
+    zone: m.zone ? { x0: Math.round(m.zone.x0 * MS), y0: Math.round(m.zone.y0 * MS), x1: Math.round((m.zone.x1 + 1) * MS) - 1, y1: Math.round((m.zone.y1 + 1) * MS) - 1 } : null,
   };
   G.cells = Array.from({ length: G.cw * G.ch }, () => []);
   pfInit();
-  Object.assign(G.players[0], m.start || {});
+  Object.assign(G.players[0], m.start || {}); G.players[0].tech = {}; G.players[1].tech = {};
   return G;
 }
 function msg(text, cls) { G.msgs.push({ text, cls: cls || '', t: 0 }); if (G.msgs.length > 6) G.msgs.shift(); if (typeof uiMsg === 'function') uiMsg(); }
@@ -66,23 +90,41 @@ function msg(text, cls) { G.msgs.push({ text, cls: cls || '', t: 0 }); if (G.msg
 const idx = (x, y) => y * G.W + x;
 const inb = (x, y) => x >= 0 && y >= 0 && x < G.W && y < G.H;
 function refreshBlk(i) { const t = G.terrain[i], r = G.res[i]; G.blkT[i] = (t === 1 || r === 1 || r === 2) ? 1 : 0; }
-function setWater(x0, y0, x1, y1) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (inb(x, y)) { const i = idx(x, y); G.terrain[i] = 1; G.res[i] = 0; refreshBlk(i); } }
-function setTerrain(x0, y0, x1, y1, t) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (inb(x, y)) { G.terrain[idx(x, y)] = t; refreshBlk(idx(x, y)); } }
+function setWater(x0, y0, x1, y1) { x0 = sc(x0); y0 = sc(y0); x1 = sc1(x1); y1 = sc1(y1); for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (inb(x, y)) { const i = idx(x, y); G.terrain[i] = 1; G.res[i] = 0; refreshBlk(i); } }
+function setTerrain(x0, y0, x1, y1, t) { x0 = sc(x0); y0 = sc(y0); x1 = sc1(x1); y1 = sc1(y1); for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (inb(x, y)) { G.terrain[idx(x, y)] = t; refreshBlk(idx(x, y)); } }
 function putRes(x, y, type, amt) { if (!inb(x, y)) return; const i = idx(x, y); if (G.terrain[i] === 1 || G.occ[i]) return; G.res[i] = type; G.amt[i] = amt; refreshBlk(i); }
 function forest(cx, cy, r, dens) {
-  dens = dens || .7;
+  dens = dens || .7; cx = sc(cx); cy = sc(cy); r = Math.round(r * MS);
   for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) {
     const d = Math.hypot(x - cx, y - cy); if (d <= r && G.rng() < dens * (1 - d / (r * 1.4))) putRes(x, y, 1, 120);
   }
 }
-function mine(cx, cy, n, amt) { n = n || 4; amt = amt || 700; const o = [[0, 0], [1, 0], [0, 1], [1, 1], [2, 0], [2, 1]]; for (let k = 0; k < n; k++) putRes(cx + o[k][0], cy + o[k][1], 2, amt); }
-function berries(cx, cy, n) { n = n || 5; for (let k = 0; k < n; k++) putRes(cx + Math.round((G.rng() - .5) * 3), cy + Math.round((G.rng() - .5) * 3), 3, 150); }
-function clearArea(cx, cy, r) { for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) if (inb(x, y) && Math.hypot(x - cx, y - cy) <= r) { const i = idx(x, y); if (G.res[i] === 1) { G.res[i] = 0; refreshBlk(i); } } }
+function mine(cx, cy, n, amt) { cx = sc(cx); cy = sc(cy); n = n || 4; amt = amt || 700; const o = [[0, 0], [1, 0], [0, 1], [1, 1], [2, 0], [2, 1]]; for (let k = 0; k < n; k++) putRes(cx + o[k][0], cy + o[k][1], 2, amt); }
+function berries(cx, cy, n) { cx = sc(cx); cy = sc(cy); n = n || 5; for (let k = 0; k < n; k++) putRes(cx + Math.round((G.rng() - .5) * 3), cy + Math.round((G.rng() - .5) * 3), 3, 150); }
+function clearArea(cx, cy, r) { cx = sc(cx); cy = sc(cy); r = Math.round(r * MS); for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) if (inb(x, y) && Math.hypot(x - cx, y - cy) <= r) { const i = idx(x, y); if (G.res[i] === 1) { G.res[i] = 0; refreshBlk(i); } } }
 function wallLine(owner, x0, y0, x1, y1, type, label) {
+  const X0 = sc(x0), Y0 = sc(y0); x1 = x1 > x0 ? sc1(x1) : sc(x1); y1 = y1 > y0 ? sc1(y1) : sc(y1); x0 = X0; y0 = Y0;
   const dx = Math.sign(x1 - x0), dy = Math.sign(y1 - y0); let x = x0, y = y0;
   for (let k = 0; k < 400; k++) { if (!G.occ[idx(x, y)]) addBuilding(type || 'sur', owner, x, y, { label }); if (x === x1 && y === y1) break; x += dx; y += dy; }
 }
 function makeRng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function scatterNature() {          // görev haritasına rastgele korular ve süsler
+  const W = G.W, H = G.H, r = G.rng, Z = G.zone;
+  const free = (x, y, d) => {
+    if (Z && x > Z.x0 - 4 && x < Z.x1 + 4 && y > Z.y0 - 4 && y < Z.y1 + 4) return false;
+    for (const b of G.blds) if (x > b.tx - d && x < b.tx + b.w + d && y > b.ty - d && y < b.ty + b.h + d) return false;
+    for (const u of G.ents) if (u.kind === 'u' && Math.abs(u.x / TILE - x) < d && Math.abs(u.y / TILE - y) < d) return false;
+    return true;
+  };
+  const n = Math.round(W * H / 650);
+  for (let k = 0; k < n; k++) {
+    const cx = (r() * W) | 0, cy = (r() * H) | 0; if (G.terrain[idx(cx, cy)] !== 0 || !free(cx, cy, 8)) continue;
+    const rad = 1.5 + r() * 2.2;
+    for (let y = Math.floor(cy - rad); y <= cy + rad; y++) for (let x = Math.floor(cx - rad); x <= cx + rad; x++) { if (!inb(x, y) || G.terrain[idx(x, y)] !== 0 || G.res[idx(x, y)] || G.occ[idx(x, y)]) continue; const d = Math.hypot(x - cx, y - cy); if (d <= rad && r() < .75 * (1 - d / (rad * 1.5))) { G.res[idx(x, y)] = 1; G.amt[idx(x, y)] = 120; refreshBlk(idx(x, y)); } }
+  }
+  const m = Math.round(W * H / 45);
+  for (let k = 0; k < m; k++) { const x = (r() * W) | 0, y = (r() * H) | 0, i = idx(x, y); if (G.terrain[i] === 1 || G.terrain[i] === 4 || G.res[i] || G.occ[i]) continue; G.decor.push({ tx: x, ty: y, v: (r() * 6) | 0, ox: (r() - .5) * 18, oy: (r() - .5) * 18 }); }
+}
 function renderBase() { // arazi renklendirmesi için gürültü
   for (let i = 0; i < G.W * G.H; i++) if (G.terrain[i] === 0 && G.rng() < .06) G.terrain[i] = 2;
 }
@@ -101,7 +143,7 @@ function freeTileNear(tx, ty) {
   for (let r = 0; r <= 8; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue; const x = tx + dx, y = ty + dy; if (inb(x, y) && !G.blkT[idx(x, y)] && !G.occ[idx(x, y)]) return [x, y]; }
   return [tx, ty];
 }
-const U = (type, owner, tx, ty, o) => { const [x, y] = freeTileNear(tx, ty); return addUnit(type, owner, x * TILE + TILE / 2, y * TILE + TILE / 2, o); };
+const U = (type, owner, tx, ty, o) => { const [x, y] = freeTileNear(sc(tx), sc(ty)); return addUnit(type, owner, x * TILE + TILE / 2, y * TILE + TILE / 2, o); };
 function addBuilding(type, owner, tx, ty, o) {
   o = o || {}; const d = BUILDS[type];
   const b = { id: ++G.nid, kind: 'b', type, d, owner, tx, ty, w: d.w, h: d.h, x: (tx + d.w / 2) * TILE, y: (ty + d.h / 2) * TILE, r: Math.max(d.w, d.h) * TILE / 2, hp: d.hp, maxhp: d.hp, built: o.built !== false, prog: o.built === false ? 0 : 1, queue: [], cd: 1, rally: null, dead: false, name: o.label || d.name, hit: 0, bw: 0 };
@@ -111,7 +153,12 @@ function addBuilding(type, owner, tx, ty, o) {
   G.ents.push(b); G.byId.set(b.id, b); G.blds.push(b); G.navVer++; G.dirtyMini = true;
   return b;
 }
-const B = (type, owner, tx, ty, o) => addBuilding(type, owner, tx, ty, o);
+const B = (type, owner, tx, ty, o) => {
+  tx = sc(tx); ty = sc(ty); const d = BUILDS[type];
+  if (o && o.ifFree) { for (let y = ty; y < ty + d.h; y++) for (let x = tx; x < tx + d.w; x++) if (!inb(x, y) || G.occ[idx(x, y)] || G.blkT[idx(x, y)]) return null; }
+  return addBuilding(type, owner, tx, ty, o);
+};
+const TP = (tx, ty) => ({ x: sc(tx) * TILE + TILE / 2, y: sc(ty) * TILE + TILE / 2 });
 
 function kill(e, src) {
   if (e.dead) return; e.dead = true; G.byId.delete(e.id); G.dirty = true;
@@ -132,6 +179,10 @@ function applyDmg(t, dmg, src) {
   if (t.hp <= 0) { kill(t, src); return; }
   if (t.owner === 1 && src && src.owner === 0) G.alert = { x: src.x, y: src.y, t: G.t };
   if (t.kind === 'u' && src && src.owner !== t.owner && src.kind === 'u' && t.d.atk && !t.d.worker && !t.hold && (t.order.t === 'idle')) { t.order = { t: 'attack', tid: src.id, auto: true }; t.rp = 0; }
+  if (src && src.owner !== t.owner && src.kind === 'u' && !src.dead && G.t - (t.callT || -9) > 1.5) {   // yardım çağrısı: yakındaki boştaki askerler karşılık verir
+    t.callT = G.t; const R = (t.d.hero ? 10 : 6) * TILE;
+    unitsNear(t.x, t.y, R, a => { if (a.owner === t.owner && a !== t && a.atk && !a.d.worker && !a.d.hero && !a.hold && a.order.t === 'idle') { a.order = { t: 'attack', tid: src.id, auto: true }; a.rp = 0; } });
+  }
 }
 
 /* ---------- uzaysal tablo ---------- */
@@ -161,15 +212,14 @@ function tcost(i, owner, soft) {
   if (b.owner === owner || !soft || b.d.landmark) return -1;
   return 25;
 }
-function los(x0, y0, x1, y1, owner) {
-  let dx = Math.abs(x1 - x0), dy = Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, e = dx - dy;
-  for (; ;) {
-    if (tcost(idx(x0, y0), owner, false) < 0) return false;
-    if (x0 === x1 && y0 === y1) return true;
-    const e2 = 2 * e;
-    if (e2 > -dy) { e -= dy; x0 += sx; }
-    if (e2 < dx) { e += dx; y0 += sy; }
+const LOSO = [[0, 0], [10, 10], [-10, 10], [10, -10], [-10, -10]];
+function los(x0, y0, x1, y1, owner) {   // karo koordinatları; birim genişliğinde koridor kontrolü
+  const ax = x0 * TILE + 16, ay = y0 * TILE + 16, bx = x1 * TILE + 16, by = y1 * TILE + 16, n = Math.ceil(Math.hypot(bx - ax, by - ay) / 8);
+  for (let k = 0; k <= n; k++) {
+    const px = ax + (bx - ax) * k / n, py = ay + (by - ay) * k / n;
+    for (const o of LOSO) { const tx = ((px + o[0]) / TILE) | 0, ty = ((py + o[1]) / TILE) | 0; if (!inb(tx, ty) || tcost(idx(tx, ty), owner, false) < 0) return false; }
   }
+  return true;
 }
 const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 function findPath(sx, sy, gx, gy, owner, soft) {
@@ -178,7 +228,7 @@ function findPath(sx, sy, gx, gy, owner, soft) {
   PF.cur++; const cur = PF.cur; PF.hi.length = 0; PF.hf.length = 0;
   const s = sy * W + sx, gi = gy * W + gx; PF.g[s] = 0; PF.mark[s] = cur; hpush(s, hh(sx, sy));
   let best = s, bestH = hh(sx, sy), it = 0;
-  while (PF.hi.length && it++ < 9000) {
+  while (PF.hi.length && it++ < 40000) {
     const c = hpop(); if (PF.closed[c] === cur) continue; PF.closed[c] = cur;
     if (c === gi) { best = c; break; }
     const cx = c % W, cy = (c / W) | 0, hc = hh(cx, cy); if (hc < bestH) { bestH = hc; best = c; }
@@ -195,7 +245,7 @@ function findPath(sx, sy, gx, gy, owner, soft) {
   const out = []; let c = best; while (c !== s) { out.push([c % W, (c / W) | 0]); c = PF.par[c]; } out.push([sx, sy]); out.reverse();
   // yumuşatma
   const res = []; let i = 0; const last = out.length - 1;
-  while (i < last) { let j = Math.min(last, i + 24); while (j > i + 1 && !los(out[i][0], out[i][1], out[j][0], out[j][1], owner)) j--; res.push(out[j]); i = j; }
+  while (i < last) { let j = i + 1; while (j < last && j - i < 20 && los(out[i][0], out[i][1], out[j + 1][0], out[j + 1][1], owner)) j++; res.push(out[j]); i = j; }
   return res;
 }
 function setPath(u, x, y, soft) {
@@ -207,21 +257,32 @@ function setPath(u, x, y, soft) {
   const lt = p[p.length - 1]; if (lt[0] === gx && lt[1] === gy && !G.blkT[idx(gx, gy)] && !G.occ[idx(gx, gy)]) u.path[u.path.length - 1] = [x, y];
   return true;
 }
+function canStand(u, x, y) { const tx = (x / TILE) | 0, ty = (y / TILE) | 0; return inb(tx, ty) && tcost(idx(tx, ty), u.owner, false) >= 0; }
 function stepMove(u, dt) {
   const p = u.path; if (!p || u.pi >= p.length) return true;
-  const w = p[u.pi];
+  const w = p[u.pi], last = u.pi === p.length - 1;
   if (u.chk !== u.pi) {
-    u.chk = u.pi; const wx = (w[0] / TILE) | 0, wy = (w[1] / TILE) | 0, i = idx(wx, wy);
+    u.chk = u.pi; u.bestD = 1e9; u.noProg = 0;
+    const wx = (w[0] / TILE) | 0, wy = (w[1] / TILE) | 0, i = idx(wx, wy);
     const c = tcost(i, u.owner, u.soft);
     if (c < 0) { if (++u.fails > 4) { u.fails = 0; u.path = null; return true; } if (!setPath(u, u.goal.x, u.goal.y, u.soft)) return true; return false; }
     if (c > 1) { const b = G.byId.get(G.occ[i]); if (b && b.id !== u.tgt) { u.breaker = b; return false; } }
   }
-  const dx = w[0] - u.x, dy = w[1] - u.y, d = Math.hypot(dx, dy), sp = u.d.speed * dt * (u.aura ? 1 : 1);
-  if (d <= sp) { u.x = w[0]; u.y = w[1]; u.pi++; u.stuck = 0; return u.pi >= p.length; }
-  const nx = u.x + dx / d * sp, ny = u.y + dy / d * sp;
-  const ti = idx(clamp((nx / TILE) | 0, 0, G.W - 1), clamp((ny / TILE) | 0, 0, G.H - 1));
-  if (tcost(ti, u.owner, false) < 0 && !(G.occ[ti] && u.soft)) { u.stuck += dt; if (u.stuck > .8) { u.stuck = 0; if (!setPath(u, u.goal.x, u.goal.y, u.soft)) return true; } return false; }
-  u.x = nx; u.y = ny; u.face = Math.atan2(dy, dx); u.stuck = 0; return false;
+  const dx = w[0] - u.x, dy = w[1] - u.y, d = Math.hypot(dx, dy), sp = u.d.speed * dt;
+  if (d <= Math.max(sp, last ? 3 : 10)) { if (d <= sp && canStand(u, w[0], w[1])) { u.x = w[0]; u.y = w[1]; } u.pi++; return u.pi >= p.length; }
+  let nx = u.x + dx / d * sp, ny = u.y + dy / d * sp;
+  if (canStand(u, u.x, u.y) && !canStand(u, nx, ny)) {        // köşeye takılırsa duvar boyunca kay
+    if (canStand(u, nx, u.y)) ny = u.y; else if (canStand(u, u.x, ny)) nx = u.x; else { nx = u.x; ny = u.y; }
+  }
+  u.x = nx; u.y = ny; u.face = Math.atan2(dy, dx);
+  if (d < u.bestD - .5) { u.bestD = d; u.noProg = 0; } else u.noProg += dt;
+  if (u.noProg > .6) {                                          // ilerleme yok: kalabalık veya engel
+    u.noProg = 0; u.bestD = 1e9;
+    if (u.goal && Math.hypot(u.goal.x - u.x, u.goal.y - u.y) < 60) { u.path = null; return true; }
+    if (++u.fails > 6) { u.fails = 0; u.path = null; return true; }
+    if (!setPath(u, u.goal.x, u.goal.y, u.soft)) return true;
+  }
+  return false;
 }
 
 /* ---------- emirler ---------- */
@@ -237,13 +298,14 @@ function setupGatherPath(u) {
   if (G.res[idx(o.tx, o.ty)] === 3) setPath(u, px, py, false); else setPath(u, px, py, false);
 }
 function inRange(u, t) {
-  const reach = u.d.range > 0 ? u.d.range : 10;
+  const reach = u.d.range > 0 ? rangeOf(u) : 10;
   if (t.kind === 'b') return rectDist(u.x, u.y, t) <= reach + u.r;
   return Math.hypot(t.x - u.x, t.y - u.y) <= reach + u.r + t.r;
 }
 function doAttack(u, t) {
   const d = u.d; let dmg = u.atk * (u.aura ? 1.2 : 1);
-  if (t.kind === 'u') { if (d.bonus && d.bonus[t.d.cls]) dmg += d.bonus[t.d.cls]; dmg = Math.max(1, dmg - t.d.armor); }
+  if (d.cls === 'sie' && hasTech(u.owner, 'topcu')) dmg *= 1.25;
+  if (t.kind === 'u') { if (d.bonus && d.bonus[t.d.cls]) dmg += d.bonus[t.d.cls]; dmg = Math.max(1, dmg - armorOf(t)); }
   else dmg = Math.max(1, dmg * (d.bm == null ? .3 : d.bm));
   u.atkT = u.atkD = Math.min(.5, u.rate * .55);
   if (d.proj) G.proj.push({ x: u.x, y: u.y, sx: u.x, sy: u.y, d0: Math.hypot(t.x - u.x, t.y - u.y) || 1, tid: t.id, tx: t.x, ty: t.y, dmg, owner: u.owner, kind: d.proj, sp: d.proj === 'ball' ? 380 : 520, splash: d.splash || 0, src: u.id, srcAtk: u.atk });
@@ -306,8 +368,8 @@ function updGather(u, dt) {
   if (o.ph === 'go') {
     let tx, ty, farm = null;
     if (o.farm) { farm = G.byId.get(o.farm); if (!farm || farm.dead || !farm.built) { u.order = { t: 'idle' }; return; } tx = farm.x; ty = farm.y; }
-    else { const i = idx(o.tx, o.ty); if (G.res[i] !== o.res || G.amt[i] <= 0) { const n = nearestRes(u.x, u.y, o.res, 12); if (!n) { u.order = { t: 'idle' }; return; } o.tx = n[0]; o.ty = n[1]; setupGatherPath(u); } tx = o.tx * TILE + TILE / 2; ty = o.ty * TILE + TILE / 2; }
-    const near = farm ? rectDist(u.x, u.y, farm) <= 14 : Math.hypot(u.x - tx, u.y - ty) <= (G.res[idx(o.tx, o.ty)] === 3 ? 14 : TILE * 1.15);
+    else { const i = idx(o.tx, o.ty); if (G.res[i] !== o.res || G.amt[i] <= 0) { const n = nearestRes(u.x, u.y, o.res, 12) || nearestRes(u.x, u.y, o.res, 26); if (!n) { autoNext(u, null); return; } o.tx = n[0]; o.ty = n[1]; setupGatherPath(u); } tx = o.tx * TILE + TILE / 2; ty = o.ty * TILE + TILE / 2; }
+    const near = farm ? rectDist(u.x, u.y, farm) <= 14 : Math.hypot(u.x - tx, u.y - ty) <= (G.res[idx(o.tx, o.ty)] === 3 ? 20 : TILE * 1.62);
     if (near) { o.ph = 'work'; u.path = null; u.face = Math.atan2(ty - u.y, tx - u.x); }
     else if (stepMove(u, dt)) { if (farm) setPath(u, farm.x, farm.y + farm.h * TILE / 2 + 8, false); else setupGatherPath(u); if (!u.path && ++o.fails > 3) u.order = { t: 'idle' }; }
   } else if (o.ph === 'work') {
@@ -317,7 +379,7 @@ function updGather(u, dt) {
       o.acc -= 1;
       if (!o.farm) { const i = idx(o.tx, o.ty); if (G.amt[i] <= 0) { o.ph = 'go'; break; } G.amt[i]--; if (G.amt[i] <= 0) { G.res[i] = 0; refreshBlk(i); G.dirtyMini = true; } }
       u.carry.amt++;
-      if (u.carry.amt >= 10) { o.ph = 'ret'; const d = findDrop(u); if (!d) { u.order = { t: 'idle' }; return; } o.drop = d.id; setPath(u, d.x, d.y + d.h * TILE / 2 + 6, false); break; }
+      if (u.carry.amt >= 10) { o.ph = 'ret'; const d = findDrop(u); if (!d) { u.order = { t: 'idle' }; if (u.owner === 0) msg('Kaynak teslim edilecek Ambar veya Saray yok!', 'warn'); return; } o.drop = d.id; setPath(u, d.x, d.y + d.h * TILE / 2 + 6, false); break; }
     }
     if (o.ph === 'work' && !o.farm && G.res[idx(o.tx, o.ty)] !== o.res) o.ph = 'go';
   } else if (o.ph === 'ret') {
@@ -331,20 +393,39 @@ function updGather(u, dt) {
 }
 function updBuildOrder(u, dt) {
   const b = G.byId.get(u.order.bid);
-  if (!b || b.dead || b.built) { // yeni inşaat ara
-    u.order = { t: 'idle' }; if (b && b.built && b.d.farm && b.owner === u.owner) orderFarm(u, b); return;
-  }
+  if (!b || b.dead || b.built) { autoNext(u, b); return; }
   if (rectDist(u.x, u.y, b) <= 26) { b.bw++; u.workT = G.t + .3; u.path = null; u.fails = 0; u.face = Math.atan2(b.y - u.y, b.x - u.x); }
   else { const done = u.path ? stepMove(u, dt) : true; if (done && !setPath(u, b.x, b.y + b.h * TILE / 2 + 8, false) && ++u.fails > 3) u.order = { t: 'idle' }; }
 }
+// İşi biten işçi kendine yeni iş bulur: tarla -> tarlada çalış, yakında inşaat varsa ona yardım et, yoksa en yakın kaynağı topla
+function autoNext(u, b) {
+  u.order = { t: 'idle' };
+  if (!u.d.worker) return;
+  if (b && b.built && b.d.farm && b.owner === u.owner && !b.dead) { orderFarm(u, b); return; }
+  let site = null, sd = 15 * TILE;
+  for (const x of G.blds) if (x.owner === u.owner && !x.built && !x.dead) { const d = rectDist(u.x, u.y, x); if (d < sd) { sd = d; site = x; } }
+  if (site) { orderBuild(u, site); return; }
+  const ref = b && b.d && b.d.drop ? b : u;
+  let best = null, bd = 1e9;
+  for (const t of [1, 2, 3]) { const n = nearestRes(ref.x, ref.y, t, 14); if (n) { const d = Math.hypot(n[0] * TILE - ref.x, n[1] * TILE - ref.y) * (t === 1 ? 1 : 1.15); if (d < bd) { bd = d; best = n; } } }
+  if (best) orderGather(u, best[0], best[1]);
+}
+function healStep(u, dt) {           // molla: en yaralı dosta şifa
+  u.hcd = (u.hcd || 0) - dt; if (u.hcd > 0) return; u.hcd = .5;
+  let best = null, bf = .999, near = null, nf = .999;
+  unitsNear(u.x, u.y, 8 * TILE, e => { if (e.owner !== u.owner || e === u || e.d.cls === 'sie') return; const f = e.hp / e.maxhp, d = Math.hypot(e.x - u.x, e.y - u.y); if (f < bf && d < 4 * TILE) { bf = f; best = e; } if (f < nf) { nf = f; near = e; } });
+  if (best) { const h = (u.heal || u.d.heal) * .5 * (hasTech(u.owner, 'tip') ? 2 : 1); best.hp = Math.min(best.maxhp, best.hp + h); u.atkT = u.atkD = .45; u.face = Math.atan2(best.y - u.y, best.x - u.x); G.fx.push({ k: 'heal', x: best.x, y: best.y, t: 0, life: .7 }); }
+  else if (near && u.order.t === 'idle' && !u.hold) { orderMove(u, near.x - 40, near.y - 20); }
+}
 function updUnit(u, dt) {
   if (u.hit > 0) u.hit -= dt; u.cd -= dt; if (u.atkT > 0) u.atkT -= dt;
+  if (u.d.healer) healStep(u, dt);
   if (u.breaker) { if (u.breaker.dead) { u.breaker = null; if (u.goal) setPath(u, u.goal.x, u.goal.y, u.soft); } else { u.tgt = u.breaker.id; attackStep(u, u.breaker, dt, true); return; } }
   const o = u.order;
   switch (o.t) {
     case 'idle': idleThink(u, dt); break;
     case 'move': if (stepMove(u, dt)) u.order = { t: 'idle' }; break;
-    case 'attack': { const t = G.byId.get(o.tid); if (!t || t.dead || t.owner === u.owner) { u.order = { t: 'idle' }; u.path = null; break; } if (o.auto && Math.hypot(t.x - u.x, t.y - u.y) > u.d.vision * TILE * 2 && !(t.kind === 'b')) { u.order = { t: 'idle' }; break; } attackStep(u, t, dt, false); break; }
+    case 'attack': { const t = G.byId.get(o.tid); if (!t || t.dead || t.owner === u.owner) { u.order = { t: 'idle' }; u.path = null; u.scan = 0; break; } if (o.auto && Math.hypot(t.x - u.x, t.y - u.y) > u.d.vision * TILE * 2 && !(t.kind === 'b')) { u.order = { t: 'idle' }; break; } attackStep(u, t, dt, false); break; }
     case 'amove': updAmove(u, dt); break;
     case 'gather': updGather(u, dt); break;
     case 'build': updBuildOrder(u, dt); break;
@@ -352,11 +433,23 @@ function updUnit(u, dt) {
 }
 
 /* ---------- bina mantığı ---------- */
-function popUsed(o) { let n = 0; for (const e of G.ents) { if (e.dead) continue; if (e.kind === 'u') n += e.d.pop; else for (const q of e.queue) n += UNITS[q.type].pop; } return n; }
-function popUsedOwner(o) { let n = 0; for (const e of G.ents) { if (e.dead || e.owner !== o) continue; if (e.kind === 'u') n += e.d.pop; else for (const q of e.queue) n += UNITS[q.type].pop; } return n; }
+function popUsedOwner(o) { let n = 0; for (const e of G.ents) { if (e.dead || e.owner !== o) continue; if (e.kind === 'u') n += e.d.pop; else for (const q of e.queue) n += qPop(q); } return n; }
 const afford = (p, c) => (p.f >= (c.f || 0)) && (p.w >= (c.w || 0)) && (p.g >= (c.g || 0));
 const pay = (p, c, s) => { s = s || 1; p.f -= (c.f || 0) * s; p.w -= (c.w || 0) * s; p.g -= (c.g || 0) * s; };
 function hasBuilt(owner, type) { return G.blds.some(b => b.owner === owner && b.type === type && b.built); }
+function queueTech(b, id) {
+  const p = G.players[b.owner], T = TECHS[id];
+  if (hasTech(b.owner, id) || G.blds.some(x => x.owner === b.owner && x.queue.some(q => q.type === 'T:' + id))) { msg('Bu ilim zaten araştırılıyor.', 'warn'); return false; }
+  if (b.queue.length >= 5) { msg('Sıra dolu.', 'warn'); return false; }
+  if (!afford(p, T.cost)) { msg('Yetersiz kaynak!', 'warn'); return false; }
+  pay(p, T.cost); b.queue.push({ type: 'T:' + id, t: 0 }); return true;
+}
+function applyTech(o, id) {
+  G.players[o].tech[id] = true;
+  if (o !== 0) return;
+  msg('İlim tamamlandı: ' + TECHS[id].name + ' — ' + TECHS[id].desc, 'good');
+  if (id === 'cografya') { G.exp.fill(1); G.fogDirty = true; G.dirtyMini = true; }
+}
 function queueTrain(b, type, silent) {
   const p = G.players[b.owner], d = UNITS[type];
   if (!b.built) return false;
@@ -376,24 +469,26 @@ function spawnSpot(b) {
 function updBuilding(b, dt) {
   if (b.hit > 0) b.hit -= dt;
   if (!b.built) {
-    if (b.bw > 0) { const dp = dt / b.d.time * Math.pow(b.bw, .7); b.prog = Math.min(1, b.prog + dp); b.hp = Math.min(b.maxhp, b.hp + b.maxhp * dp * .9); b.bw = 0; if (b.prog >= 1) { b.built = true; b.hp = Math.max(b.hp, b.maxhp * .95); if (b.owner === 0) msg(b.name + ' tamamlandı.', 'good'); G.dirtyMini = true; if (b.d.farm) for (const u of G.ents) if (u.kind === 'u' && u.order.t === 'build' && u.order.bid === b.id) { orderFarm(u, b); } } }
+    if (b.bw > 0) { const dp = dt / b.d.time * Math.pow(b.bw, .7); b.prog = Math.min(1, b.prog + dp); b.hp = Math.min(b.maxhp, b.hp + b.maxhp * dp * .9); b.bw = 0; if (b.prog >= 1) { b.built = true; b.hp = Math.max(b.hp, b.maxhp * .95); if (b.owner === 0) msg(b.name + ' tamamlandı.', 'good'); G.dirtyMini = true; for (const u of G.ents) if (u.kind === 'u' && u.order.t === 'build' && u.order.bid === b.id) autoNext(u, b); } }
     return;
   }
   if (b.queue.length) {
-    const q = b.queue[0], d = UNITS[q.type]; q.t += dt;
-    if (q.t >= d.time) {
+    const q = b.queue[0]; q.t += dt;
+    if (q.t >= qTime(q) && q.type.startsWith('T:')) { b.queue.shift(); applyTech(b.owner, q.type.slice(2)); }
+    else if (q.t >= qTime(q)) {
       b.queue.shift(); const s = spawnSpot(b);
       const o = {}; if (b.owner === 1) { o.ai = 'army'; o.rally = b.rally || { x: b.x, y: b.y + b.h * TILE / 2 + 60 }; }
       const u = addUnit(q.type, b.owner, s.x, s.y, o);
       if (b.rally && b.owner === 0) { const rt = G.res[idx(clamp((b.rally.x / TILE) | 0, 0, G.W - 1), clamp((b.rally.y / TILE) | 0, 0, G.H - 1))]; if (u.d.worker && rt) orderGather(u, (b.rally.x / TILE) | 0, (b.rally.y / TILE) | 0); else orderMove(u, b.rally.x, b.rally.y); }
-      if (b.owner === 0 && typeof uiBeep === 'function') uiBeep();
+      if (b.owner === 0) { if (G.t - G.readyT > 2.5) { msg(u.d.name + ' hazır.', 'good'); G.readyT = G.t; } if (typeof uiBeep === 'function') uiBeep(); }
     }
   }
+  if (b.d.healAura) { b.hcd = (b.hcd || 0) - dt; if (b.hcd <= 0) { b.hcd = 1; unitsNear(b.x, b.y, 6 * TILE, e => { if (e.owner === b.owner && e.hp < e.maxhp && e.d.cls !== 'sie') e.hp = Math.min(e.maxhp, e.hp + 2); }); } }
   if (b.d.atk) {
     b.cd -= dt;
     if (b.cd <= 0) {
       let best = null, bd = 1e9; unitsNear(b.x, b.y, b.d.range + b.w * 16, e => { if (e.owner === b.owner) return; const d = Math.hypot(e.x - b.x, e.y - b.y); if (d < bd) { bd = d; best = e; } });
-      if (best) { G.proj.push({ x: b.x, y: b.y - 30, sx: b.x, sy: b.y, d0: bd || 1, tid: best.id, tx: best.x, ty: best.y, dmg: Math.max(1, b.d.atk - best.d.armor), owner: b.owner, kind: 'arrow', sp: 520, splash: 0, src: b.id }); b.cd = b.d.rate; } else b.cd = .3;
+      if (best) { G.proj.push({ x: b.x, y: b.y - 30, sx: b.x, sy: b.y, d0: bd || 1, tid: best.id, tx: best.x, ty: best.y, dmg: Math.max(1, b.d.atk - armorOf(best)), owner: b.owner, kind: 'arrow', sp: 520, splash: 0, src: b.id }); b.cd = b.d.rate; } else b.cd = .3;
     }
   }
 }
@@ -406,7 +501,7 @@ function updProj(dt) {
       const src = G.byId.get(p.src);
       if (p.splash) {
         G.fx.push({ k: 'boom', x: p.tx, y: p.ty, t: 0, life: .5, r: p.splash });
-        unitsNear(p.tx, p.ty, p.splash, e => { if (e.owner !== p.owner) applyDmg(e, Math.max(1, p.srcAtk * .5 - e.d.armor), src); });
+        unitsNear(p.tx, p.ty, p.splash, e => { if (e.owner !== p.owner) applyDmg(e, Math.max(1, p.srcAtk * .5 - armorOf(e)), src); });
         if (t && !t.dead && t.kind === 'b') applyDmg(t, p.dmg, src);
         else if (t && !t.dead && t.kind === 'u') { /* birim zaten sıçramadan etkilendi */ }
       } else if (t && !t.dead) applyDmg(t, p.dmg, src);
@@ -479,7 +574,9 @@ function step(dt) {
     if (u.kind !== 'u' || u.dead) continue;
     unitsNear(u.x, u.y, u.r * 2, e => {
       if (e === u || e.id < u.id) return; const dx = e.x - u.x, dy = e.y - u.y, d = Math.hypot(dx, dy) || .01, ov = u.r + e.r - d; if (ov <= 0) return;
-      const px = dx / d * ov * .25, py = dy / d * ov * .25; pushUnit(u, -px, -py); pushUnit(e, px, py);
+      const mu = !!(u.path && u.pi < u.path.length), me = !!(e.path && e.pi < e.path.length);
+      const ku = mu && !me ? .08 : !mu && me ? .42 : .25, ke = .5 - ku;
+      pushUnit(u, -dx / d * ov * ku, -dy / d * ov * ku); pushUnit(e, dx / d * ov * ke, dy / d * ov * ke);
     });
   }
   updProj(dt);
@@ -489,7 +586,20 @@ function step(dt) {
   G.vtick -= dt; if (G.vtick <= 0) { G.vtick = .3; updVis(); G.dirtyMini = true; }
   G.atick -= dt; if (G.atick <= 0) { G.atick = 1; aiTick(1); }
   G.ctick -= dt; if (G.ctick <= 0) { G.ctick = .5; checkMission(.5); }
+  G.ltick -= dt; if (G.ltick <= 0) { G.ltick = 1; lifeTick(); }
   for (const m of G.msgs) m.t += dt; G.msgs = G.msgs.filter(m => m.t < 9);
+}
+function lifeTick() {
+  for (const o of [0, 1]) if (hasTech(o, 'tip')) for (const u of G.ents) if (u.kind === 'u' && u.owner === o && !u.dead && u.hp < u.maxhp && u.d.cls !== 'sie') u.hp = Math.min(u.maxhp, u.hp + .6);
+  let idleW = 0, idleM = 0, newly = 0;
+  for (const u of G.ents) {
+    if (u.kind !== 'u' || u.owner !== 0 || u.dead) continue;
+    const idle = u.order.t === 'idle';
+    if (u.d.worker) { if (idle) { idleW++; if (u.wasBusy) newly++; } u.wasBusy = !idle; }
+    else if (!u.d.hero && u.d.atk && idle && !u.hold) idleM++;
+  }
+  G.idleW = idleW; G.idleM = idleM;
+  if (newly && G.t - G.idleT > 6) { G.idleT = G.t; msg(newly > 1 ? newly + ' reaya boşta kaldı! (B tuşu ile bul)' : 'Bir reaya işini bitirdi ve boşta bekliyor. (B tuşu ile bul)', 'warn'); }
 }
 function pushUnit(u, dx, dy) {
   if (u.order.t === 'gather' && u.order.ph === 'work') return;

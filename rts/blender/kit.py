@@ -21,7 +21,7 @@ def _link(nt, a, b):
     nt.links.new(a, b)
 
 
-def M(name, col, rough=.7, metal=0., brick=None, noise=0., emit=None, stripes=None, team=False, nf=.45):
+def M(name, col, rough=.7, metal=0., brick=None, noise=0., emit=None, stripes=None, team=False, nf=.45, bump=None):
     """Principled malzeme. brick: tuğla ölçeği, noise: kir/doku ölçeği, stripes: (renk2, ölçek)."""
     if name in MATS:
         return MATS[name]
@@ -73,8 +73,8 @@ def M(name, col, rough=.7, metal=0., brick=None, noise=0., emit=None, stripes=No
             _link(nt, nz.outputs['Fac'], gr.inputs['Fac']); _link(nt, gr.outputs['Color'], mix.inputs[7])
             color_out = mix.outputs[2]
             if not brick:
-                bump = nt.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = .12 if metal > .1 or rough < .6 else .25
-                _link(nt, nz.outputs['Fac'], bump.inputs['Height']); _link(nt, bump.outputs['Normal'], b.inputs['Normal'])
+                bmp = nt.nodes.new('ShaderNodeBump'); bmp.inputs['Strength'].default_value = bump if bump is not None else (.12 if metal > .1 or rough < .6 else .25); bump_node = bmp
+                _link(nt, nz.outputs['Fac'], bump_node.inputs['Height']); _link(nt, bump_node.outputs['Normal'], b.inputs['Normal'])
         if color_out is not None:
             _link(nt, color_out, b.inputs['Base Color'])
     m['team'] = 1 if team else 0
@@ -205,7 +205,11 @@ def setup_scene(res_x, res_y, scale=1., target=(0, 0, 0), samples=24):
     sc.cycles.max_bounces = 4; sc.cycles.diffuse_bounces = 2; sc.cycles.glossy_bounces = 2; sc.cycles.transparent_max_bounces = 4
     sc.render.film_transparent = True
     sc.render.resolution_x = res_x; sc.render.resolution_y = res_y; sc.render.resolution_percentage = 100
-    sc.view_settings.view_transform = 'Standard'; sc.view_settings.look = 'None'; sc.view_settings.exposure = 0
+    sc.view_settings.view_transform = 'AgX'; sc.view_settings.exposure = .1
+    try:
+        sc.view_settings.look = 'AgX - Punchy'
+    except Exception:
+        pass
     sc.render.image_settings.file_format = 'PNG'; sc.render.image_settings.color_mode = 'RGBA'
     return sc
 
@@ -237,11 +241,11 @@ def mask_mode(on):
         sc.cycles.samples = 4; sc.cycles.use_denoising = False
         if cat:
             cat.hide_render = True
-        sc.view_settings.exposure = 0
+        sc.view_settings.view_transform = 'Standard'; sc.view_settings.look = 'None'; sc.view_settings.exposure = 0
         sc.world.node_tree.nodes['Background'].inputs[1].default_value = 0
     else:
         sc.cycles.samples = sc.get('_samples', sc.cycles.samples); sc.cycles.use_denoising = True
         if cat:
             cat.hide_render = False
-        sc.view_settings.exposure = 0
+        sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Punchy'; sc.view_settings.exposure = .1
         sc.world.node_tree.nodes['Background'].inputs[1].default_value = .55

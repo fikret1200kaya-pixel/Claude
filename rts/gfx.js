@@ -423,7 +423,7 @@ function iconCanvas(kind, type, colIdx) { // buton portreleri
 const BL = { ok: false, imgs: {}, tint: new Map() };
 function loadBlender(cb) {
   const S = window.SPRITES; if (!S) { cb(); return; }
-  const list = []; for (const u of Object.values(S.units)) list.push(u.img, u.mask); list.push(S.statics.img, S.statics.mask);
+  const list = []; for (const u of Object.values(S.units)) list.push(u.img, u.mask); list.push(S.statics.img, S.statics.mask); if (S.portraits) list.push(S.portraits.img, S.portraits.mask);
   let n = list.length, fail = false;
   const done = () => { if (--n === 0) { BL.ok = !fail; cb(); } };
   list.forEach(src => { const im = new Image(); im.onload = done; im.onerror = () => { fail = true; done(); }; im.src = 'assets/' + src; BL.imgs[src] = im; });
@@ -455,7 +455,16 @@ function blStatic(c, name, owner, sx, sy, z, alpha, reveal, light) {
   if (light) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = light; c.drawImage(BL.imgs[S.img], x, y, w, h, dx, dy, w * k, h * k); }
   c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1; return true;
 }
+function blPortrait(look, owner) {
+  const P = SPRITES.portraits, f = P && P.f[look]; if (!f) return null;
+  const cv = mkCanvas(96, 96), c = cv.getContext('2d'), gr = c.createRadialGradient(48, 38, 6, 48, 48, 70);
+  gr.addColorStop(0, '#6a4a2a'); gr.addColorStop(1, '#140b05'); c.fillStyle = gr; c.fillRect(0, 0, 96, 96);
+  const [x, y, w, h] = f; c.drawImage(BL.imgs[P.img], x, y, w, h, 0, 0, 96, 96);
+  c.globalCompositeOperation = 'multiply'; c.drawImage(tintAtlas(P.mask, G.colors[owner]), x, y, w, h, 0, 0, 96, 96); c.globalCompositeOperation = 'source-over';
+  return cv;
+}
 function blIcon(kind, type, owner) {
+  if (kind === 'u') { const p = blPortrait(UNITS[type].look, owner); if (p) return p; }
   const cv = mkCanvas(48, 48), c = cv.getContext('2d'); c.fillStyle = '#2a1c10'; c.fillRect(0, 0, 48, 48);
   if (kind === 'u') { const look = UNITS[type].look, f = blFrame(look, 1, 'idle', 0); if (!f) return null; const [, , w, h, ax, ay] = f; const big = UNITS[type].cls === 'cav' || UNITS[type].cls === 'hero' || UNITS[type].cls === 'sie'; const z = big ? .8 : 1.05; blUnit(c, look, owner, 1, 'idle', 0, 24, big ? 50 : 54, z); }
   else { const nm = type === 'ayasofya' && G.flags.captured ? 'ayasofya_cap' : type, f = SPRITES.statics.f[nm]; if (!f) return null; const [, , w, h, ax, ay] = f; const k = Math.min(44 / w, 44 / h) * SPRITES.statics.scale; blStatic(c, nm, owner, 24 - (w / 2 - ax) * k / SPRITES.statics.scale, 46 - (h - ay) * k / SPRITES.statics.scale, k); }

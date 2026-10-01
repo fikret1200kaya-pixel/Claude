@@ -18,8 +18,8 @@ def mats():
         plaster=M('plaster', (.86, .8, .68), .8, noise=6, nf=.22),
         roof=M('roof', (.64, .22, .13), .7, brick=7, noise=10, nf=.25),
         roof_d=M('roof_d', (.36, .22, .17), .75, brick=7, noise=10, nf=.25),
-        lead=M('lead', (.5, .55, .58), .55, .15, noise=3, nf=.12),
-        lead_t=M('lead_t', (.3, .55, .55), .5, .12, noise=3, nf=.12),
+        lead=M('lead', (.52, .56, .6), .5, .2, noise=3, nf=.06, bump=0),
+        lead_t=M('lead_t', (.3, .55, .55), .45, .15, noise=3, nf=.06, bump=0),
         wood=M('swood', (.46, .3, .16), .75, stripes=((.38, .24, .12), 18), noise=12, nf=.25),
         wood_d=M('swood_d', (.24, .15, .08), .7, noise=12, nf=.25),
         thatch=M('thatch', (.8, .66, .36), .9, noise=22, nf=.5),
@@ -323,10 +323,78 @@ def b_ayasofya(S, cap):
         flag(S, 2.0, 0, 1.45, 1.4, 1.3)
 
 
+def b_cami(S, cap):
+    box(2.9, 2.9, .12, (0, 0, .06), S['stone_d'])
+    box(2.0, 2.0, 1.0, (-.2, -.2, .62), S['plaster'])
+    box(2.1, 2.1, .08, (-.2, -.2, 1.16), S['stone'])
+    for u in (-.75, .35):
+        arch(S, ('x', .805), u, .4, .22, .38); arch(S, ('y', .805), u, .4, .22, .38)
+    dome(S, -.2, -.2, 1.2, .82, S['lead'], drum=.28)
+    for (x, y) in ((.62, .62), (-1.02, .62), (.62, -1.02)):
+        cyl(.26, .1, (x, y, 1.25), S['plaster'], v=16); dome(S, x, y, 1.3, .24, S['lead'], fin=None)
+    # son cemaat yeri (revak)
+    box(.5, 2.0, .05, (1.1, -.2, .9), S['stone'])
+    for y in (-1.0, -.45, .1, .6):
+        cyl(.05, .78, (1.3, y, .5), S['stone'], v=10)
+    for y in (-.75, -.2, .35):
+        dome(S, 1.1, y, .93, .2, S['lead'], fin=None)
+    minaret(S, -1.25, 1.2, 3.3)
+    cyl(.32, .25, (.95, 1.0, .12), S['stone'], v=8); cyl(.36, .06, (.95, 1.0, .5), S['lead'], r2=.05, v=8)   # şadırvan
+    for k in range(4):
+        cyl(.03, .25, (.95 + math.cos(k * PI / 2) * .28, 1.0 + math.sin(k * PI / 2) * .28, .37), S['stone'], v=6)
+    flag(S, 1.3, -1.3, .12, 1.4)
+
+
+def b_medrese(S, cap):
+    box(2.9, 2.9, .1, (0, 0, .05), S['stone_d'])
+    box(2.6, 2.6, .04, (0, 0, .12), S['stone'])
+    # U biçimli hücreler + kubbeler
+    cells = [(-1.05, y) for y in (-1.05, -.35, .35, 1.05)] + [(x, -1.05) for x in (-.35, .35, 1.05)] + [(x, 1.05) for x in (-.35, .35)]
+    for (x, y) in cells:
+        box(.62, .62, .7, (x, y, .45), S['stone_w']); dome(S, x, y, .8, .22, S['lead'], fin=None)
+    for (x, y) in ((-1.05, -.35), (-1.05, .35), (-.35, -1.05), (.35, -1.05)):
+        pass
+    # revaklar
+    for y in (-.5, 0, .5):
+        cyl(.04, .6, (-.62, y, .42), S['stone'], v=8)
+    for x in (-.1, .45):
+        cyl(.04, .6, (x, -.62, .42), S['stone'], v=8)
+    # dershane (büyük kubbe) ön köşede
+    box(.9, .9, 1.0, (.95, .95, .6), S['stone_w']); dome(S, .95, .95, 1.1, .4, S['lead'])
+    arch(S, ('x', 1.405), .95, .12, .3, .45, mat=S['wood_d'])
+    # avluda ağaç ve havuz
+    cyl(.22, .08, (.2, .2, .16), S['stone'], v=12); cyl(.18, .02, (.2, .2, .2), M('water', (.15, .35, .45), .1), v=12)
+    cyl(.04, .5, (-.35, .35, .4), S['bark'], v=8); blob(.25, (-.35, .35, .78), S['leaf2'], sub=2, disp=.4, seed=77, tex_scale=3)
+    flag(S, -1.3, 1.3, .1, 1.5)
+
+
+def n_decor(S, v):
+    rnd = random.Random(v * 41 + 9)
+    k = v % 6
+    if k == 0:
+        for i in range(3):
+            blob(.12 + rnd.random() * .08, (rnd.random() * .3 - .15, rnd.random() * .3 - .15, .05), S['rock'], sc=(1, 1, .7), sub=2, disp=.5, seed=v * 9 + i, tex_scale=2)
+    elif k == 1:
+        cyl(.12, .14, (0, 0, .07), S['bark'], v=12); cyl(.11, .01, (0, 0, .145), S['swood' if False else 'wood'], v=12)
+    elif k == 2:
+        for i in range(14):
+            a = rnd.random() * 2 * PI; r = rnd.random() * .3
+            cyl(.006, .12, (math.cos(a) * r, math.sin(a) * r, .06), S['leaf2'], v=4)
+            ball(.025, (math.cos(a) * r, math.sin(a) * r, .13), [S['red'], S['white'], S['straw']][i % 3], seg=8)
+    elif k == 3:
+        blob(.2, (0, 0, .12), S['leaf'], sc=(1, 1, .7), sub=2, disp=.5, seed=v, tex_scale=4)
+    elif k == 4:
+        for i in range(18):
+            a = rnd.random() * 2 * PI; r = rnd.random() * .3
+            cyl(.012, .22, (math.cos(a) * r, math.sin(a) * r, .1), S['leaf2'], r2=0, v=4, rot=(rnd.random() * .5 - .25, rnd.random() * .5 - .25, 0))
+    else:
+        blob(.3, (0, 0, .1), S['rock'], sc=(1.3, 1, .6), sub=2, disp=.4, seed=v * 3, tex_scale=2)
+
+
 BUILD = dict(saray=(b_saray, 3, 3.9), ev=(b_ev, 2, 1.6), ambar=(b_ambar, 2, 1.4), tarla=(b_tarla, 2, .4), kisla=(b_kisla, 3, 2.0),
              ahir=(b_ahir, 3, 1.8), ocak=(b_ocak, 3, 2.3), dokum=(b_dokum, 3, 2.6), kule=(b_kule, 2, 3.4), burc=(b_burc, 2, 3.3),
              sur=(b_sur, 1, 1.4), kapi=(b_kapi, 1, 1.5), kale=(b_kale, 4, 4.0), hisar=(b_hisar, 4, 3.9), kamp=(b_kamp, 3, 2.3),
-             ayasofya=(b_ayasofya, 5, 3.0), ayasofya_cap=(lambda S, c: b_ayasofya(S, True), 5, 4.6))
+             ayasofya=(b_ayasofya, 5, 3.0), ayasofya_cap=(lambda S, c: b_ayasofya(S, True), 5, 4.6), cami=(b_cami, 3, 4.0), medrese=(b_medrese, 3, 2.0))
 
 
 # ------------------------------------------------------------ doğa
@@ -371,6 +439,8 @@ def n_berry(S, v):
 NATURE = {}
 for i in range(6):
     NATURE['tree%d' % i] = ((lambda i: lambda S, c: n_tree(S, i))(i), 1, 2.3)
+for i in range(6):
+    NATURE['decor%d' % i] = ((lambda i: lambda S, c: n_decor(S, i))(i), 1, .5)
 for i in range(3):
     NATURE['mine%d' % i] = ((lambda i: lambda S, c: n_mine(S, i))(i), 1, .9)
     NATURE['berry%d' % i] = ((lambda i: lambda S, c: n_berry(S, i))(i), 1, .7)

@@ -22,13 +22,15 @@ function showBrief(i) {
   $('bx').textContent = m.brief;
   $('bo').innerHTML = m.objectives.map(o => `<li>${o.text}${o.opt ? ' (isteğe bağlı)' : ''}</li>`).join('');
   $('bw').textContent = i === 5 ? 'Gedik Ahmed Paşa ölürse görev kaybedilir.' : 'Sultan (komutan) ölürse görev kaybedilir.' + (m.timeLimit ? ' Süre sınırı: ' + fmtT(m.timeLimit) + '.' : '');
+  const pc = $('bpor'); pc.hidden = true;
+  if (BL.ok && SPRITES.portraits) { const look = i === 5 ? 'sipahi' : 'fatih', f = SPRITES.portraits.f[look]; if (f) { pc.hidden = false; const c = pc.getContext('2d'); c.clearRect(0, 0, 160, 160); const g = c.createRadialGradient(80, 60, 10, 80, 80, 110); g.addColorStop(0, '#7a5530'); g.addColorStop(1, '#1a0f07'); c.fillStyle = g; c.fillRect(0, 0, 160, 160); c.drawImage(BL.imgs[SPRITES.portraits.img], f[0], f[1], f[2], f[3], 0, 0, 160, 160); } }
   $('bgo').onclick = () => startMission(i);
   show('brief');
 }
 function startMission(i) {
   curMission = i; const m = MISSIONS[i];
   m.objectives.forEach(o => o.ok = false);
-  newGame(m); G.rng = makeRng(m.seed); renderBase(); m.setup(); buildTerrain();
+  newGame(m); G.rng = makeRng(m.seed); renderBase(); m.setup(); scatterNature(); buildTerrain();
   const q = new URLSearchParams(location.search);
   if (q.has('cheat')) { Object.assign(G.players[0], { f: 9999, w: 9999, g: 9999 }); }
   if (q.has('nofog')) m.noFog = true;

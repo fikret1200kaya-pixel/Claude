@@ -17,11 +17,20 @@ Fatih Sultan Mehmed'in tahta çıkışından (1451) vefatına (1481) uzanan 6 g�
 ## Kontroller
 - Sol tık / kutu çizme: seç · Çift tık: ekrandaki aynı türleri seç
 - Sağ tık: hareket, saldırı, kaynak toplama, bina yapımına yardım (binada: toplanma noktası)
-- V: saldırarak ilerle · S: dur · G: mevzi · H: Sultan'a git · Boşluk: seçime git
+- V: saldırarak ilerle · S: dur · G: mevzi · H: Sultan'a git · B/N: boştaki reaya/asker · Delete: yok et · Boşluk: seçime git
 - Ctrl+1..9: grup ata, 1..9: grubu seç · Ok tuşları / ekran kenarı: kaydır · Tekerlek: yakınlaş
 - P / Esc: duraklat · `.` `,`: oyun hızı
 
+## Yeni birimler, binalar ve ilimler
+- **Akıncı** (Ahır): hızlı keşif süvarisi, çok geniş görüş.
+- **Molla** (Cami): yakındaki yaralıları iyileştirir, haritayı geniş açar. Cami çevresindeki birimleri de yavaşça iyileştirir.
+- **Medrese** (Cami gerekir) ilimleri: *İlm-i Coğrafya* (haritanın tamamını açar), *Tıp İlmi* (genel iyileşme), *Dökümcülük* (top hasarı/menzili), *Zırh Demirciliği* (+1 zırh).
+- İstanbul'un Fethi'nde **Akşemseddin** orduya katılır; surlarda ilk gedik açılınca **Ulubatlı Hasan** sancakla gediğe atılır.
+
 ## Oynanış notları
+- İşi biten reaya kendine yeni iş bulur (tarla, yakındaki inşaat ya da en yakın kaynak). Boşta kalan olursa uyarı çıkar; üst çubuktaki ⚒ / ⚔ sayaçları ya da **B** / **N** tuşları boştakileri bulur.
+- **Delete**: seçili kendi birim/binanı yok eder.
+- Saldırıya uğrayan birimin çevresindeki boştaki askerler yardıma koşar.
 - Okçu ve piyade surlara neredeyse hasar vermez; surları **toplar** (Dökümhane) yıkar.
 - Sultan'ın yakınındaki askerler +%20 saldırı gücü kazanır. Sultan ölürse görev kaybedilir.
 - Azap atlılara, sipahi okçulara karşı güçlüdür.

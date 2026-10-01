@@ -5,7 +5,8 @@ Kullanım: python3 pack.py <units_dir> <static_dir> <rts/assets>
 import os, sys, json, math
 from PIL import Image, ImageChops
 
-UNIT_ANCHOR = (64, 64 + .45 * math.cos(math.radians(30)) * 32 / math.cos(math.radians(45)))
+USCALE = 1.2
+UNIT_ANCHOR = (64, 64 + .45 * math.cos(math.radians(30)) * 32 / math.cos(math.radians(45)) * USCALE)
 
 
 def bbox(*ims):
@@ -78,6 +79,23 @@ def main(udir, sdir, out):
     meta = pack_group(entries, 4096, os.path.join(out, 'static.png'), os.path.join(out, 'static_m.png'))
     S['statics'] = {'img': 'static.png', 'mask': 'static_m.png', 'f': meta, 'scale': 2}
     print('statics', len(meta))
+    pdir = udir.rstrip('/') + '_portraits'
+    if os.path.isdir(pdir):
+        entries = {}
+        for f in os.listdir(pdir):
+            if f.endswith('_m.png') or not f.startswith('p_'):
+                continue
+            key = f[2:-4]; c = Image.open(os.path.join(pdir, f)).convert('RGBA')
+            mf = os.path.join(pdir, 'p_%s_m.png' % key); m = Image.open(mf) if os.path.exists(mf) else Image.new('RGBA', c.size, (0, 0, 0, 0))
+            entries[key] = (c, m, 0, 0)
+        # portreler kırpılmadan (sabit kare) paketlenir
+        pos, H = shelf_pack([(k, v[0].width, v[0].height) for k, v in entries.items()], 1024)
+        at = Image.new('RGBA', (1024, H), (0, 0, 0, 0)); mt = Image.new('RGBA', (1024, H), (255, 255, 255, 0)); meta = {}
+        for k, (c, m, _, _) in entries.items():
+            x, y = pos[k]; at.paste(c, (x, y)); mt.paste(mask_rgba(m), (x, y)); meta[k] = [x, y, c.width, c.height]
+        at.save(os.path.join(out, 'portraits.png'), optimize=True); mt.save(os.path.join(out, 'portraits_m.png'), optimize=True)
+        S['portraits'] = {'img': 'portraits.png', 'mask': 'portraits_m.png', 'f': meta}
+        print('portraits', len(meta))
     with open(os.path.join(out, 'sprites.js'), 'w') as fh:
         fh.write('/* Blender ile üretildi (rts/blender) */\nwindow.SPRITES = ' + json.dumps(S, separators=(',', ':')) + ';\n')
 
