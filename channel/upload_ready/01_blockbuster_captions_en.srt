@@ -1,0 +1,386 @@
+1
+00:00:00,200 --> 00:00:04,230
+In the year 2000, a small startup
+walked into Blockbuster's headquarters
+
+2
+00:00:04,280 --> 00:00:05,390
+with an offer.
+
+3
+00:00:05,440 --> 00:00:08,150
+Buy us for $50 million.
+
+4
+00:00:08,200 --> 00:00:10,990
+Blockbuster's executives listened...
+
+5
+00:00:11,040 --> 00:00:12,790
+and said no.
+
+6
+00:00:12,840 --> 00:00:16,270
+Ten years later, that
+startup was worth billions.
+
+7
+00:00:16,320 --> 00:00:17,590
+And Blockbuster?
+
+8
+00:00:17,640 --> 00:00:18,990
+Bankrupt.
+
+9
+00:00:19,040 --> 00:00:23,030
+This is the story of the most
+expensive "no" in business history.
+
+10
+00:00:23,080 --> 00:00:26,750
+Blockbuster began in
+1985 in Dallas, Texas.
+
+11
+00:00:26,800 --> 00:00:32,430
+The idea was simple: big, bright stores,
+thousands of movies, and a guarantee
+
+12
+00:00:32,480 --> 00:00:35,150
+you'd find what you
+wanted on a Friday night.
+
+13
+00:00:35,200 --> 00:00:36,750
+It worked.
+
+14
+00:00:36,800 --> 00:00:40,830
+At its peak, in the mid-2000s,
+Blockbuster operated roughly nine
+
+15
+00:00:40,880 --> 00:00:46,030
+thousand stores worldwide and
+employed tens of thousands of people.
+
+16
+00:00:46,080 --> 00:00:49,870
+Friday night at Blockbuster was
+a ritual for a whole generation.
+
+17
+00:00:49,920 --> 00:00:51,790
+But there was a hidden problem.
+
+18
+00:00:51,840 --> 00:00:55,670
+A huge slice of the company's profit
+didn't come from renting movies.
+
+19
+00:00:55,720 --> 00:00:57,910
+It came from late fees.
+
+20
+00:00:57,960 --> 00:01:03,960
+Every forgotten tape, every overdue
+DVD, quietly fed the machine.
+
+21
+00:01:04,080 --> 00:01:08,850
+Meanwhile, in 1997, Reed Hastings
+and Marc Randolph had started
+
+22
+00:01:08,900 --> 00:01:09,790
+Netflix.
+
+23
+00:01:09,840 --> 00:01:14,270
+Their model: rent DVDs online
+and deliver them by mail.
+
+24
+00:01:14,320 --> 00:01:15,350
+No store.
+
+25
+00:01:15,400 --> 00:01:17,110
+No late fees.
+
+26
+00:01:17,160 --> 00:01:21,950
+By the year 2000, Netflix was
+losing money and needed a lifeline.
+
+27
+00:01:22,000 --> 00:01:26,170
+Hastings and his team met with Blockbuster's
+leadership and proposed a deal:
+
+28
+00:01:26,220 --> 00:01:30,670
+Blockbuster would buy Netflix for
+about $50 million, and Netflix would
+
+29
+00:01:30,720 --> 00:01:33,390
+run Blockbuster's online business.
+
+30
+00:01:33,440 --> 00:01:34,710
+Blockbuster passed.
+
+31
+00:01:34,760 --> 00:01:38,890
+According to accounts from people in the
+room, the idea wasn't taken seriously.
+
+32
+00:01:38,940 --> 00:01:41,590
+Online rental looked like a niche.
+
+33
+00:01:41,640 --> 00:01:44,390
+Blockbuster had thousands of stores.
+
+34
+00:01:44,440 --> 00:01:47,810
+Why bother with a tiny company
+shipping discs in red envelopes?
+
+35
+00:01:47,860 --> 00:01:50,030
+Netflix kept growing.
+
+36
+00:01:50,080 --> 00:01:53,550
+By 2004, it had millions of subscribers.
+
+37
+00:01:53,600 --> 00:01:57,150
+Blockbuster finally woke up, and launched
+its own online service and a program
+
+38
+00:01:57,200 --> 00:01:58,990
+called Total Access.
+
+39
+00:01:59,040 --> 00:02:00,630
+It was aggressive.
+
+40
+00:02:00,680 --> 00:02:02,310
+It was good.
+
+41
+00:02:02,360 --> 00:02:05,550
+And in 2004, the company
+also took a bold step:
+
+42
+00:02:05,600 --> 00:02:08,070
+it scrapped late fees in its stores.
+
+43
+00:02:08,120 --> 00:02:09,910
+But there was a catch.
+
+44
+00:02:09,960 --> 00:02:13,830
+The change cut into revenue that Wall
+Street had come to depend on, and the
+
+45
+00:02:13,880 --> 00:02:16,910
+company was also carrying heavy debt.
+
+46
+00:02:16,960 --> 00:02:19,570
+Investor Carl Icahn pushed back hard.
+
+47
+00:02:19,620 --> 00:02:24,950
+CEO John Antioco, who had championed the
+new strategy, clashed with the board
+
+48
+00:02:25,000 --> 00:02:30,070
+over how much to spend,
+and in 2007, he left.
+
+49
+00:02:30,120 --> 00:02:33,430
+His replacement pulled back on the
+online push and went back to focusing on
+
+50
+00:02:33,480 --> 00:02:34,710
+stores.
+
+51
+00:02:34,760 --> 00:02:39,070
+By then, Netflix had already started
+streaming movies over the internet.
+
+52
+00:02:39,120 --> 00:02:40,950
+The timing was brutal.
+
+53
+00:02:41,000 --> 00:02:42,870
+The financial crisis hit.
+
+54
+00:02:42,920 --> 00:02:44,250
+Stores were closing.
+
+55
+00:02:44,300 --> 00:02:47,380
+Redbox kiosks were renting
+movies for a dollar.
+
+56
+00:02:47,430 --> 00:02:53,390
+And Netflix was now in living rooms,
+on game consoles, and on phones.
+
+57
+00:02:53,440 --> 00:02:58,230
+In September 2010, Blockbuster
+filed for bankruptcy.
+
+58
+00:02:58,280 --> 00:03:02,230
+In 2011, Dish Network bought its
+remaining assets for roughly
+
+59
+00:03:02,280 --> 00:03:04,170
+$300 million.
+
+60
+00:03:04,220 --> 00:03:09,470
+Today, only one Blockbuster store remains
+open, in Bend, Oregon, and it has
+
+61
+00:03:09,520 --> 00:03:11,710
+become a tourist attraction.
+
+62
+00:03:11,760 --> 00:03:13,950
+So what actually went wrong?
+
+63
+00:03:14,000 --> 00:03:15,310
+Three things.
+
+64
+00:03:15,360 --> 00:03:16,750
+One.
+
+65
+00:03:16,800 --> 00:03:20,030
+They defended the old model
+instead of building the new one.
+
+66
+00:03:20,080 --> 00:03:24,070
+Late fees and stores felt safe, so the
+company protected them while customers
+
+67
+00:03:24,120 --> 00:03:25,630
+moved on.
+
+68
+00:03:25,680 --> 00:03:26,710
+Two.
+
+69
+00:03:26,760 --> 00:03:29,950
+They mistook a small
+competitor for a harmless one.
+
+70
+00:03:30,000 --> 00:03:32,310
+Netflix looked tiny.
+
+71
+00:03:32,360 --> 00:03:35,950
+But it was growing exactly
+where customers were heading.
+
+72
+00:03:36,000 --> 00:03:37,310
+Three.
+
+73
+00:03:37,360 --> 00:03:40,750
+They changed too late, and
+without full commitment.
+
+74
+00:03:40,800 --> 00:03:45,510
+When Blockbuster finally moved, leadership
+fought itself, and the strategy was
+
+75
+00:03:45,560 --> 00:03:47,430
+never given a real chance.
+
+76
+00:03:47,480 --> 00:03:52,030
+Netflix, on the other hand, made
+a habit of cannibalizing itself.
+
+77
+00:03:52,080 --> 00:03:57,390
+It moved from DVDs to streaming, then
+from streaming to making its own shows.
+
+78
+00:03:57,440 --> 00:04:00,910
+It chose to disrupt itself
+before someone else did.
+
+79
+00:04:00,960 --> 00:04:03,470
+Blockbuster didn't die
+because it was stupid.
+
+80
+00:04:03,520 --> 00:04:05,950
+It died because it was comfortable.
+
+81
+00:04:06,000 --> 00:04:08,750
+The question every business
+has to ask is simple:
+
+82
+00:04:08,800 --> 00:04:11,270
+are we protecting what
+made us successful...
+
+83
+00:04:11,320 --> 00:04:13,550
+or building what comes next?
+
+84
+00:04:13,600 --> 00:04:16,350
+If you enjoyed this story, subscribe.
+
+85
+00:04:16,400 --> 00:04:20,430
+Next up: the company that
+invented the digital camera...
+
+86
+00:04:20,480 --> 00:04:21,780
+and still went bankrupt.
