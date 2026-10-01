@@ -414,5 +414,50 @@ function iconCanvas(kind, type, colIdx) { // buton portreleri
   const cv = mkCanvas(48, 48), c = cv.getContext('2d'); c.fillStyle = '#2a1c10'; c.fillRect(0, 0, 48, 48);
   if (kind === 'u') { const sp = unitSprite(UNITS[type].look, colIdx, 1, 'idle', 0), big = UNITS[type].cls === 'cav' || UNITS[type].cls === 'hero' || UNITS[type].cls === 'sie'; const s = big ? 76 : 56; c.drawImage(sp, 64 - s / 2, (big ? 92 : 90) - s, s, s, 0, 0, 48, 48); }
   else { const s = buildingSprite(type, colIdx), m = s.meta, sc = Math.min(44 / s.cv.width * 1.0, 46 / s.cv.height); c.drawImage(s.cv, 24 - s.cv.width * sc / 2, 46 - s.cv.height * sc, s.cv.width * sc, s.cv.height * sc); }
-  return cv.toDataURL();
+  return cv;
+}
+
+/* ======================  BLENDER SPRITE'LARI  ======================
+   assets/sprites.js (window.SPRITES) + atlas PNG'leri. Takım rengi: maske atlası
+   renge boyanır ve 'multiply' ile birimin açık gri takım bölgelerine uygulanır. */
+const BL = { ok: false, imgs: {}, tint: new Map() };
+function loadBlender(cb) {
+  const S = window.SPRITES; if (!S) { cb(); return; }
+  const list = []; for (const u of Object.values(S.units)) list.push(u.img, u.mask); list.push(S.statics.img, S.statics.mask);
+  let n = list.length, fail = false;
+  const done = () => { if (--n === 0) { BL.ok = !fail; cb(); } };
+  list.forEach(src => { const im = new Image(); im.onload = done; im.onerror = () => { fail = true; done(); }; im.src = 'assets/' + src; BL.imgs[src] = im; });
+}
+function tintAtlas(src, col) {
+  const k = src + col; let t = BL.tint.get(k); if (t) return t;
+  const im = BL.imgs[src]; t = mkCanvas(im.width, im.height); const c = t.getContext('2d');
+  c.drawImage(im, 0, 0); c.globalCompositeOperation = 'source-in'; c.fillStyle = col; c.fillRect(0, 0, t.width, t.height);
+  BL.tint.set(k, t); return t;
+}
+function blFrame(look, dir, act, fr) { const U = SPRITES.units[look]; if (!U) return null; return U.f[dir + '_' + act + '_' + fr] || U.f[dir + '_idle_0']; }
+function blUnit(c, look, owner, dir, act, fr, sx, sy, z, alpha) {
+  const U = SPRITES.units[look], f = U && blFrame(look, dir, act, fr); if (!f) return false;
+  const [x, y, w, h, ax, ay] = f, dx = sx - ax * z, dy = sy - ay * z, dw = w * z, dh = h * z;
+  if (alpha != null) c.globalAlpha = alpha;
+  c.drawImage(BL.imgs[U.img], x, y, w, h, dx, dy, dw, dh);
+  c.globalCompositeOperation = 'multiply'; c.drawImage(tintAtlas(U.mask, G.colors[owner]), x, y, w, h, dx, dy, dw, dh); c.globalCompositeOperation = 'source-over';
+  c.globalAlpha = 1; return true;
+}
+function blHas(name) { return BL.ok && !!SPRITES.statics.f[name]; }
+function blStatic(c, name, owner, sx, sy, z, alpha, reveal, light) {
+  const S = SPRITES.statics, f = S.f[name]; if (!f) return false;
+  const k = z / S.scale; let [x, y, w, h, ax, ay] = f; let dy = sy - ay * k;
+  if (reveal != null && reveal < 1) { const cut = h * (1 - reveal); y += cut; h -= cut; dy += cut * k; }
+  const dx = sx - ax * k;
+  if (alpha != null) c.globalAlpha = alpha;
+  c.drawImage(BL.imgs[S.img], x, y, w, h, dx, dy, w * k, h * k);
+  if (owner != null) { c.globalCompositeOperation = 'multiply'; c.drawImage(tintAtlas(S.mask, G.colors[owner]), x, y, w, h, dx, dy, w * k, h * k); }
+  if (light) { c.globalCompositeOperation = 'lighter'; c.globalAlpha = light; c.drawImage(BL.imgs[S.img], x, y, w, h, dx, dy, w * k, h * k); }
+  c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1; return true;
+}
+function blIcon(kind, type, owner) {
+  const cv = mkCanvas(48, 48), c = cv.getContext('2d'); c.fillStyle = '#2a1c10'; c.fillRect(0, 0, 48, 48);
+  if (kind === 'u') { const look = UNITS[type].look, f = blFrame(look, 1, 'idle', 0); if (!f) return null; const [, , w, h, ax, ay] = f; const big = UNITS[type].cls === 'cav' || UNITS[type].cls === 'hero' || UNITS[type].cls === 'sie'; const z = big ? .8 : 1.05; blUnit(c, look, owner, 1, 'idle', 0, 24, big ? 50 : 54, z); }
+  else { const nm = type === 'ayasofya' && G.flags.captured ? 'ayasofya_cap' : type, f = SPRITES.statics.f[nm]; if (!f) return null; const [, , w, h, ax, ay] = f; const k = Math.min(44 / w, 44 / h) * SPRITES.statics.scale; blStatic(c, nm, owner, 24 - (w / 2 - ax) * k / SPRITES.statics.scale, 46 - (h - ay) * k / SPRITES.statics.scale, k); }
+  return cv;
 }

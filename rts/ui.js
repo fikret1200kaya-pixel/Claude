@@ -67,13 +67,35 @@ function drawSpr(c, spr, sx, sy, ax, ay, alpha) { const z = cam.z; if (alpha != 
 function drawUnit(c, u) {
   const [sx, sy] = w2s(u.x, u.y), [act, fr] = unitAct(u);
   if (u.d.hero && u.owner === 0) { c.strokeStyle = 'rgba(231,185,58,.7)'; c.lineWidth = 2; c.beginPath(); c.ellipse(sx, sy, 22 * cam.z, 11 * cam.z, 0, 0, 7); c.stroke(); }
-  const spr = unitSprite(u.d.look, u.owner, facingDir(u.face || 0), act, fr);
-  drawSpr(c, spr, sx, sy, 64, 86); if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; drawSpr(c, spr, sx, sy, 64, 86, .35); c.globalCompositeOperation = 'source-over'; }
+  if (BL.ok && blUnit(c, u.d.look, u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z)) { if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; blUnit(c, u.d.look, u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z, .3); c.globalCompositeOperation = 'source-over'; } }
+  else { const spr = unitSprite(u.d.look, u.owner, facingDir(u.face || 0), act, fr);
+  drawSpr(c, spr, sx, sy, 64, 86); if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; drawSpr(c, spr, sx, sy, 64, 86, .35); c.globalCompositeOperation = 'source-over'; } }
   if (u.carry && u.carry.amt > 0 && u.d.worker) { c.fillStyle = ['', '#8a5a2a', '#f2c230', '#c0405a'][u.carry.type]; c.beginPath(); c.arc(sx - 7 * cam.z, sy - 18 * cam.z, 3.4 * cam.z, 0, 7); c.fill(); c.strokeStyle = OUT; c.lineWidth = 1; c.stroke(); }
 }
 const unitTop = u => (u.d.cls === 'cav' || u.d.cls === 'hero' ? 62 : u.d.look === 'sahi' ? 52 : u.d.cls === 'sie' ? 38 : 50);
 function bScreen(b) { const s = buildingSprite(b.type, b.owner, b.type === 'ayasofya' && G.flags.captured ? 'cap' : ''); const [ox, oy] = w2s(b.tx * TILE, b.ty * TILE); return { s, ox, oy, dx: ox - s.meta.ox * cam.z, dy: oy - s.meta.oy * cam.z }; }
+const bName = b => b.type === 'ayasofya' && G.flags.captured ? 'ayasofya_cap' : b.type;
+function drawBuildingBL(c, b) {
+  const z = cam.z, [sx, sy] = w2s(b.x, b.y), nm = bName(b);
+  if (!b.built) {
+    const P = [[0, 0], [b.w, 0], [b.w, b.h], [0, b.h]].map(([x, y]) => w2s((b.tx + x) * TILE, (b.ty + y) * TILE));
+    c.beginPath(); P.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.fillStyle = 'rgba(120,90,50,.55)'; c.fill(); c.strokeStyle = 'rgba(60,40,20,.8)'; c.lineWidth = 1.5; c.stroke();
+    blStatic(c, nm, b.owner, sx, sy, z, .95, .1 + b.prog * .9);
+    c.strokeStyle = '#7a5530'; c.lineWidth = 2 * z; const top = (BH[b.type] || 30) * Math.min(1, b.prog + .25);
+    for (const [x, y] of [[0, 0], [b.w, 0], [b.w, b.h], [0, b.h]]) { const a = w2s((b.tx + x) * TILE, (b.ty + y) * TILE), t = w2s((b.tx + x) * TILE, (b.ty + y) * TILE, top); c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(t[0], t[1]); c.stroke(); }
+    for (let k = 1; k <= 3; k++) { const zz = top * k / 3.2; const a = w2s((b.tx) * TILE, (b.ty + b.h) * TILE, zz), bb = w2s((b.tx + b.w) * TILE, (b.ty + b.h) * TILE, zz), cc = w2s((b.tx + b.w) * TILE, b.ty * TILE, zz); c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(bb[0], bb[1]); c.lineTo(cc[0], cc[1]); c.stroke(); }
+    return;
+  }
+  blStatic(c, nm, b.owner, sx, sy, z, null, null, b.hit > 0 ? .25 : 0);
+  if (b.type === 'dokum') { const [bx, by] = w2s(b.x - 24, b.y - 24, 100); for (let i = 0; i < 6; i++) { const ph = (G.t * .3 + i / 6) % 1; c.fillStyle = `rgba(80,76,72,${.5 * (1 - ph)})`; c.beginPath(); c.arc(bx + Math.sin(ph * 6 + i) * 6 * z + ph * 20 * z, by - ph * 70 * z, (6 + ph * 16) * z, 0, 7); c.fill(); } }
+  drawFire(c, b);
+}
+function drawFire(c, b) {
+  const z = cam.z, hpf = b.hp / b.maxhp;
+  if (hpf < .6 && !b.d.landmark) { const n = hpf < .3 ? 5 : 2, hb = BH[b.type] || 30; for (let i = 0; i < n; i++) { const rx = hash2(b.id, i, 1), ry = hash2(b.id, i, 2), wx = (b.tx + .2 + rx * (b.w - .4)) * TILE, wy = (b.ty + .2 + ry * (b.h - .4)) * TILE, [fx, fy] = w2s(wx, wy, hb * (.4 + hash2(b.id, i, 3) * .4)); const fl = Math.sin(G.t * 13 + i * 3) * .2 + 1; const g = c.createRadialGradient(fx, fy, 1, fx, fy - 6 * z, 12 * z * fl); g.addColorStop(0, 'rgba(255,240,150,.95)'); g.addColorStop(.4, 'rgba(255,130,30,.8)'); g.addColorStop(1, 'rgba(200,40,0,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(fx, fy - 6 * z, 7 * z * fl, 13 * z * fl, 0, 0, 7); c.fill(); for (let k = 0; k < 3; k++) { const ph = (G.t * .5 + k / 3 + rx) % 1; c.fillStyle = `rgba(40,35,30,${.5 * (1 - ph)})`; c.beginPath(); c.arc(fx + ph * 10 * z, fy - (14 + ph * 46) * z, (5 + ph * 10) * z, 0, 7); c.fill(); } } }
+}
 function drawBuilding(c, b) {
+  if (blHas(bName(b))) return drawBuildingBL(c, b);
   const { s, ox, oy, dx, dy } = bScreen(b), z = cam.z, m = s.meta, W = s.cv.width, H = s.cv.height;
   if (!b.built) {
     // temel ve iskele
@@ -95,6 +117,13 @@ function drawBuilding(c, b) {
 }
 function drawRes(c, tx, ty, r) {
   const [sx, sy] = w2s(tx * TILE + 16, ty * TILE + 16), z = cam.z, v = (hash2(tx, ty, 9) * 6) | 0;
+  if (BL.ok) {
+    const nm = r === 1 ? 'tree' + v : r === 2 ? 'mine' + (v % 3) : 'berry' + (v % 3);
+    if (r === 1) { const sway = Math.sin(G.t * 1.3 + tx * .7 + ty * .3) * .02; c.save(); c.translate(sx, sy); c.transform(1, 0, sway, 1, 0, 0); blStatic(c, nm, null, 0, 0, z); c.restore(); }
+    else blStatic(c, nm, null, sx, sy, z);
+    if (r === 2) { const ph = (G.t * .7 + hash2(tx, ty, 4) * 5) % 3; if (ph < .35) { const a = Math.sin(ph / .35 * Math.PI), gx = sx + (hash2(tx, ty, 5) - .5) * 30 * z, gy = sy - (8 + hash2(tx, ty, 6) * 18) * z; c.strokeStyle = `rgba(255,250,200,${a})`; c.lineWidth = 1.5; c.beginPath(); c.moveTo(gx - 5 * a, gy); c.lineTo(gx + 5 * a, gy); c.moveTo(gx, gy - 5 * a); c.lineTo(gx, gy + 5 * a); c.stroke(); } }
+    return;
+  }
   if (r === 1) { const spr = treeSprite(v), sway = Math.sin(G.t * 1.3 + tx * .7 + ty * .3) * .025; c.save(); c.translate(sx, sy + 4 * z); c.transform(1, 0, sway, 1, 0, 0); c.drawImage(spr, -32 * z, -72 * z, 64 * z, 84 * z); c.restore(); }
   else if (r === 2) { drawSpr(c, mineSprite(v % 3), sx, sy, 32, 40); const ph = (G.t * .7 + hash2(tx, ty, 4) * 5) % 3; if (ph < .35) { const a = Math.sin(ph / .35 * Math.PI), gx = sx + (hash2(tx, ty, 5) - .5) * 30 * z, gy = sy - (8 + hash2(tx, ty, 6) * 18) * z; c.strokeStyle = `rgba(255,250,200,${a})`; c.lineWidth = 1.5; c.beginPath(); c.moveTo(gx - 5 * a, gy); c.lineTo(gx + 5 * a, gy); c.moveTo(gx, gy - 5 * a); c.lineTo(gx, gy + 5 * a); c.stroke(); } }
   else if (r === 3) drawSpr(c, berrySprite(v % 3), sx, sy, 24, 24);
@@ -108,7 +137,8 @@ function drawProj(c, p) {
 }
 function drawFx(c, f) {
   const a = 1 - f.t / f.life, z = cam.z;
-  if (f.k === 'corpse') { if (f.owner !== 0 && !visAt(f.x, f.y)) return; const [sx, sy] = w2s(f.x, f.y); const spr = unitSprite(f.look, f.owner, facingDir(f.face), 'idle', 0); c.save(); c.globalAlpha = Math.min(1, a * 3) * .85; c.translate(sx, sy); c.scale(z, z * .45); c.rotate(1.35); c.drawImage(spr, -64, -86); c.restore(); c.fillStyle = `rgba(90,15,10,${.35 * a})`; c.beginPath(); c.ellipse(sx + 4 * z, sy + 2 * z, 10 * z, 4 * z, 0, 0, 7); c.fill(); }
+  if (f.k === 'corpse' && BL.ok && SPRITES.units[f.look]) { if (f.owner !== 0 && !visAt(f.x, f.y)) return; const [sx, sy] = w2s(f.x, f.y); blUnit(c, f.look, f.owner, facingDir(f.face), 'dead', 0, sx, sy, z, Math.min(1, a * 3)); }
+  else if (f.k === 'corpse') { if (f.owner !== 0 && !visAt(f.x, f.y)) return; const [sx, sy] = w2s(f.x, f.y); const spr = unitSprite(f.look, f.owner, facingDir(f.face), 'idle', 0); c.save(); c.globalAlpha = Math.min(1, a * 3) * .85; c.translate(sx, sy); c.scale(z, z * .45); c.rotate(1.35); c.drawImage(spr, -64, -86); c.restore(); c.fillStyle = `rgba(90,15,10,${.35 * a})`; c.beginPath(); c.ellipse(sx + 4 * z, sy + 2 * z, 10 * z, 4 * z, 0, 0, 7); c.fill(); }
   else if (f.k === 'rubble') { for (let i = 0; i < 6 * f.w * f.h; i++) { const wx = (f.tx + hash2(f.id, i, 1) * f.w) * TILE, wy = (f.ty + hash2(f.id, i, 2) * f.h) * TILE, [sx, sy] = w2s(wx, wy), r = (3 + hash2(f.id, i, 3) * 6) * z; c.fillStyle = `rgba(${110 + hash2(f.id, i, 4) * 50 | 0},${100 + hash2(f.id, i, 4) * 40 | 0},85,${Math.min(1, a * 4)})`; c.beginPath(); c.moveTo(sx - r, sy); c.lineTo(sx - r * .3, sy - r * .8); c.lineTo(sx + r, sy - r * .3); c.lineTo(sx + r * .6, sy + r * .4); c.closePath(); c.fill(); } }
   else if (f.k === 'puff') { const [sx, sy] = w2s(f.x, f.y, 10 + f.t * 40); c.fillStyle = `rgba(110,100,90,${.6 * a})`; c.beginPath(); c.arc(sx, sy, f.r * (1 + f.t) * z, 0, 7); c.fill(); }
   else if (f.k === 'boom') { const [sx, sy] = w2s(f.x, f.y); const R = f.r * (.4 + f.t * 2) * z; const g = c.createRadialGradient(sx, sy - 8 * z, 1, sx, sy - 8 * z, R); g.addColorStop(0, `rgba(255,245,180,${a})`); g.addColorStop(.35, `rgba(255,140,30,${.85 * a})`); g.addColorStop(1, 'rgba(120,40,0,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(sx, sy - 6 * z, R, R * .75, 0, 0, 7); c.fill(); c.strokeStyle = `rgba(255,255,255,${.4 * a})`; c.lineWidth = 2; c.beginPath(); c.ellipse(sx, sy, R * 1.3, R * .65, 0, 0, 7); c.stroke(); for (let k = 0; k < 4; k++) { c.fillStyle = `rgba(70,60,55,${.5 * a})`; c.beginPath(); c.arc(sx + (k - 1.5) * 9 * z, sy - (16 + f.t * 60 + k * 4) * z, (8 + f.t * 16) * z, 0, 7); c.fill(); } }
@@ -151,7 +181,7 @@ function render() {
   if (place && mouse.in) {
     const w = s2w(mouse.x, mouse.y), d = BUILDS[place.type], tx = Math.floor(w.x / TILE - d.w / 2 + .5), ty = Math.floor(w.y / TILE - d.h / 2 + .5); place.tx = tx; place.ty = ty; place.ok = canPlace(place.type, tx, ty);
     diamond(c, tx, ty, d.w, d.h, place.ok ? '#7dff8a' : '#ff5c5c', place.ok ? 'rgba(80,255,120,.25)' : 'rgba(255,70,70,.3)', 2);
-    const s = buildingSprite(place.type, 0), [ox, oy] = w2s(tx * TILE, ty * TILE); c.globalAlpha = .6; c.drawImage(s.cv, ox - s.meta.ox * z, oy - s.meta.oy * z, s.cv.width * z, s.cv.height * z); c.globalAlpha = 1;
+    if (blHas(place.type)) { const [gx, gy] = w2s((tx + d.w / 2) * TILE, (ty + d.h / 2) * TILE); blStatic(c, place.type, 0, gx, gy, z, .6); } else { const s = buildingSprite(place.type, 0), [ox, oy] = w2s(tx * TILE, ty * TILE); c.globalAlpha = .6; c.drawImage(s.cv, ox - s.meta.ox * z, oy - s.meta.oy * z, s.cv.width * z, s.cv.height * z); c.globalAlpha = 1; }
     if (d.atk) { const [sx, sy] = w2s((tx + d.w / 2) * TILE, (ty + d.h / 2) * TILE); c.strokeStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(sx, sy, d.range * 1.414 * z, d.range * .707 * z, 0, 0, 7); c.stroke(); }
   }
   if (mouse.down && mouse.drag && !place) { c.strokeStyle = '#7dff8a'; c.lineWidth = 1; c.strokeRect(mouse.sx, mouse.sy, mouse.x - mouse.sx, mouse.y - mouse.sy); c.fillStyle = 'rgba(125,255,138,.1)'; c.fillRect(mouse.sx, mouse.sy, mouse.x - mouse.sx, mouse.y - mouse.sy); }
@@ -292,7 +322,9 @@ function scrollCam(dt) {
 /* ---------- HUD ---------- */
 let cardBtns = [];
 const ICONS = new Map();
-function icon(kind, type) { const k = kind + type; if (!ICONS.has(k)) ICONS.set(k, iconCanvas(kind, type, 0)); return ICONS.get(k); }
+function icon(kind, type) { const k = kind + type + (type === 'ayasofya' && G.flags.captured ? 'c' : ''); if (!ICONS.has(k)) ICONS.set(k, (BL.ok && blIcon(kind, type, 0)) || iconCanvas(kind, type, 0)); return ICONS.get(k); }
+const icH = (kind, type) => `<canvas class="ic" width="48" height="48" data-ic="${kind}|${type}"></canvas>`;
+function fillIcons(root) { root.querySelectorAll('canvas[data-ic]').forEach(cv => { const [k, t] = cv.dataset.ic.split('|'); cv.getContext('2d').drawImage(icon(k, t), 0, 0); }); }
 function uiMsg() { $('log').innerHTML = G.msgs.map(m => `<div class="m ${m.cls}">${m.text}</div>`).join(''); }
 function uiObjectives() {
   const m = G.m; $('objs').innerHTML = `<h4>${m.title}</h4>` + m.objectives.filter(o => !o.hidden || o.ok).map(o => `<div class="${o.ok ? 'ok' : ''}">${o.ok ? '✔' : '◇'} ${o.text}${!o.ok && o.prog ? ' <b>' + o.prog() + '</b>' : ''}</div>`).join('') + (m.timeLimit ? `<div class="tl">⏳ Kalan: ${fmtT(Math.max(0, m.timeLimit - G.t))}</div>` : '');
@@ -310,7 +342,7 @@ function buildCard() {
   const units = s.filter(e => e.kind === 'u'), blds = s.filter(e => e.kind === 'b'), av = G.m.avail;
   if (units.some(u => u.d.worker)) {
     const hk = ['q', 'w', 'e', 'r', 't', 'a', 'f', 'z', 'x', 'c']; let i = 0;
-    for (const t of av.build) { const d = BUILDS[t]; const dis = !afford(p, d.cost) || (d.req && !hasBuilt(0, d.req)); btn(d.name, hk[i++], () => { if (!afford(p, d.cost)) { msg('Yetersiz kaynak!', 'warn'); return; } if (d.req && !hasBuilt(0, d.req)) { msg(BUILDS[d.req].name + ' gerekli.', 'warn'); return; } place = { type: t }; amovePending = false; }, d.cost, d.desc + (d.req ? ' (' + BUILDS[d.req].name + ' gerekir)' : ''), dis, icon('b', t)); }
+    for (const t of av.build) { const d = BUILDS[t]; const dis = !afford(p, d.cost) || (d.req && !hasBuilt(0, d.req)); btn(d.name, hk[i++], () => { if (!afford(p, d.cost)) { msg('Yetersiz kaynak!', 'warn'); return; } if (d.req && !hasBuilt(0, d.req)) { msg(BUILDS[d.req].name + ' gerekli.', 'warn'); return; } place = { type: t }; amovePending = false; }, d.cost, d.desc + (d.req ? ' (' + BUILDS[d.req].name + ' gerekir)' : ''), dis, 'b|' + t); }
   }
   if (units.some(u => u.atk && !u.d.worker)) {
     btn('Saldır-ilerle', 'v', () => { amovePending = true; place = null; }, null, 'Hedefe giderken karşılaştığın düşmana saldır', false, 'amove');
@@ -319,27 +351,27 @@ function buildCard() {
   } else if (units.length) btn('Dur', 's', () => { units.forEach(orderStop); }, null, 'Emirleri iptal et', false, 'stop');
   if (blds.length === 1 && blds[0].built && blds[0].d.trains) {
     const b = blds[0], hk = ['q', 'w', 'e', 'r']; let i = 0;
-    for (const t of b.d.trains) { if (!av.train.includes(t)) continue; const d = UNITS[t]; const dis = !afford(p, d.cost) || p.pop + d.pop > p.cap; btn(d.name, hk[i++], () => { queueTrain(b, t); cardSig = ''; }, d.cost, d.desc + ' (' + d.pop + ' nüfus, ' + d.time + ' sn)', dis, icon('u', t)); }
+    for (const t of b.d.trains) { if (!av.train.includes(t)) continue; const d = UNITS[t]; const dis = !afford(p, d.cost) || p.pop + d.pop > p.cap; btn(d.name, hk[i++], () => { queueTrain(b, t); cardSig = ''; }, d.cost, d.desc + ' (' + d.pop + ' nüfus, ' + d.time + ' sn)', dis, 'u|' + t); }
   }
 }
 function updateCard() {
   const sig = G.sel.map(e => e.id).join(',') + '|' + (place ? 1 : 0) + '|' + Math.floor(G.players[0].f) + Math.floor(G.players[0].w) + Math.floor(G.players[0].g) + '|' + G.players[0].pop + '|' + G.blds.filter(b => b.owner === 0 && b.built).length;
   if (sig !== cardSig) {
     cardSig = sig; buildCard(); const el = $('card'); el.innerHTML = '';
-    cardBtns.forEach(b => { const d = document.createElement('button'); d.className = 'cb' + (b.dis ? ' dis' : ''); const im = b.img && b.img.length > 20 ? `<img src="${b.img}" alt="">` : `<span class="gl">${GLYPH[b.img] || '◆'}</span>`; d.innerHTML = `${im}<span class="k">${(b.key || '').toUpperCase()}</span><span class="lb">${b.label}</span>${b.cost ? `<small>${costShort(b.cost)}</small>` : ''}`; d.title = (b.tip || '') + (b.cost ? '\n' + sfmt(b.cost) : ''); d.onclick = () => b.fn(); el.appendChild(d); });
+    cardBtns.forEach(b => { const d = document.createElement('button'); d.className = 'cb' + (b.dis ? ' dis' : ''); const im = b.img && b.img.includes('|') ? icH(...b.img.split('|')) : `<span class="gl">${GLYPH[b.img] || '◆'}</span>`; d.innerHTML = `${im}<span class="k">${(b.key || '').toUpperCase()}</span><span class="lb">${b.label}</span>${b.cost ? `<small>${costShort(b.cost)}</small>` : ''}`; d.title = (b.tip || '') + (b.cost ? '\n' + sfmt(b.cost) : ''); d.onclick = () => b.fn(); el.appendChild(d); }); fillIcons(el);
   }
   const info = $('info'), one = G.sel.length === 1 ? G.sel[0] : null;
   if (!G.sel.length) info.innerHTML = '<div class="hint">Birim seç: tıkla veya kutu çiz.<br>Sağ tık: hareket · saldırı · kaynak topla.<br><b>H</b>: Sultan\'a git — <b>Boşluk</b>: seçime git — <b>Tekerlek</b>: yakınlaş</div>';
   else if (one) {
-    const d = one.d, por = one.kind === 'u' ? icon('u', one.type) : icon('b', one.type);
-    let h = `<div class="por"><img src="${por}" alt=""></div><div class="tx"><h3>${one.name}</h3><div class="hp"><i style="width:${Math.max(0, one.hp / one.maxhp * 100)}%"></i></div><div>Can: ${Math.ceil(one.hp)} / ${one.maxhp}</div>`;
+    const d = one.d;
+    let h = `<div class="por">${icH(one.kind === 'u' ? 'u' : 'b', one.type)}</div><div class="tx"><h3>${one.name}</h3><div class="hp"><i style="width:${Math.max(0, one.hp / one.maxhp * 100)}%"></i></div><div>Can: ${Math.ceil(one.hp)} / ${one.maxhp}</div>`;
     if (one.kind === 'u') { h += `<div>⚔ ${d.atk}${d.bonus ? ' (+' + Object.entries(d.bonus).map(([k, v]) => v + ' ' + { cav: 'atlı', arc: 'okçu' }[k]).join(',') + ')' : ''} · ⛨ ${d.armor} · ➶ ${d.range ? Math.round(d.range / TILE) + ' kare' : 'yakın'}</div>`; if (one.carry && one.carry.amt) h += `<div>Taşıyor: ${one.carry.amt}</div>`; if (one.aura) h += '<div class="g">Komutan etkisi: +%20 saldırı</div>'; h += `<div class="d">${one.desc || d.desc || ''}</div>`; }
-    else { if (!one.built) h += `<div>İnşaat: %${Math.floor(one.prog * 100)}</div>`; else if (one.queue.length) h += '<div>Üretim: ' + one.queue.map((q, i) => `<span class="q" data-i="${i}" title="İptal et"><img src="${icon('u', q.type)}" alt="">${i === 0 ? '%' + Math.floor(q.t / UNITS[q.type].time * 100) : ''}</span>`).join(' ') + '</div>'; if (one.owner === 0 && one.d.trains) h += '<div class="d">Sağ tık: toplanma noktası</div>'; if (one.d.desc) h += `<div class="d">${one.d.desc}</div>`; }
-    info.innerHTML = h + '</div>';
+    else { if (!one.built) h += `<div>İnşaat: %${Math.floor(one.prog * 100)}</div>`; else if (one.queue.length) h += '<div>Üretim: ' + one.queue.map((q, i) => `<span class="q" data-i="${i}" title="İptal et">${icH('u', q.type)}${i === 0 ? '%' + Math.floor(q.t / UNITS[q.type].time * 100) : ''}</span>`).join(' ') + '</div>'; if (one.owner === 0 && one.d.trains) h += '<div class="d">Sağ tık: toplanma noktası</div>'; if (one.d.desc) h += `<div class="d">${one.d.desc}</div>`; }
+    info.innerHTML = h + '</div>'; fillIcons(info);
     info.querySelectorAll('.q').forEach(q => q.onclick = () => { const i = +q.dataset.i, it = one.queue[i]; if (!it) return; one.queue.splice(i, 1); const c = UNITS[it.type].cost; G.players[0].f += c.f || 0; G.players[0].w += c.w || 0; G.players[0].g += c.g || 0; });
   } else {
     const cnt = {}; G.sel.forEach(e => { const k = e.type; cnt[k] = cnt[k] || { n: 0, e }; cnt[k].n++; });
-    info.innerHTML = `<div class="tx"><h3>${G.sel.length} birim</h3><div class="grid">` + Object.values(cnt).map(({ n, e }) => `<span class="gi" title="${e.name}"><img src="${icon(e.kind, e.type)}" alt=""><b>${n}</b></span>`).join('') + '</div></div>';
+    info.innerHTML = `<div class="tx"><h3>${G.sel.length} birim</h3><div class="grid">` + Object.values(cnt).map(({ n, e }) => `<span class="gi" title="${e.name}">${icH(e.kind, e.type)}<b>${n}</b></span>`).join('') + '</div></div>'; fillIcons(info);
   }
 }
 const costShort = c => Object.entries(c).map(([k, v]) => `<i class="r${k}"></i>${v}`).join(' ');

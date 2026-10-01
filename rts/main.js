@@ -77,6 +77,7 @@ function drawMenuBg() {
   const url = c.toDataURL('image/jpeg', .85); for (const s of document.querySelectorAll('.screen')) s.style.background = `#0b0805 url(${url}) center/cover no-repeat`;
 }
 drawMenuBg();
-(function () { // test için doğrudan başlatma: ?m=3
+loadBlender(() => { // Blender sprite atlasları yüklendikten sonra başla
+  if (BL.ok) Object.assign(BH, { saray: 130, ev: 52, ambar: 48, tarla: 10, kisla: 74, ahir: 62, ocak: 84, dokum: 96, kule: 112, burc: 96, sur: 46, kapi: 52, kale: 120, hisar: 130, kamp: 84, ayasofya: 112 });
   const q = new URLSearchParams(location.search); if (q.has('m')) startMission(+q.get('m') - 1);
-})();
+});

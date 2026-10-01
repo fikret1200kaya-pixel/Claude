@@ -31,5 +31,18 @@ URL parametreleri: `?m=3` (görevi doğrudan başlat), `&nofog` (sis yok), `&che
 
 Dosyalar: `engine.js` (simülasyon, yol bulma, YZ), `gfx.js` (izometrik grafik: prosedürel 3B birim/bina sprite'ları, arazi), `ui.js` (çizim, girdi, HUD), `missions.js` (görev verileri), `main.js` (menü akışı).
 
-## Grafik
-Tüm görseller kodla üretilir (harici resim dosyası yok): 2:1 izometrik görünüm, 8 yönlü ve yürüme/saldırı animasyonlu birimler, gölgelendirilmiş binalar (kubbe, minare, sur, burç, çadır), yumuşak sahilli su, savaş sisi, ateş, duman ve patlama efektleri.
+## Grafik (Blender)
+Birim, bina ve doğa sprite'ları **Blender 4.2** ile 3B modellenip render edilir (`rts/blender/`):
+
+```bash
+pip install bpy==4.2.0 pillow
+cd rts/blender
+python3 units.py   /tmp/out/units          # 10 birim × 8 yön × 16 kare (+ takım maskesi)
+python3 statics.py /tmp/out/st             # binalar, ağaçlar, maden, çalılar (2x)
+python3 pack.py    /tmp/out/units /tmp/out/st ../assets   # atlaslar + sprites.js
+```
+
+Kamera oyunun 2:1 izometrik açısıyla birebir eşleşir (30° yükseklik, ortografik, 1 kare = 32 px). Takım rengi ayrı bir maske atlasıyla oyunda boyanır, böylece her görevde düşman rengi değişebilir. `assets/` yoksa oyun kodla çizilen yedek grafiklere döner.
+
+### Yedek (prosedürel) grafik
+Atlaslar yüklenemezse görseller kodla üretilir: 2:1 izometrik görünüm, 8 yönlü ve yürüme/saldırı animasyonlu birimler, gölgelendirilmiş binalar (kubbe, minare, sur, burç, çadır), yumuşak sahilli su, savaş sisi, ateş, duman ve patlama efektleri.
