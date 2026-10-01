@@ -17,8 +17,8 @@ Fatih Sultan Mehmed'in tahta çıkışından (1451) vefatına (1481) uzanan 6 g�
 ## Kontroller
 - Sol tık / kutu çizme: seç · Çift tık: ekrandaki aynı türleri seç
 - Sağ tık: hareket, saldırı, kaynak toplama, bina yapımına yardım (binada: toplanma noktası)
-- V: saldırarak ilerle · S: dur · H (komut kartında): mevzi · H tuşu: Sultan'a git · Boşluk: seçime git
-- Ctrl+1..9: grup ata, 1..9: grubu seç · WASD/oklar: kaydır · Tekerlek: yakınlaş
+- V: saldırarak ilerle · S: dur · G: mevzi · H: Sultan'a git · Boşluk: seçime git
+- Ctrl+1..9: grup ata, 1..9: grubu seç · Ok tuşları / ekran kenarı: kaydır · Tekerlek: yakınlaş
 - P / Esc: duraklat · `.` `,`: oyun hızı
 
 ## Oynanış notları
@@ -29,4 +29,7 @@ Fatih Sultan Mehmed'in tahta çıkışından (1451) vefatına (1481) uzanan 6 g�
 ## Test/Geliştirme
 URL parametreleri: `?m=3` (görevi doğrudan başlat), `&nofog` (sis yok), `&cheat` (bol kaynak).
 
-Dosyalar: `engine.js` (simülasyon, yol bulma, YZ), `ui.js` (çizim, girdi, HUD), `missions.js` (görev verileri), `main.js` (menü akışı).
+Dosyalar: `engine.js` (simülasyon, yol bulma, YZ), `gfx.js` (izometrik grafik: prosedürel 3B birim/bina sprite'ları, arazi), `ui.js` (çizim, girdi, HUD), `missions.js` (görev verileri), `main.js` (menü akışı).
+
+## Grafik
+Tüm görseller kodla üretilir (harici resim dosyası yok): 2:1 izometrik görünüm, 8 yönlü ve yürüme/saldırı animasyonlu birimler, gölgelendirilmiş binalar (kubbe, minare, sur, burç, çadır), yumuşak sahilli su, savaş sisi, ateş, duman ve patlama efektleri.

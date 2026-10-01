@@ -97,7 +97,11 @@ function addUnit(type, owner, x, y, o) {
   if (d.hero && owner === 0 && !G.hero) G.hero = u;
   return u;
 }
-const U = (type, owner, tx, ty, o) => addUnit(type, owner, tx * TILE + TILE / 2, ty * TILE + TILE / 2, o);
+function freeTileNear(tx, ty) {
+  for (let r = 0; r <= 8; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue; const x = tx + dx, y = ty + dy; if (inb(x, y) && !G.blkT[idx(x, y)] && !G.occ[idx(x, y)]) return [x, y]; }
+  return [tx, ty];
+}
+const U = (type, owner, tx, ty, o) => { const [x, y] = freeTileNear(tx, ty); return addUnit(type, owner, x * TILE + TILE / 2, y * TILE + TILE / 2, o); };
 function addBuilding(type, owner, tx, ty, o) {
   o = o || {}; const d = BUILDS[type];
   const b = { id: ++G.nid, kind: 'b', type, d, owner, tx, ty, w: d.w, h: d.h, x: (tx + d.w / 2) * TILE, y: (ty + d.h / 2) * TILE, r: Math.max(d.w, d.h) * TILE / 2, hp: d.hp, maxhp: d.hp, built: o.built !== false, prog: o.built === false ? 0 : 1, queue: [], cd: 1, rally: null, dead: false, name: o.label || d.name, hit: 0, bw: 0 };
@@ -114,9 +118,10 @@ function kill(e, src) {
   if (e.kind === 'b') {
     for (let y = e.ty; y < e.ty + e.h; y++) for (let x = e.tx; x < e.tx + e.w; x++) if (inb(x, y) && G.occ[idx(x, y)] === e.id) G.occ[idx(x, y)] = 0;
     G.navVer++; G.blds = G.blds.filter(b => b !== e); G.dirtyMini = true;
+    if (!e.d.landmark) G.fx.push({ k: 'rubble', x: e.x, y: e.y, t: 0, life: 40, tx: e.tx, ty: e.ty, w: e.w, h: e.h, id: e.id });
     for (let k = 0; k < 14; k++) G.fx.push({ k: 'puff', x: e.x + (Math.random() - .5) * e.w * TILE, y: e.y + (Math.random() - .5) * e.h * TILE, t: 0, life: .8 + Math.random() * .6, r: 8 + Math.random() * 14 });
   } else {
-    G.fx.push({ k: 'blood', x: e.x, y: e.y, t: 0, life: 6 });
+    G.fx.push({ k: 'corpse', x: e.x, y: e.y, t: 0, life: 9, look: e.d.look, owner: e.owner, face: e.face || 0 });
     if (e.owner === 0) G.stats.lost++; else G.stats.kills++;
   }
   if (e.owner === 0 && e.kind === 'b' && e.d.drop) { /* kaynak teslim noktası kaybı */ }
@@ -240,7 +245,8 @@ function doAttack(u, t) {
   const d = u.d; let dmg = u.atk * (u.aura ? 1.2 : 1);
   if (t.kind === 'u') { if (d.bonus && d.bonus[t.d.cls]) dmg += d.bonus[t.d.cls]; dmg = Math.max(1, dmg - t.d.armor); }
   else dmg = Math.max(1, dmg * (d.bm == null ? .3 : d.bm));
-  if (d.proj) G.proj.push({ x: u.x, y: u.y, tid: t.id, tx: t.x, ty: t.y, dmg, owner: u.owner, kind: d.proj, sp: d.proj === 'ball' ? 380 : 520, splash: d.splash || 0, src: u.id, srcAtk: u.atk });
+  u.atkT = u.atkD = Math.min(.5, u.rate * .55);
+  if (d.proj) G.proj.push({ x: u.x, y: u.y, sx: u.x, sy: u.y, d0: Math.hypot(t.x - u.x, t.y - u.y) || 1, tid: t.id, tx: t.x, ty: t.y, dmg, owner: u.owner, kind: d.proj, sp: d.proj === 'ball' ? 380 : 520, splash: d.splash || 0, src: u.id, srcAtk: u.atk });
   else { applyDmg(t, dmg, u); }
 }
 function attackStep(u, t, dt, brk) {
@@ -306,7 +312,7 @@ function updGather(u, dt) {
     else if (stepMove(u, dt)) { if (farm) setPath(u, farm.x, farm.y + farm.h * TILE / 2 + 8, false); else setupGatherPath(u); if (!u.path && ++o.fails > 3) u.order = { t: 'idle' }; }
   } else if (o.ph === 'work') {
     if (!u.carry || u.carry.type !== o.res) u.carry = { type: o.res, amt: 0 };
-    o.acc += dt * (o.farm ? .8 : RATE[o.res] || 1);
+    u.workT = G.t + .3; o.acc += dt * (o.farm ? .8 : RATE[o.res] || 1);
     while (o.acc >= 1) {
       o.acc -= 1;
       if (!o.farm) { const i = idx(o.tx, o.ty); if (G.amt[i] <= 0) { o.ph = 'go'; break; } G.amt[i]--; if (G.amt[i] <= 0) { G.res[i] = 0; refreshBlk(i); G.dirtyMini = true; } }
@@ -328,11 +334,11 @@ function updBuildOrder(u, dt) {
   if (!b || b.dead || b.built) { // yeni inşaat ara
     u.order = { t: 'idle' }; if (b && b.built && b.d.farm && b.owner === u.owner) orderFarm(u, b); return;
   }
-  if (rectDist(u.x, u.y, b) <= 26) { b.bw++; u.path = null; u.fails = 0; u.face = Math.atan2(b.y - u.y, b.x - u.x); }
+  if (rectDist(u.x, u.y, b) <= 26) { b.bw++; u.workT = G.t + .3; u.path = null; u.fails = 0; u.face = Math.atan2(b.y - u.y, b.x - u.x); }
   else { const done = u.path ? stepMove(u, dt) : true; if (done && !setPath(u, b.x, b.y + b.h * TILE / 2 + 8, false) && ++u.fails > 3) u.order = { t: 'idle' }; }
 }
 function updUnit(u, dt) {
-  if (u.hit > 0) u.hit -= dt; u.cd -= dt;
+  if (u.hit > 0) u.hit -= dt; u.cd -= dt; if (u.atkT > 0) u.atkT -= dt;
   if (u.breaker) { if (u.breaker.dead) { u.breaker = null; if (u.goal) setPath(u, u.goal.x, u.goal.y, u.soft); } else { u.tgt = u.breaker.id; attackStep(u, u.breaker, dt, true); return; } }
   const o = u.order;
   switch (o.t) {
@@ -387,7 +393,7 @@ function updBuilding(b, dt) {
     b.cd -= dt;
     if (b.cd <= 0) {
       let best = null, bd = 1e9; unitsNear(b.x, b.y, b.d.range + b.w * 16, e => { if (e.owner === b.owner) return; const d = Math.hypot(e.x - b.x, e.y - b.y); if (d < bd) { bd = d; best = e; } });
-      if (best) { G.proj.push({ x: b.x, y: b.y, tid: best.id, tx: best.x, ty: best.y, dmg: Math.max(1, b.d.atk - best.d.armor), owner: b.owner, kind: 'arrow', sp: 520, splash: 0, src: b.id }); b.cd = b.d.rate; } else b.cd = .3;
+      if (best) { G.proj.push({ x: b.x, y: b.y - 30, sx: b.x, sy: b.y, d0: bd || 1, tid: best.id, tx: best.x, ty: best.y, dmg: Math.max(1, b.d.atk - best.d.armor), owner: b.owner, kind: 'arrow', sp: 520, splash: 0, src: b.id }); b.cd = b.d.rate; } else b.cd = .3;
     }
   }
 }
@@ -411,7 +417,7 @@ function updProj(dt) {
 
 /* ---------- görüş ---------- */
 function updVis() {
-  G.vis.fill(0); const W = G.W, H = G.H;
+  G.fogDirty = true; G.vis.fill(0); const W = G.W, H = G.H;
   if (G.m.noFog) { G.vis.fill(1); G.exp.fill(1); return; }
   for (const e of G.ents) {
     if (e.owner !== 0 || e.dead) continue; const r = e.d.vision || 6, cx = (e.x / TILE) | 0, cy = (e.y / TILE) | 0, r2 = r * r;
@@ -466,7 +472,7 @@ function step(dt) {
   // aura
   G.otick -= dt;
   if (G.otick <= 0) { G.otick = .5; const heroes = G.ents.filter(e => e.kind === 'u' && e.d.hero && !e.dead); for (const u of G.ents) if (u.kind === 'u') { u.aura = false; if (!u.d.hero) for (const h of heroes) if (h.owner === u.owner && Math.hypot(h.x - u.x, h.y - u.y) < 170) { u.aura = true; break; } } }
-  for (const e of G.ents) { if (e.dead) continue; if (e.kind === 'u') updUnit(e, dt); }
+  for (const e of G.ents) { if (e.dead || e.kind !== 'u') continue; const lx = e.x, ly = e.y; updUnit(e, dt); const mv = Math.hypot(e.x - lx, e.y - ly); e.moving = mv > .15 && mv < 12; e.ph = (e.ph || 0) + mv / 3.4; }
   for (const b of G.blds) if (!b.dead) updBuilding(b, dt);
   // ayrışma
   for (const u of G.ents) {

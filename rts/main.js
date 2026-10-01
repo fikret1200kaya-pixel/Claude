@@ -55,6 +55,28 @@ function showEpilogue() {
   $('et').textContent = EPILOGUE.title; $('el').innerHTML = EPILOGUE.lines.map(l => `<p>${l}</p>`).join(''); show('epi');
 }
 buildMenu();
+/* ---------- menü arka planı: alacakaranlıkta İstanbul silüeti ---------- */
+function drawMenuBg() {
+  const W = Math.max(800, innerWidth), H = Math.max(500, innerHeight), c = mkCanvas(W, H), x = c.getContext('2d'), r = makeRng(1453);
+  const sky = x.createLinearGradient(0, 0, 0, H * .72); sky.addColorStop(0, '#0d0a1c'); sky.addColorStop(.45, '#3a1c2e'); sky.addColorStop(.8, '#a8462a'); sky.addColorStop(1, '#e8a04a'); x.fillStyle = sky; x.fillRect(0, 0, W, H);
+  for (let i = 0; i < 160; i++) { x.fillStyle = `rgba(255,245,220,${r() * .7})`; x.fillRect(r() * W, r() * H * .45, 1.3, 1.3); }
+  x.fillStyle = '#f6e7b8'; x.beginPath(); x.arc(W * .8, H * .2, 34, 0, 7); x.fill(); x.fillStyle = sky; x.fillStyle = '#1a1024'; x.beginPath(); x.arc(W * .8 + 13, H * .2 - 6, 30, 0, 7); x.fill();
+  const sea = H * .74; const sg = x.createLinearGradient(0, sea, 0, H); sg.addColorStop(0, '#c0703a'); sg.addColorStop(.25, '#4a2a2a'); sg.addColorStop(1, '#0b0805'); x.fillStyle = sg; x.fillRect(0, sea, W, H - sea);
+  for (let i = 0; i < 70; i++) { x.fillStyle = `rgba(255,200,120,${r() * .35})`; x.fillRect(r() * W, sea + r() * (H - sea) * .5, 10 + r() * 30, 1.2); }
+  const sil = '#120a0c'; x.fillStyle = sil;
+  // tepeler
+  x.beginPath(); x.moveTo(0, sea); for (let i = 0; i <= 40; i++) { const px = i / 40 * W; x.lineTo(px, sea - 26 - Math.sin(i * .7) * 10 - Math.sin(i * .23) * 18); } x.lineTo(W, sea); x.fill();
+  const domeAt = (cx, base, rw, h) => { x.beginPath(); x.moveTo(cx - rw, base); x.bezierCurveTo(cx - rw, base - h * 1.3, cx + rw, base - h * 1.3, cx + rw, base); x.fill(); x.fillRect(cx - 1, base - h - 14, 2, 14); };
+  const minaret = (cx, base, h) => { x.fillRect(cx - 3, base - h, 6, h); x.beginPath(); x.moveTo(cx - 4, base - h); x.lineTo(cx, base - h - 24); x.lineTo(cx + 4, base - h); x.fill(); x.fillRect(cx - 6, base - h * .7, 12, 3); };
+  const mosque = (cx, s) => { const base = sea - 30; x.fillRect(cx - 90 * s, base - 40 * s, 180 * s, 42 * s); domeAt(cx, base - 40 * s, 62 * s, 54 * s); domeAt(cx - 70 * s, base - 30 * s, 26 * s, 20 * s); domeAt(cx + 70 * s, base - 30 * s, 26 * s, 20 * s); for (const k of [-1, 1]) { minaret(cx + k * 112 * s, base, 150 * s); minaret(cx + k * 132 * s, base + 4, 130 * s); } };
+  mosque(W * .32, 1); mosque(W * .66, .7);
+  for (let i = 0; i < 30; i++) { const px = r() * W, hh = 20 + r() * 30; x.fillRect(px, sea - 30 - hh, 20 + r() * 26, hh + 6); }
+  // ön planda surlar
+  const wy = H * .9; x.fillStyle = '#0b0607'; x.fillRect(0, wy, W, H - wy); for (let px = 0; px < W; px += 22) x.fillRect(px, wy - 10, 12, 10); for (let k = 0; k < 6; k++) { const px = k * W / 5; x.fillRect(px - 26, wy - 52, 52, 60); for (let q = 0; q < 3; q++) x.fillRect(px - 26 + q * 20, wy - 62, 12, 10); }
+  const v = x.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.6)'); x.fillStyle = v; x.fillRect(0, 0, W, H);
+  const url = c.toDataURL('image/jpeg', .85); for (const s of document.querySelectorAll('.screen')) s.style.background = `#0b0805 url(${url}) center/cover no-repeat`;
+}
+drawMenuBg();
 (function () { // test için doğrudan başlatma: ?m=3
   const q = new URLSearchParams(location.search); if (q.has('m')) startMission(+q.get('m') - 1);
 })();

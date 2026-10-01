@@ -4,61 +4,91 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fatih — Bir Sultanın Hikâyesi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
-:root{--gold:#d9b25e;--red:#8e2a22;--ink:#1b1410;--paper:#efe0bd}
+/* Taş, ceviz ahşabı ve varak altın: Osmanlı sefer çadırı / el yazması paleti */
+:root{color-scheme:dark;
+  --gold:#d9b25e;--gold-hi:#f3d68a;--gold-lo:#8a6a2a;--red:#8e2a22;--ink:#170f09;--paper:#efe0bd;--wood:#3a2616;--wood-hi:#5a3c22;--stone:#4a443c;
+  --f-disp:'Cinzel',Georgia,'Times New Roman',serif;--f-body:'Crimson Pro',Georgia,'Times New Roman',serif}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:Georgia,'Times New Roman',serif;color:var(--paper);user-select:none}
-canvas#c{position:fixed;inset:0;display:block;cursor:crosshair}
-.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at 50% 30%,#3b1b14,#120907 70%);z-index:20;padding:20px;text-align:center}
+html,body{margin:0;height:100%;overflow:hidden;background:#0b0805;font-family:var(--f-body);font-size:16px;color:var(--paper);user-select:none}
+canvas#c{position:fixed;inset:0;display:block;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M2 2 L20 9 L12 12 L9 20 Z' fill='%23f3d68a' stroke='%23301c08' stroke-width='1.5'/%3E%3C/svg%3E") 2 2,auto}
+/* ---- ekranlar ---- */
+.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:20;padding:20px 16px;text-align:center;background:#0b0805}
 .screen.on{display:flex}
-h1{font-size:clamp(34px,6vw,64px);letter-spacing:.12em;margin:0;color:var(--gold);text-shadow:0 3px 0 #000,0 0 30px #8e2a22}
-h2{color:var(--gold);margin:.2em 0}
-.sub{opacity:.8;margin:6px 0 22px;font-style:italic}
-.btn{background:linear-gradient(#a8352a,#6d1c15);color:#fff3d6;border:2px solid var(--gold);border-radius:6px;padding:10px 22px;font:inherit;font-size:17px;cursor:pointer;margin:5px}
-.btn:hover{filter:brightness(1.2)}.btn.dis{opacity:.4;pointer-events:none}.btn.sm{padding:4px 10px;font-size:13px}
-.mlist{display:grid;gap:8px;width:min(560px,92vw)}
-.mi{display:flex;justify-content:space-between;align-items:center;text-align:left;background:rgba(0,0,0,.4);border:1px solid #6b5230;border-radius:6px;padding:10px 14px;cursor:pointer}
-.mi:hover{border-color:var(--gold)}.mi.lock{opacity:.4;pointer-events:none}.mi b{color:var(--gold)}.mi small{opacity:.7;display:block}
-.card{max-width:760px;width:94vw;max-height:84vh;overflow:auto;background:rgba(0,0,0,.55);border:2px solid #6b5230;border-radius:8px;padding:20px 26px;text-align:left;line-height:1.55;font-size:17px}
-.card p{margin:.5em 0;white-space:pre-line}.card ul{margin:.3em 0;padding-left:20px}
+#mbg{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+h1{font-family:var(--f-disp);font-weight:900;font-size:clamp(44px,8vw,96px);letter-spacing:.16em;margin:0;line-height:1;background:linear-gradient(#fff3c4,#e2b450 45%,#8a5a1a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #1a0d04) drop-shadow(0 0 24px rgba(226,180,80,.35))}
+h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;text-wrap:balance}
+.sub{opacity:.85;font-style:italic;font-size:18px;text-wrap:balance}
+.btn{font-family:var(--f-disp);font-weight:700;letter-spacing:.06em;background:linear-gradient(#a8352a,#6d1c15 60%,#4e130e);color:#fff3d6;border:2px solid var(--gold);border-radius:3px;padding:10px 24px;font-size:16px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 3px 0 #1a0d04,0 0 0 3px rgba(0,0,0,.4)}
+.btn:hover{filter:brightness(1.18)}.btn:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}.btn.sm{padding:4px 10px;font-size:12px}
+.mlist{display:grid;gap:8px;width:min(580px,100%)}
+.mi{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;background:linear-gradient(90deg,rgba(40,24,12,.92),rgba(20,12,6,.82));border:1px solid var(--gold-lo);border-left:4px solid var(--gold);padding:10px 16px;cursor:pointer;font-size:17px}
+.mi:hover{border-color:var(--gold-hi);background:linear-gradient(90deg,rgba(70,36,16,.95),rgba(30,16,8,.85))}
+.mi.lock{opacity:.4;pointer-events:none}.mi b{font-family:var(--f-disp);color:var(--gold);letter-spacing:.04em}.mi small{opacity:.75;display:block;font-style:italic}
+.card{max-width:780px;width:100%;max-height:70vh;overflow:auto;background:linear-gradient(#f1e3c2,#e3cfa2);color:#2a1a0c;border:3px double var(--gold-lo);box-shadow:0 0 0 6px rgba(20,10,4,.9),0 20px 50px rgba(0,0,0,.6);padding:22px 30px;text-align:left;line-height:1.6;font-size:18px}
+.card p{margin:.5em 0;white-space:pre-line;max-width:68ch}.card ul{margin:.3em 0;padding-left:22px}.card b{font-family:var(--f-disp);color:#6d1c15;letter-spacing:.04em}
+.card p:first-of-type::first-letter{font-family:var(--f-disp);font-size:3em;float:left;line-height:.9;margin:4px 8px 0 0;color:#8e2a22}
+/* ---- oyun arayüzü ---- */
+#vig{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 55%,rgba(10,5,0,.45))}
 #hud{position:fixed;inset:0;pointer-events:none;display:none;z-index:10}
 #hud.on{display:block}
-#top{position:absolute;left:0;right:0;top:0;height:34px;background:linear-gradient(#2a1a10,#1a0f09);border-bottom:2px solid #6b5230;display:flex;align-items:center;gap:22px;padding:0 14px;pointer-events:auto;font-size:16px}
-#top span.i{white-space:nowrap}#top .sp{flex:1}
-#objs{position:absolute;left:10px;top:44px;max-width:330px;background:rgba(15,8,5,.8);border:1px solid #6b5230;border-radius:6px;padding:8px 12px;font-size:14px;line-height:1.45}
-#objs h4{margin:0 0 4px;color:var(--gold)}#objs .ok{color:#8bd88b;text-decoration:line-through;opacity:.8}#objs .tl{color:#ffb15c;margin-top:4px}
-#log{position:absolute;left:50%;transform:translateX(-50%);top:44px;width:min(560px,50vw);pointer-events:none;text-align:center}
-#log .m{background:rgba(15,8,5,.8);border:1px solid #6b5230;border-radius:5px;margin:3px 0;padding:4px 10px;font-size:14px}
-#log .m.warn{border-color:#d2553a;color:#ffc7b5}#log .m.good{border-color:#6bb86b;color:#c8f0c8}
-#bar{position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(#2a1a10,#150b07);border-top:3px solid #6b5230;display:flex;gap:10px;padding:8px 10px;pointer-events:auto}
-#minibox{width:180px;height:140px;background:#000;border:2px solid #6b5230;display:flex;align-items:center;justify-content:center;flex:none}
-#mini{image-rendering:pixelated;cursor:pointer}
-#info{flex:1;min-width:0;font-size:14px;line-height:1.4;overflow:auto;padding:0 6px}
-#info h3{margin:0 0 3px;color:var(--gold);font-size:17px}#info .hint{opacity:.7}#info .d{opacity:.7;font-style:italic;margin-top:3px}#info .g{color:#8bd88b}
-#info .hp{height:7px;background:#400;border-radius:3px;margin:3px 0}#info .hp i{display:block;height:100%;background:#4caf50;border-radius:3px}
-#info .q{background:#3a2a1a;border:1px solid #6b5230;border-radius:3px;padding:1px 5px;cursor:pointer;display:inline-block;margin:1px}
-#card{width:min(430px,44vw);display:grid;grid-template-columns:repeat(3,1fr);gap:4px;align-content:start;flex:none}
-.cb{position:relative;background:linear-gradient(#5a3b24,#33200f);border:1px solid #8a6a3a;color:var(--paper);border-radius:4px;font:inherit;font-size:12px;padding:6px 3px 3px;cursor:pointer;height:46px;line-height:1.1}
-.cb small{display:block;font-size:10px;opacity:.85;margin-top:2px}.cb .k{position:absolute;top:1px;left:3px;font-size:9px;color:var(--gold)}
-.cb:hover{border-color:var(--gold)}.cb.dis{opacity:.45}
-#ctl{position:absolute;right:10px;top:44px;pointer-events:auto;display:flex;gap:4px}
-#pause{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:15;pointer-events:auto}
-@media(max-width:900px){#card{width:38vw}#objs{max-width:220px;font-size:12px}}
+.wood{background:linear-gradient(180deg,#5a3c22,#3a2616 40%,#2a1a0e);border:2px solid #1a0d05;box-shadow:inset 0 0 0 1px rgba(243,214,138,.35),inset 0 2px 6px rgba(255,220,160,.12)}
+#top{position:absolute;left:0;right:0;top:0;height:38px;display:flex;align-items:center;gap:20px;padding:0 16px;pointer-events:auto;font-family:var(--f-disp);font-size:16px;font-variant-numeric:tabular-nums;border-bottom:3px solid var(--gold-lo)}
+#top .i{display:flex;align-items:center;gap:6px;white-space:nowrap}#top .sp{flex:1}
+.ri{display:inline-block;width:20px;height:20px;background-size:contain;background-repeat:no-repeat;filter:drop-shadow(0 1px 0 #000)}
+.rf{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 19V6' stroke='%237a5a20' stroke-width='1.6'/%3E%3Cg fill='%23f0c94a' stroke='%237a5a20' stroke-width='.7'%3E%3Cellipse cx='10' cy='4' rx='1.8' ry='3'/%3E%3Cellipse cx='7.4' cy='8' rx='1.6' ry='2.8' transform='rotate(-35 7.4 8)'/%3E%3Cellipse cx='12.6' cy='8' rx='1.6' ry='2.8' transform='rotate(35 12.6 8)'/%3E%3Cellipse cx='7.4' cy='12' rx='1.6' ry='2.8' transform='rotate(-35 7.4 12)'/%3E%3Cellipse cx='12.6' cy='12' rx='1.6' ry='2.8' transform='rotate(35 12.6 12)'/%3E%3C/g%3E%3C/svg%3E")}
+.rw{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='2' y='6' width='14' height='9' rx='2' fill='%238a5a2a' stroke='%23321a08'/%3E%3Cellipse cx='16' cy='10.5' rx='3' ry='4.5' fill='%23d9b27a' stroke='%23321a08'/%3E%3Cellipse cx='16' cy='10.5' rx='1.4' ry='2.2' fill='none' stroke='%238a5a2a'/%3E%3C/svg%3E")}
+.rg{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='8' fill='%23f2c230' stroke='%237a5a10' stroke-width='1.4'/%3E%3Ccircle cx='10' cy='10' r='5.4' fill='none' stroke='%23a8741a'/%3E%3Cpath d='M7 6.5a4 4 0 1 0 0 7a3.2 3.2 0 1 1 0-7z' fill='%23a8741a'/%3E%3C/svg%3E")}
+.rp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='6' r='3.6' fill='%23efe0bd' stroke='%23321a08'/%3E%3Cpath d='M3 19c0-5 3-8 7-8s7 3 7 8z' fill='%23c0392b' stroke='%23321a08'/%3E%3C/svg%3E")}
+#objs{position:absolute;left:12px;top:50px;max-width:340px;background:rgba(18,10,5,.82);border:1px solid var(--gold-lo);border-top:3px solid var(--gold);padding:8px 14px;font-size:15px;line-height:1.45;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+#objs h4{margin:0 0 4px;font-family:var(--f-disp);color:var(--gold);letter-spacing:.06em}#objs .ok{color:#9be09b;text-decoration:line-through;opacity:.75}#objs .tl{color:#ffb15c;margin-top:4px}
+#log{position:absolute;left:50%;transform:translateX(-50%);top:50px;width:min(580px,52vw);pointer-events:none;text-align:center}
+#log .m{background:rgba(18,10,5,.85);border:1px solid var(--gold-lo);margin:3px 0;padding:4px 12px;font-size:16px;text-shadow:0 1px 0 #000}
+#log .m.warn{border-color:#d2553a;color:#ffc7b5}#log .m.good{border-color:#6bb86b;color:#d4f5c8}
+#bar{position:absolute;left:0;right:0;bottom:0;height:168px;display:flex;gap:10px;padding:10px 12px;pointer-events:auto;border-top:4px solid var(--gold-lo)}
+#bar::before{content:"";position:absolute;left:0;right:0;top:-12px;height:12px;background:repeating-linear-gradient(90deg,transparent 0 14px,rgba(217,178,94,.0) 14px 16px);pointer-events:none}
+#minibox{width:196px;flex:none;display:flex;align-items:center;justify-content:center;background:radial-gradient(#1a120a,#0b0805);border:2px solid var(--gold-lo);box-shadow:inset 0 0 12px #000}
+#mini{cursor:pointer}
+#info{flex:1;min-width:0;display:flex;gap:12px;font-size:15px;line-height:1.35;overflow:auto;padding:4px 10px;background:rgba(10,6,3,.45);border:1px solid rgba(217,178,94,.25)}
+#info .por{flex:none;width:84px;height:84px;border:2px solid var(--gold);background:#1a120a;box-shadow:inset 0 0 10px #000}#info .por img{width:100%;height:100%}
+#info .tx{min-width:0;flex:1}#info h3{margin:0 0 2px;font-family:var(--f-disp);color:var(--gold);font-size:18px;letter-spacing:.04em}
+#info .hint{opacity:.75;align-self:center}#info .d{opacity:.75;font-style:italic;margin-top:3px}#info .g{color:#9be09b}
+#info .hp{height:8px;background:#3a0c08;border:1px solid #000;margin:3px 0;max-width:260px}#info .hp i{display:block;height:100%;background:linear-gradient(#6fdc6f,#2f9a3a)}
+#info .q{display:inline-flex;align-items:center;gap:2px;background:#2a1a0e;border:1px solid var(--gold-lo);padding:1px 4px 1px 1px;cursor:pointer;margin:1px;font-size:12px}#info .q img{width:26px;height:26px}
+#info .grid{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}#info .gi{position:relative;width:40px;height:40px;border:1px solid var(--gold-lo);background:#1a120a}#info .gi img{width:100%;height:100%}#info .gi b{position:absolute;right:2px;bottom:0;font-size:12px;text-shadow:0 0 3px #000}
+#card{width:min(440px,44vw);display:grid;grid-template-columns:repeat(5,1fr);gap:4px;align-content:start;flex:none}
+.cb{position:relative;aspect-ratio:1;max-width:100%;background:linear-gradient(#4a3020,#24160a);border:2px solid #8a6a3a;color:var(--paper);font:inherit;font-size:11px;padding:0;cursor:pointer;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.6)}
+.cb img{position:absolute;inset:0;width:100%;height:100%}
+.cb .gl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--gold-hi);text-shadow:0 2px 0 #000}
+.cb .k{position:absolute;top:1px;left:3px;font-family:var(--f-disp);font-size:11px;color:var(--gold-hi);text-shadow:0 0 3px #000,0 0 2px #000}
+.cb .lb{position:absolute;left:0;right:0;bottom:0;background:rgba(10,5,2,.78);font-size:10.5px;line-height:1.15;padding:1px 1px 2px}
+.cb small{position:absolute;right:2px;top:1px;font-size:9.5px;text-shadow:0 0 3px #000,0 0 3px #000;display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+.cb small i{display:inline-block;width:9px;height:9px;background-size:contain;vertical-align:-1px;margin-right:1px}
+.cb small i.rf,.cb small i.rw,.cb small i.rg{width:9px;height:9px}
+.cb:hover{border-color:var(--gold-hi);filter:brightness(1.15)}.cb.dis{filter:grayscale(.85) brightness(.55)}
+.cb:focus-visible{outline:2px solid var(--gold-hi)}
+#ctl{position:absolute;right:12px;top:50px;pointer-events:auto;display:flex;gap:4px}
+#pause{position:fixed;inset:0;background:rgba(5,3,1,.7);display:none;align-items:center;justify-content:center;flex-direction:column;gap:8px;z-index:15;pointer-events:auto;padding:16px}
+@media(max-width:900px){#card{width:40vw;grid-template-columns:repeat(4,1fr)}#objs{max-width:220px;font-size:13px}#minibox{width:150px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 
+<div id="vig"></div>
 <div id="hud">
-  <div id="top">
-    <span class="i">🌾 <b id="rf">0</b></span><span class="i">🪵 <b id="rw">0</b></span><span class="i">🪙 <b id="rg">0</b></span><span class="i">👥 <b id="rp">0/0</b></span>
+  <div id="top" class="wood">
+    <span class="i" title="Yiyecek"><i class="ri rf"></i><b id="rf">0</b></span><span class="i" title="Odun"><i class="ri rw"></i><b id="rw">0</b></span><span class="i" title="Altın"><i class="ri rg"></i><b id="rg">0</b></span><span class="i" title="Nüfus"><i class="ri rp"></i><b id="rp">0/0</b></span>
     <span class="sp"></span><span class="i">⏱ <b id="rt">0:00</b></span><span class="i">Hız <b id="spd">1x</b></span>
   </div>
   <div id="objs"></div>
   <div id="log"></div>
-  <div id="ctl"><button class="btn sm" onclick="G.speed=Math.max(1,G.speed-1);uiSpeed()">−</button><button class="btn sm" onclick="G.speed=Math.min(4,G.speed+1);uiSpeed()">+</button><button class="btn sm" onclick="togglePause()">Duraklat</button></div>
-  <div id="bar">
-    <div id="minibox"><canvas id="mini" width="64" height="64"></canvas></div>
+  <div id="ctl"><button class="btn sm" onclick="G.speed=Math.max(1,G.speed-1);uiSpeed()" title="Yavaşlat">−</button><button class="btn sm" onclick="G.speed=Math.min(4,G.speed+1);uiSpeed()" title="Hızlandır">+</button><button class="btn sm" onclick="togglePause()">Menü</button></div>
+  <div id="bar" class="wood">
+    <div id="minibox"><canvas id="mini" width="64" height="32"></canvas></div>
     <div id="info"></div>
     <div id="card"></div>
   </div>
@@ -68,34 +98,35 @@ h2{color:var(--gold);margin:.2em 0}
   <button class="btn" onclick="togglePause()">Devam</button>
   <button class="btn" onclick="restartMission()">Görevi Yeniden Başlat</button>
   <button class="btn" onclick="toMenu()">Ana Menü</button>
-  <div class="sub" style="max-width:520px">Sol tık: seç / kutu seç · Sağ tık: hareket, saldır, kaynak topla · V: saldırarak ilerle · H: Sultan'a git · Ctrl+1..9: grup · WASD/ok: kaydır · Tekerlek: yakınlaş · P/Esc: duraklat · . ve ,: hız</div>
+  <div class="sub" style="max-width:560px;font-size:16px">Sol tık: seç / kutu seç · Sağ tık: hareket, saldır, kaynak topla · V: saldırarak ilerle · S: dur · G: mevzi · H: Sultan'a git · Ctrl+1..9: grup · Ok tuşları / ekran kenarı: kaydır · Tekerlek: yakınlaş · P / Esc: duraklat · . ve ,: hız</div>
 </div>
 
 <div id="menu" class="screen on">
   <h1>FATİH</h1>
-  <div class="sub">Bir Sultanın Hikâyesi — Tahta Çıkıştan Vefata (1451–1481)</div>
+  <div class="sub">Bir Sultanın Hikâyesi — Tahta Çıkıştan Vefata, 1451–1481</div>
   <div class="mlist" id="mlist"></div>
-  <div style="margin-top:14px"><button class="btn sm" onclick="resetProg()">İlerlemeyi sıfırla</button></div>
+  <div><button class="btn sm" onclick="resetProg()">İlerlemeyi sıfırla</button></div>
 </div>
 
 <div id="brief" class="screen">
   <h2 id="bt"></h2><div class="sub" id="bd"></div>
   <div class="card"><p id="bx"></p><b>Hedefler</b><ul id="bo"></ul><b>Dikkat:</b> <span id="bw"></span></div>
-  <div><button class="btn" id="bgo">Göreve Başla</button><button class="btn" onclick="toMenu()">Menü</button></div>
+  <div><button class="btn" id="bgo">Göreve Başla</button> <button class="btn" onclick="toMenu()">Menü</button></div>
 </div>
 
 <div id="result" class="screen">
-  <h2 id="rtitle"></h2><div class="card"><p id="rtext"></p><p id="rhist" style="color:var(--gold)"></p><p id="rstat" style="opacity:.7;font-size:14px"></p></div>
+  <h2 id="rtitle"></h2><div class="card"><p id="rtext"></p><p id="rhist" style="color:#6d1c15;font-style:italic"></p><p id="rstat" style="opacity:.7;font-size:15px"></p></div>
   <div id="rbtns"></div>
 </div>
 
 <div id="epi" class="screen">
-  <h2 id="et"></h2><div class="card" id="el" style="font-size:18px"></div>
+  <h2 id="et"></h2><div class="card" id="el"></div>
   <div><button class="btn" onclick="toMenu()">Ana Menü</button></div>
 </div>
 
 <script src="engine.js"></script>
 <script src="missions.js"></script>
+<script src="gfx.js"></script>
 <script src="ui.js"></script>
 <script src="main.js"></script>
 </body>
