@@ -54,7 +54,7 @@ Chapters:
 
 **Photo credits (paste into the description):**
 - George Eastman: George Grantham Bain Collection, Library of Congress, via Wikimedia Commons (no known copyright restrictions)
-- Steve Sasson: PHOTOGRAPHER NAME (fill in), CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), via Wikimedia Commons, cropped
+- Steve Sasson: Aljawad, CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/), via Wikimedia Commons, cropped
 - Other images: original AI-generated illustrations (no real people depicted)
 
 **Tags:** kodak, kodak bankruptcy, digital camera, why kodak failed, innovator's dilemma, steve sasson, business case study, business stories, company collapse, disruption
