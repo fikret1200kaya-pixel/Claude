@@ -1,13 +1,4 @@
 // ===== Scenes 2: too late → collapse → lessons → outro =====
-function slam(s, x, y, t, t0, o = {}) { const p = t - t0; if (p < 0) return; const k = E.outB(cl(p / .3)); txt(s, x, y, Object.assign({ size: 200, color: '#fff', align: 'center', glow: 40, glowColor: ORANGE, sp: 6, scale: lerp(1.5, 1, cl(p / .15)), alpha: cl(p / .08) }, o)); }
-function spot(x, y, r, a = 1) { ctx.save(); ctx.globalAlpha *= a; const g = ctx.createRadialGradient(x, y, 20, x, y, r); g.addColorStop(0, 'rgba(255,170,100,.40)'); g.addColorStop(1, 'rgba(255,170,100,0)'); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2); ctx.restore(); }
-function numeral(n, label, t, a, sub) {
-  const lt = t - a, p = E.outQ(seg(lt, .1, .8));
-  txt(n, 96, 470, { size: 400, color: ORANGE, sp: 4, glow: 40, alpha: p, scale: .8 + .2 * p });
-  ctx.fillStyle = CREAM; ctx.fillRect(100, 510, 860 * E.outC(seg(lt, .5, 1.3)), 6);
-  bigLine(label, 100, 620, seg(lt, .5, 1.5), { size: 96, sp: 5, color: '#fff' });
-  if (sub) txt(sub, 100, 600, { size: 50, color: STEEL, sp: 4, alpha: seg(lt, 1.2, 2) });
-}
 
 scene('growing', T0(27), T0(29), (t, a) => {
   tag('05 · TOO LATE', t, a);

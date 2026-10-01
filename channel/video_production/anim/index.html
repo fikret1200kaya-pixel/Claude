@@ -15,6 +15,7 @@ window.ready = (async () => {
   await load(`videos/${VID}/manifest.js`);
   await load(`videos/${VID}/data.js`);
   await load('engine.js');
+  await load('lib.js');
   for (const f of VIDEO.scripts) if (f !== 'data.js') await load(`videos/${VID}/${f}`);
   await load('main.js');
   await window.mainReady;

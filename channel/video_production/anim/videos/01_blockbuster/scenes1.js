@@ -1,14 +1,4 @@
 // ===== Scenes 1: cold open → the offer =====
-const SCENES = [];
-function scene(name, a, b, fn) { SCENES.push({ name, a, b, fn }); }
-function gear(x, y, r, ang, col = STEEL) {
-  ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.fillStyle = col; ctx.strokeStyle = col;
-  ctx.beginPath(); for (let i = 0; i < 12; i++) { const a0 = i * Math.PI / 6, a1 = a0 + Math.PI / 12; ctx.lineTo(Math.cos(a0) * r * 1.15, Math.sin(a0) * r * 1.15); ctx.lineTo(Math.cos(a1) * r * 1.15, Math.sin(a1) * r * 1.15); ctx.lineTo(Math.cos(a1) * r * .95, Math.sin(a1) * r * .95); ctx.lineTo(Math.cos(a0 + Math.PI / 6) * r * .95, Math.sin(a0 + Math.PI / 6) * r * .95); }
-  ctx.closePath(); ctx.fill(); ctx.fillStyle = NAVY; ctx.beginPath(); ctx.arc(0, 0, r * .45, 0, 7); ctx.fill(); ctx.restore();
-}
-function flatCoin(x, y, r) { const g = ctx.createLinearGradient(0, y - r, 0, y + r); g.addColorStop(0, '#FFE08A'); g.addColorStop(1, '#C8801A'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x, y, r, r * .38, 0, 0, 7); ctx.fill(); ctx.strokeStyle = '#9a5d10'; ctx.lineWidth = 2; ctx.stroke(); }
-function tape(x, y, w, a = 1) { ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y); ctx.fillStyle = '#10182c'; ctx.strokeStyle = CREAM; ctx.lineWidth = 3; rr(-w / 2, -w * .3, w, w * .6, 6); ctx.fill(); ctx.stroke(); ctx.fillStyle = CREAM; for (const dx of [-w * .22, w * .22]) { ctx.beginPath(); ctx.arc(dx, 0, w * .11, 0, 7); ctx.fill(); } ctx.fillStyle = ORANGE; ctx.fillRect(-w * .3, -w * .24, w * .6, w * .07); ctx.restore(); }
-function bigLine(s, x, y, p, o = {}) { txt(typed(s, p), x, y, Object.assign({ size: 70, color: CREAM, sp: 3 }, o)); }
 
 // --- COLD OPEN ---
 scene('year2000', 0, T0(1), (t, a) => {
