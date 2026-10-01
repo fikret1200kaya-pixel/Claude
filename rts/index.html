@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fatih — Bir Sultanın Hikâyesi</title>
+<style>
+:root{--gold:#d9b25e;--red:#8e2a22;--ink:#1b1410;--paper:#efe0bd}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:Georgia,'Times New Roman',serif;color:var(--paper);user-select:none}
+canvas#c{position:fixed;inset:0;display:block;cursor:crosshair}
+.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at 50% 30%,#3b1b14,#120907 70%);z-index:20;padding:20px;text-align:center}
+.screen.on{display:flex}
+h1{font-size:clamp(34px,6vw,64px);letter-spacing:.12em;margin:0;color:var(--gold);text-shadow:0 3px 0 #000,0 0 30px #8e2a22}
+h2{color:var(--gold);margin:.2em 0}
+.sub{opacity:.8;margin:6px 0 22px;font-style:italic}
+.btn{background:linear-gradient(#a8352a,#6d1c15);color:#fff3d6;border:2px solid var(--gold);border-radius:6px;padding:10px 22px;font:inherit;font-size:17px;cursor:pointer;margin:5px}
+.btn:hover{filter:brightness(1.2)}.btn.dis{opacity:.4;pointer-events:none}.btn.sm{padding:4px 10px;font-size:13px}
+.mlist{display:grid;gap:8px;width:min(560px,92vw)}
+.mi{display:flex;justify-content:space-between;align-items:center;text-align:left;background:rgba(0,0,0,.4);border:1px solid #6b5230;border-radius:6px;padding:10px 14px;cursor:pointer}
+.mi:hover{border-color:var(--gold)}.mi.lock{opacity:.4;pointer-events:none}.mi b{color:var(--gold)}.mi small{opacity:.7;display:block}
+.card{max-width:760px;width:94vw;max-height:84vh;overflow:auto;background:rgba(0,0,0,.55);border:2px solid #6b5230;border-radius:8px;padding:20px 26px;text-align:left;line-height:1.55;font-size:17px}
+.card p{margin:.5em 0;white-space:pre-line}.card ul{margin:.3em 0;padding-left:20px}
+#hud{position:fixed;inset:0;pointer-events:none;display:none;z-index:10}
+#hud.on{display:block}
+#top{position:absolute;left:0;right:0;top:0;height:34px;background:linear-gradient(#2a1a10,#1a0f09);border-bottom:2px solid #6b5230;display:flex;align-items:center;gap:22px;padding:0 14px;pointer-events:auto;font-size:16px}
+#top span.i{white-space:nowrap}#top .sp{flex:1}
+#objs{position:absolute;left:10px;top:44px;max-width:330px;background:rgba(15,8,5,.8);border:1px solid #6b5230;border-radius:6px;padding:8px 12px;font-size:14px;line-height:1.45}
+#objs h4{margin:0 0 4px;color:var(--gold)}#objs .ok{color:#8bd88b;text-decoration:line-through;opacity:.8}#objs .tl{color:#ffb15c;margin-top:4px}
+#log{position:absolute;left:50%;transform:translateX(-50%);top:44px;width:min(560px,50vw);pointer-events:none;text-align:center}
+#log .m{background:rgba(15,8,5,.8);border:1px solid #6b5230;border-radius:5px;margin:3px 0;padding:4px 10px;font-size:14px}
+#log .m.warn{border-color:#d2553a;color:#ffc7b5}#log .m.good{border-color:#6bb86b;color:#c8f0c8}
+#bar{position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(#2a1a10,#150b07);border-top:3px solid #6b5230;display:flex;gap:10px;padding:8px 10px;pointer-events:auto}
+#minibox{width:180px;height:140px;background:#000;border:2px solid #6b5230;display:flex;align-items:center;justify-content:center;flex:none}
+#mini{image-rendering:pixelated;cursor:pointer}
+#info{flex:1;min-width:0;font-size:14px;line-height:1.4;overflow:auto;padding:0 6px}
+#info h3{margin:0 0 3px;color:var(--gold);font-size:17px}#info .hint{opacity:.7}#info .d{opacity:.7;font-style:italic;margin-top:3px}#info .g{color:#8bd88b}
+#info .hp{height:7px;background:#400;border-radius:3px;margin:3px 0}#info .hp i{display:block;height:100%;background:#4caf50;border-radius:3px}
+#info .q{background:#3a2a1a;border:1px solid #6b5230;border-radius:3px;padding:1px 5px;cursor:pointer;display:inline-block;margin:1px}
+#card{width:min(430px,44vw);display:grid;grid-template-columns:repeat(3,1fr);gap:4px;align-content:start;flex:none}
+.cb{position:relative;background:linear-gradient(#5a3b24,#33200f);border:1px solid #8a6a3a;color:var(--paper);border-radius:4px;font:inherit;font-size:12px;padding:6px 3px 3px;cursor:pointer;height:46px;line-height:1.1}
+.cb small{display:block;font-size:10px;opacity:.85;margin-top:2px}.cb .k{position:absolute;top:1px;left:3px;font-size:9px;color:var(--gold)}
+.cb:hover{border-color:var(--gold)}.cb.dis{opacity:.45}
+#ctl{position:absolute;right:10px;top:44px;pointer-events:auto;display:flex;gap:4px}
+#pause{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:15;pointer-events:auto}
+@media(max-width:900px){#card{width:38vw}#objs{max-width:220px;font-size:12px}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div id="top">
+    <span class="i">🌾 <b id="rf">0</b></span><span class="i">🪵 <b id="rw">0</b></span><span class="i">🪙 <b id="rg">0</b></span><span class="i">👥 <b id="rp">0/0</b></span>
+    <span class="sp"></span><span class="i">⏱ <b id="rt">0:00</b></span><span class="i">Hız <b id="spd">1x</b></span>
+  </div>
+  <div id="objs"></div>
+  <div id="log"></div>
+  <div id="ctl"><button class="btn sm" onclick="G.speed=Math.max(1,G.speed-1);uiSpeed()">−</button><button class="btn sm" onclick="G.speed=Math.min(4,G.speed+1);uiSpeed()">+</button><button class="btn sm" onclick="togglePause()">Duraklat</button></div>
+  <div id="bar">
+    <div id="minibox"><canvas id="mini" width="64" height="64"></canvas></div>
+    <div id="info"></div>
+    <div id="card"></div>
+  </div>
+</div>
+
+<div id="pause"><h2>Duraklatıldı</h2>
+  <button class="btn" onclick="togglePause()">Devam</button>
+  <button class="btn" onclick="restartMission()">Görevi Yeniden Başlat</button>
+  <button class="btn" onclick="toMenu()">Ana Menü</button>
+  <div class="sub" style="max-width:520px">Sol tık: seç / kutu seç · Sağ tık: hareket, saldır, kaynak topla · V: saldırarak ilerle · H: Sultan'a git · Ctrl+1..9: grup · WASD/ok: kaydır · Tekerlek: yakınlaş · P/Esc: duraklat · . ve ,: hız</div>
+</div>
+
+<div id="menu" class="screen on">
+  <h1>FATİH</h1>
+  <div class="sub">Bir Sultanın Hikâyesi — Tahta Çıkıştan Vefata (1451–1481)</div>
+  <div class="mlist" id="mlist"></div>
+  <div style="margin-top:14px"><button class="btn sm" onclick="resetProg()">İlerlemeyi sıfırla</button></div>
+</div>
+
+<div id="brief" class="screen">
+  <h2 id="bt"></h2><div class="sub" id="bd"></div>
+  <div class="card"><p id="bx"></p><b>Hedefler</b><ul id="bo"></ul><b>Dikkat:</b> <span id="bw"></span></div>
+  <div><button class="btn" id="bgo">Göreve Başla</button><button class="btn" onclick="toMenu()">Menü</button></div>
+</div>
+
+<div id="result" class="screen">
+  <h2 id="rtitle"></h2><div class="card"><p id="rtext"></p><p id="rhist" style="color:var(--gold)"></p><p id="rstat" style="opacity:.7;font-size:14px"></p></div>
+  <div id="rbtns"></div>
+</div>
+
+<div id="epi" class="screen">
+  <h2 id="et"></h2><div class="card" id="el" style="font-size:18px"></div>
+  <div><button class="btn" onclick="toMenu()">Ana Menü</button></div>
+</div>
+
+<script src="engine.js"></script>
+<script src="missions.js"></script>
+<script src="ui.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
