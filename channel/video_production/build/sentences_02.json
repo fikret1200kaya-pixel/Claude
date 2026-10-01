@@ -1,0 +1,2595 @@
+[
+ {
+  "i": 0,
+  "para": 0,
+  "text": "Nineteen seventy-five.",
+  "t0": 0.2,
+  "words": [
+   [
+    "nineteen",
+    0.2
+   ],
+   [
+    "seventy",
+    0.2
+   ],
+   [
+    "five",
+    0.2
+   ]
+  ],
+  "t1": 2.15
+ },
+ {
+  "i": 1,
+  "para": 0,
+  "text": "A young engineer at Kodak builds a strange gadget: a toaster-sized box with a lens, a tape recorder, and a tiny screen.",
+  "t0": 2.4,
+  "words": [
+   [
+    "a",
+    2.4
+   ],
+   [
+    "young",
+    2.56
+   ],
+   [
+    "engineer",
+    2.68
+   ],
+   [
+    "at",
+    3.08
+   ],
+   [
+    "kodak",
+    3.2
+   ],
+   [
+    "builds",
+    3.6
+   ],
+   [
+    "a",
+    3.88
+   ],
+   [
+    "strange",
+    4.04
+   ],
+   [
+    "gadget",
+    4.36
+   ],
+   [
+    "a",
+    5.2
+   ],
+   [
+    "toaster",
+    5.32
+   ],
+   [
+    "sized",
+    5.76
+   ],
+   [
+    "box",
+    6.0
+   ],
+   [
+    "with",
+    6.28
+   ],
+   [
+    "a",
+    6.44
+   ],
+   [
+    "lens",
+    6.6
+   ],
+   [
+    "a",
+    7.16
+   ],
+   [
+    "tape",
+    7.45
+   ],
+   [
+    "recorder",
+    7.75
+   ],
+   [
+    "and",
+    8.04
+   ],
+   [
+    "a",
+    8.2
+   ],
+   [
+    "tiny",
+    8.32
+   ],
+   [
+    "screen",
+    8.72
+   ]
+  ],
+  "t1": 9.47
+ },
+ {
+  "i": 2,
+  "para": 0,
+  "text": "It's the world's first digital camera.",
+  "t0": 9.72,
+  "words": [
+   [
+    "its",
+    9.72
+   ],
+   [
+    "the",
+    9.96
+   ],
+   [
+    "worlds",
+    10.12
+   ],
+   [
+    "first",
+    10.44
+   ],
+   [
+    "digital",
+    10.68
+   ],
+   [
+    "camera",
+    11.12
+   ]
+  ],
+  "t1": 11.99
+ },
+ {
+  "i": 3,
+  "para": 0,
+  "text": "His bosses look at it and say: \"That's cute, but don't tell anyone about it.\" Thirty-seven years later, Kodak files for bankruptcy.",
+  "t0": 12.24,
+  "words": [
+   [
+    "his",
+    12.24
+   ],
+   [
+    "bosses",
+    12.56
+   ],
+   [
+    "look",
+    12.88
+   ],
+   [
+    "at",
+    13.0
+   ],
+   [
+    "it",
+    13.16
+   ],
+   [
+    "and",
+    13.32
+   ],
+   [
+    "say",
+    13.64
+   ],
+   [
+    "thats",
+    14.16
+   ],
+   [
+    "cute",
+    14.6
+   ],
+   [
+    "but",
+    15.4
+   ],
+   [
+    "dont",
+    15.6
+   ],
+   [
+    "tell",
+    15.84
+   ],
+   [
+    "anyone",
+    16.14
+   ],
+   [
+    "about",
+    16.44
+   ],
+   [
+    "it",
+    16.6
+   ],
+   [
+    "thirty",
+    17.92
+   ],
+   [
+    "seven",
+    18.24
+   ],
+   [
+    "years",
+    18.48
+   ],
+   [
+    "later",
+    18.76
+   ],
+   [
+    "kodak",
+    19.04
+   ],
+   [
+    "files",
+    19.44
+   ],
+   [
+    "for",
+    19.76
+   ],
+   [
+    "bankruptcy",
+    19.96
+   ]
+  ],
+  "t1": 21.35
+ },
+ {
+  "i": 4,
+  "para": 1,
+  "text": "George Eastman founded Kodak in the late eighteen hundreds with a simple slogan: \"You press the button, we do the rest.\" Photography became something for everyone.",
+  "t0": 21.6,
+  "words": [
+   [
+    "george",
+    21.6
+   ],
+   [
+    "eastman",
+    21.96
+   ],
+   [
+    "founded",
+    22.4
+   ],
+   [
+    "kodak",
+    22.72
+   ],
+   [
+    "in",
+    23.08
+   ],
+   [
+    "the",
+    23.2
+   ],
+   [
+    "late",
+    23.36
+   ],
+   [
+    "eighteen",
+    23.52
+   ],
+   [
+    "hundreds",
+    23.88
+   ],
+   [
+    "with",
+    24.2
+   ],
+   [
+    "a",
+    24.36
+   ],
+   [
+    "simple",
+    24.44
+   ],
+   [
+    "slogan",
+    24.8
+   ],
+   [
+    "you",
+    25.92
+   ],
+   [
+    "press",
+    26.12
+   ],
+   [
+    "the",
+    26.32
+   ],
+   [
+    "button",
+    26.44
+   ],
+   [
+    "we",
+    26.92
+   ],
+   [
+    "do",
+    27.12
+   ],
+   [
+    "the",
+    27.28
+   ],
+   [
+    "rest",
+    27.48
+   ],
+   [
+    "photography",
+    29.0
+   ],
+   [
+    "became",
+    29.64
+   ],
+   [
+    "something",
+    30.08
+   ],
+   [
+    "for",
+    30.36
+   ],
+   [
+    "everyone",
+    30.52
+   ]
+  ],
+  "t1": 31.63
+ },
+ {
+  "i": 5,
+  "para": 2,
+  "text": "For about a century, Kodak dominated.",
+  "t0": 31.88,
+  "words": [
+   [
+    "for",
+    31.88
+   ],
+   [
+    "about",
+    32.04
+   ],
+   [
+    "a",
+    32.32
+   ],
+   [
+    "century",
+    32.44
+   ],
+   [
+    "kodak",
+    32.9
+   ],
+   [
+    "dominated",
+    33.36
+   ]
+  ],
+  "t1": 34.35
+ },
+ {
+  "i": 6,
+  "para": 2,
+  "text": "In the United States it controlled the vast majority of film and camera sales.",
+  "t0": 34.6,
+  "words": [
+   [
+    "in",
+    34.6
+   ],
+   [
+    "the",
+    34.76
+   ],
+   [
+    "united",
+    34.92
+   ],
+   [
+    "states",
+    35.28
+   ],
+   [
+    "it",
+    35.52
+   ],
+   [
+    "controlled",
+    35.64
+   ],
+   [
+    "the",
+    36.04
+   ],
+   [
+    "vast",
+    36.2
+   ],
+   [
+    "majority",
+    36.48
+   ],
+   [
+    "of",
+    36.92
+   ],
+   [
+    "film",
+    37.12
+   ],
+   [
+    "and",
+    37.32
+   ],
+   [
+    "camera",
+    37.48
+   ],
+   [
+    "sales",
+    37.88
+   ]
+  ],
+  "t1": 39.11
+ },
+ {
+  "i": 7,
+  "para": 2,
+  "text": "At its peak in the nineteen eighties it employed well over a hundred thousand people.",
+  "t0": 39.36,
+  "words": [
+   [
+    "at",
+    39.36
+   ],
+   [
+    "its",
+    39.52
+   ],
+   [
+    "peak",
+    39.72
+   ],
+   [
+    "in",
+    39.92
+   ],
+   [
+    "the",
+    40.04
+   ],
+   [
+    "nineteen",
+    40.16
+   ],
+   [
+    "eighties",
+    40.56
+   ],
+   [
+    "it",
+    41.28
+   ],
+   [
+    "employed",
+    41.36
+   ],
+   [
+    "well",
+    41.8
+   ],
+   [
+    "over",
+    42.0
+   ],
+   [
+    "a",
+    42.24
+   ],
+   [
+    "hundred",
+    42.36
+   ],
+   [
+    "thousand",
+    42.64
+   ],
+   [
+    "people",
+    43.08
+   ]
+  ],
+  "t1": 43.85
+ },
+ {
+  "i": 8,
+  "para": 2,
+  "text": "Kodak made money the way a razor company does: sell the camera cheaply, then earn forever on the film.",
+  "t0": 44.1,
+  "words": [
+   [
+    "kodak",
+    44.1
+   ],
+   [
+    "made",
+    45.12
+   ],
+   [
+    "money",
+    45.28
+   ],
+   [
+    "the",
+    45.52
+   ],
+   [
+    "way",
+    45.72
+   ],
+   [
+    "a",
+    45.8
+   ],
+   [
+    "razor",
+    45.92
+   ],
+   [
+    "company",
+    46.32
+   ],
+   [
+    "does",
+    46.84
+   ],
+   [
+    "sell",
+    47.72
+   ],
+   [
+    "the",
+    47.88
+   ],
+   [
+    "camera",
+    48.04
+   ],
+   [
+    "cheaply",
+    48.4
+   ],
+   [
+    "then",
+    49.0
+   ],
+   [
+    "earn",
+    49.16
+   ],
+   [
+    "forever",
+    49.46
+   ],
+   [
+    "on",
+    49.76
+   ],
+   [
+    "the",
+    49.88
+   ],
+   [
+    "film",
+    50.04
+   ]
+  ],
+  "t1": 51.27
+ },
+ {
+  "i": 9,
+  "para": 3,
+  "text": "In nineteen seventy-five, Steve Sasson, a Kodak engineer, built the first self-contained digital camera.",
+  "t0": 51.52,
+  "words": [
+   [
+    "in",
+    51.52
+   ],
+   [
+    "nineteen",
+    51.68
+   ],
+   [
+    "seventy",
+    52.16
+   ],
+   [
+    "five",
+    52.52
+   ],
+   [
+    "steve",
+    52.84
+   ],
+   [
+    "sasson",
+    53.16
+   ],
+   [
+    "a",
+    53.8
+   ],
+   [
+    "kodak",
+    53.96
+   ],
+   [
+    "engineer",
+    54.4
+   ],
+   [
+    "built",
+    55.44
+   ],
+   [
+    "the",
+    55.72
+   ],
+   [
+    "first",
+    55.84
+   ],
+   [
+    "self",
+    56.08
+   ],
+   [
+    "contained",
+    56.32
+   ],
+   [
+    "digital",
+    56.68
+   ],
+   [
+    "camera",
+    57.08
+   ]
+  ],
+  "t1": 58.03
+ },
+ {
+  "i": 10,
+  "para": 3,
+  "text": "It captured a zero point zero one megapixel black-and-white image, and took about twenty-three seconds to record it onto a cassette tape.",
+  "t0": 58.28,
+  "words": [
+   [
+    "it",
+    58.28
+   ],
+   [
+    "captured",
+    58.56
+   ],
+   [
+    "a",
+    58.88
+   ],
+   [
+    "zero",
+    59.0
+   ],
+   [
+    "point",
+    59.4
+   ],
+   [
+    "zero",
+    59.64
+   ],
+   [
+    "one",
+    60.04
+   ],
+   [
+    "megapixel",
+    60.46
+   ],
+   [
+    "black",
+    60.88
+   ],
+   [
+    "and",
+    61.12
+   ],
+   [
+    "white",
+    61.24
+   ],
+   [
+    "image",
+    61.52
+   ],
+   [
+    "and",
+    62.48
+   ],
+   [
+    "took",
+    62.72
+   ],
+   [
+    "about",
+    62.92
+   ],
+   [
+    "twenty",
+    63.16
+   ],
+   [
+    "three",
+    63.48
+   ],
+   [
+    "seconds",
+    63.68
+   ],
+   [
+    "to",
+    64.04
+   ],
+   [
+    "record",
+    64.16
+   ],
+   [
+    "it",
+    64.48
+   ],
+   [
+    "onto",
+    64.72
+   ],
+   [
+    "a",
+    64.96
+   ],
+   [
+    "cassette",
+    65.22
+   ],
+   [
+    "tape",
+    65.48
+   ]
+  ],
+  "t1": 66.63
+ },
+ {
+  "i": 11,
+  "para": 4,
+  "text": "Sasson later recalled that management's reaction was less excitement and more confusion.",
+  "t0": 66.88,
+  "words": [
+   [
+    "sasson",
+    66.88
+   ],
+   [
+    "later",
+    67.2
+   ],
+   [
+    "recalled",
+    67.44
+   ],
+   [
+    "that",
+    67.76
+   ],
+   [
+    "managements",
+    67.92
+   ],
+   [
+    "reaction",
+    68.48
+   ],
+   [
+    "was",
+    68.88
+   ],
+   [
+    "less",
+    69.12
+   ],
+   [
+    "excitement",
+    69.28
+   ],
+   [
+    "and",
+    70.16
+   ],
+   [
+    "more",
+    70.44
+   ],
+   [
+    "confusion",
+    70.64
+   ]
+  ],
+  "t1": 72.07
+ },
+ {
+  "i": 12,
+  "para": 4,
+  "text": "Why would anyone want to look at pictures on a TV screen?",
+  "t0": 72.32,
+  "words": [
+   [
+    "why",
+    72.32
+   ],
+   [
+    "would",
+    72.44
+   ],
+   [
+    "anyone",
+    72.64
+   ],
+   [
+    "want",
+    72.96
+   ],
+   [
+    "to",
+    73.06
+   ],
+   [
+    "look",
+    73.16
+   ],
+   [
+    "at",
+    73.32
+   ],
+   [
+    "pictures",
+    73.44
+   ],
+   [
+    "on",
+    73.8
+   ],
+   [
+    "a",
+    73.96
+   ],
+   [
+    "tv",
+    74.2
+   ],
+   [
+    "screen",
+    74.44
+   ]
+  ],
+  "t1": 75.31
+ },
+ {
+  "i": 13,
+  "para": 4,
+  "text": "And, more importantly, it threatened Kodak's most profitable business: film.",
+  "t0": 75.56,
+  "words": [
+   [
+    "and",
+    75.56
+   ],
+   [
+    "more",
+    75.84
+   ],
+   [
+    "importantly",
+    76.0
+   ],
+   [
+    "it",
+    77.24
+   ],
+   [
+    "threatened",
+    77.44
+   ],
+   [
+    "kodaks",
+    77.88
+   ],
+   [
+    "most",
+    78.4
+   ],
+   [
+    "profitable",
+    78.56
+   ],
+   [
+    "business",
+    79.08
+   ],
+   [
+    "film",
+    80.52
+   ]
+  ],
+  "t1": 81.17
+ },
+ {
+  "i": 14,
+  "para": 5,
+  "text": "Kodak did patent the technology, and even sold early digital cameras in the nineteen nineties.",
+  "t0": 81.42,
+  "words": [
+   [
+    "kodak",
+    81.42
+   ],
+   [
+    "did",
+    82.32
+   ],
+   [
+    "patent",
+    82.56
+   ],
+   [
+    "the",
+    82.8
+   ],
+   [
+    "technology",
+    82.92
+   ],
+   [
+    "and",
+    83.92
+   ],
+   [
+    "even",
+    84.16
+   ],
+   [
+    "sold",
+    84.48
+   ],
+   [
+    "early",
+    84.68
+   ],
+   [
+    "digital",
+    84.96
+   ],
+   [
+    "cameras",
+    85.44
+   ],
+   [
+    "in",
+    85.76
+   ],
+   [
+    "the",
+    85.88
+   ],
+   [
+    "nineteen",
+    86.0
+   ],
+   [
+    "nineties",
+    86.44
+   ]
+  ],
+  "t1": 87.35
+ },
+ {
+  "i": 15,
+  "para": 5,
+  "text": "But the leadership kept protecting film, which was still printing money.",
+  "t0": 87.6,
+  "words": [
+   [
+    "but",
+    87.6
+   ],
+   [
+    "the",
+    87.76
+   ],
+   [
+    "leadership",
+    87.92
+   ],
+   [
+    "kept",
+    88.4
+   ],
+   [
+    "protecting",
+    88.64
+   ],
+   [
+    "film",
+    89.16
+   ],
+   [
+    "which",
+    89.8
+   ],
+   [
+    "was",
+    90.0
+   ],
+   [
+    "still",
+    90.16
+   ],
+   [
+    "printing",
+    90.36
+   ],
+   [
+    "money",
+    90.76
+   ]
+  ],
+  "t1": 92.23
+ },
+ {
+  "i": 16,
+  "para": 6,
+  "text": "This is the classic innovator's dilemma.",
+  "t0": 92.48,
+  "words": [
+   [
+    "this",
+    92.48
+   ],
+   [
+    "is",
+    92.68
+   ],
+   [
+    "the",
+    92.8
+   ],
+   [
+    "classic",
+    92.96
+   ],
+   [
+    "innovators",
+    93.32
+   ],
+   [
+    "dilemma",
+    93.84
+   ]
+  ],
+  "t1": 94.31
+ },
+ {
+  "i": 17,
+  "para": 6,
+  "text": "Digital photography would be cheaper, but it would also destroy the film revenue.",
+  "t0": 94.56,
+  "words": [
+   [
+    "digital",
+    94.56
+   ],
+   [
+    "photography",
+    95.28
+   ],
+   [
+    "would",
+    95.88
+   ],
+   [
+    "be",
+    96.04
+   ],
+   [
+    "cheaper",
+    96.2
+   ],
+   [
+    "but",
+    96.84
+   ],
+   [
+    "it",
+    97.04
+   ],
+   [
+    "would",
+    97.16
+   ],
+   [
+    "also",
+    97.36
+   ],
+   [
+    "destroy",
+    97.6
+   ],
+   [
+    "the",
+    97.96
+   ],
+   [
+    "film",
+    98.08
+   ],
+   [
+    "revenue",
+    98.32
+   ]
+  ],
+  "t1": 99.71
+ },
+ {
+  "i": 18,
+  "para": 6,
+  "text": "Every step toward digital felt like cutting off the branch the company was sitting on.",
+  "t0": 99.96,
+  "words": [
+   [
+    "every",
+    99.96
+   ],
+   [
+    "step",
+    100.2
+   ],
+   [
+    "toward",
+    100.44
+   ],
+   [
+    "digital",
+    100.78
+   ],
+   [
+    "felt",
+    101.12
+   ],
+   [
+    "like",
+    101.32
+   ],
+   [
+    "cutting",
+    101.52
+   ],
+   [
+    "off",
+    101.72
+   ],
+   [
+    "the",
+    101.92
+   ],
+   [
+    "branch",
+    102.04
+   ],
+   [
+    "the",
+    102.4
+   ],
+   [
+    "company",
+    102.52
+   ],
+   [
+    "was",
+    102.84
+   ],
+   [
+    "sitting",
+    102.96
+   ],
+   [
+    "on",
+    103.32
+   ]
+  ],
+  "t1": 104.07
+ },
+ {
+  "i": 19,
+  "para": 7,
+  "text": "So Kodak hesitated.",
+  "t0": 104.32,
+  "words": [
+   [
+    "so",
+    104.32
+   ],
+   [
+    "kodak",
+    104.48
+   ],
+   [
+    "hesitated",
+    104.88
+   ]
+  ],
+  "t1": 105.71
+ },
+ {
+  "i": 20,
+  "para": 7,
+  "text": "Competitors didn't.",
+  "t0": 105.96,
+  "words": [
+   [
+    "competitors",
+    105.96
+   ],
+   [
+    "didnt",
+    106.6
+   ]
+  ],
+  "t1": 107.27
+ },
+ {
+  "i": 21,
+  "para": 7,
+  "text": "Japanese companies like Sony, Canon and Fujifilm pushed digital hard.",
+  "t0": 107.52,
+  "words": [
+   [
+    "japanese",
+    107.52
+   ],
+   [
+    "companies",
+    107.96
+   ],
+   [
+    "like",
+    108.36
+   ],
+   [
+    "sony",
+    108.6
+   ],
+   [
+    "canon",
+    109.34
+   ],
+   [
+    "and",
+    110.08
+   ],
+   [
+    "fujifilm",
+    110.76
+   ],
+   [
+    "pushed",
+    111.44
+   ],
+   [
+    "digital",
+    111.76
+   ],
+   [
+    "hard",
+    112.28
+   ]
+  ],
+  "t1": 113.08
+ },
+ {
+  "i": 22,
+  "para": 7,
+  "text": "Fujifilm, Kodak's rival in film, used its chemistry know-how to expand into other industries, such as healthcare and cosmetics.",
+  "t0": 113.33,
+  "words": [
+   [
+    "fujifilm",
+    113.33
+   ],
+   [
+    "kodaks",
+    114.39
+   ],
+   [
+    "rival",
+    115.44
+   ],
+   [
+    "in",
+    115.84
+   ],
+   [
+    "film",
+    115.96
+   ],
+   [
+    "used",
+    116.64
+   ],
+   [
+    "its",
+    116.92
+   ],
+   [
+    "chemistry",
+    117.12
+   ],
+   [
+    "know",
+    117.6
+   ],
+   [
+    "how",
+    117.8
+   ],
+   [
+    "to",
+    118.0
+   ],
+   [
+    "expand",
+    118.12
+   ],
+   [
+    "into",
+    118.52
+   ],
+   [
+    "other",
+    118.76
+   ],
+   [
+    "industries",
+    119.04
+   ],
+   [
+    "such",
+    120.08
+   ],
+   [
+    "as",
+    120.32
+   ],
+   [
+    "healthcare",
+    120.74
+   ],
+   [
+    "and",
+    121.16
+   ],
+   [
+    "cosmetics",
+    121.4
+   ]
+  ],
+  "t1": 122.23
+ },
+ {
+  "i": 23,
+  "para": 7,
+  "text": "Kodak stayed too attached to photos and film.",
+  "t0": 122.48,
+  "words": [
+   [
+    "kodak",
+    122.48
+   ],
+   [
+    "stayed",
+    123.56
+   ],
+   [
+    "too",
+    123.84
+   ],
+   [
+    "attached",
+    124.08
+   ],
+   [
+    "to",
+    124.32
+   ],
+   [
+    "photos",
+    124.52
+   ],
+   [
+    "and",
+    124.92
+   ],
+   [
+    "film",
+    125.04
+   ]
+  ],
+  "t1": 125.91
+ },
+ {
+  "i": 24,
+  "para": 8,
+  "text": "Then came phones.",
+  "t0": 126.16,
+  "words": [
+   [
+    "then",
+    126.16
+   ],
+   [
+    "came",
+    126.48
+   ],
+   [
+    "phones",
+    126.8
+   ]
+  ],
+  "t1": 127.79
+ },
+ {
+  "i": 25,
+  "para": 8,
+  "text": "By the two-thousands, cameras were built into mobile phones, and sharing photos online replaced printing them.",
+  "t0": 128.04,
+  "words": [
+   [
+    "by",
+    128.04
+   ],
+   [
+    "the",
+    128.2
+   ],
+   [
+    "two",
+    128.4
+   ],
+   [
+    "thousands",
+    128.6
+   ],
+   [
+    "cameras",
+    129.4
+   ],
+   [
+    "were",
+    129.8
+   ],
+   [
+    "built",
+    129.96
+   ],
+   [
+    "into",
+    130.24
+   ],
+   [
+    "mobile",
+    130.44
+   ],
+   [
+    "phones",
+    130.76
+   ],
+   [
+    "and",
+    131.84
+   ],
+   [
+    "sharing",
+    132.0
+   ],
+   [
+    "photos",
+    132.32
+   ],
+   [
+    "online",
+    132.72
+   ],
+   [
+    "replaced",
+    133.12
+   ],
+   [
+    "printing",
+    133.56
+   ],
+   [
+    "them",
+    134.0
+   ]
+  ],
+  "t1": 134.95
+ },
+ {
+  "i": 26,
+  "para": 9,
+  "text": "Kodak's film sales fell sharply, year after year.",
+  "t0": 135.2,
+  "words": [
+   [
+    "kodaks",
+    135.2
+   ],
+   [
+    "film",
+    135.53
+   ],
+   [
+    "sales",
+    135.87
+   ],
+   [
+    "fell",
+    136.2
+   ],
+   [
+    "sharply",
+    136.44
+   ],
+   [
+    "year",
+    137.32
+   ],
+   [
+    "after",
+    137.64
+   ],
+   [
+    "year",
+    137.96
+   ]
+  ],
+  "t1": 139.03
+ },
+ {
+  "i": 27,
+  "para": 9,
+  "text": "In January two thousand twelve, Kodak filed for Chapter Eleven bankruptcy protection.",
+  "t0": 139.28,
+  "words": [
+   [
+    "in",
+    139.28
+   ],
+   [
+    "january",
+    139.52
+   ],
+   [
+    "two",
+    140.0
+   ],
+   [
+    "thousand",
+    140.2
+   ],
+   [
+    "twelve",
+    140.56
+   ],
+   [
+    "kodak",
+    140.84
+   ],
+   [
+    "filed",
+    141.28
+   ],
+   [
+    "for",
+    141.52
+   ],
+   [
+    "chapter",
+    141.76
+   ],
+   [
+    "eleven",
+    142.04
+   ],
+   [
+    "bankruptcy",
+    142.44
+   ],
+   [
+    "protection",
+    143.08
+   ]
+  ],
+  "t1": 144.15
+ },
+ {
+  "i": 28,
+  "para": 10,
+  "text": "The cruelest comparison came that same year.",
+  "t0": 144.4,
+  "words": [
+   [
+    "the",
+    144.4
+   ],
+   [
+    "cruelest",
+    144.72
+   ],
+   [
+    "comparison",
+    145.04
+   ],
+   [
+    "came",
+    145.6
+   ],
+   [
+    "that",
+    145.84
+   ],
+   [
+    "same",
+    146.04
+   ],
+   [
+    "year",
+    146.36
+   ]
+  ],
+  "t1": 146.81
+ },
+ {
+  "i": 29,
+  "para": 10,
+  "text": "Facebook bought Instagram, a photo-sharing app with just thirteen employees, for about one billion dollars.",
+  "t0": 147.06,
+  "words": [
+   [
+    "facebook",
+    147.06
+   ],
+   [
+    "bought",
+    147.76
+   ],
+   [
+    "instagram",
+    148.44
+   ],
+   [
+    "a",
+    149.12
+   ],
+   [
+    "photo",
+    149.32
+   ],
+   [
+    "sharing",
+    149.64
+   ],
+   [
+    "app",
+    149.88
+   ],
+   [
+    "with",
+    150.12
+   ],
+   [
+    "just",
+    150.28
+   ],
+   [
+    "thirteen",
+    150.48
+   ],
+   [
+    "employees",
+    151.26
+   ],
+   [
+    "for",
+    152.04
+   ],
+   [
+    "about",
+    152.2
+   ],
+   [
+    "one",
+    152.52
+   ],
+   [
+    "billion",
+    152.72
+   ],
+   [
+    "dollars",
+    153.12
+   ]
+  ],
+  "t1": 153.99
+ },
+ {
+  "i": 30,
+  "para": 10,
+  "text": "Kodak, the company that once defined photography, had once employed over a hundred thousand people.",
+  "t0": 154.24,
+  "words": [
+   [
+    "kodak",
+    154.24
+   ],
+   [
+    "the",
+    155.0
+   ],
+   [
+    "company",
+    155.2
+   ],
+   [
+    "that",
+    155.52
+   ],
+   [
+    "once",
+    155.68
+   ],
+   [
+    "defined",
+    155.92
+   ],
+   [
+    "photography",
+    156.32
+   ],
+   [
+    "had",
+    157.44
+   ],
+   [
+    "once",
+    157.6
+   ],
+   [
+    "employed",
+    157.84
+   ],
+   [
+    "over",
+    158.24
+   ],
+   [
+    "a",
+    158.44
+   ],
+   [
+    "hundred",
+    158.6
+   ],
+   [
+    "thousand",
+    158.88
+   ],
+   [
+    "people",
+    159.32
+   ]
+  ],
+  "t1": 159.91
+ },
+ {
+  "i": 31,
+  "para": 11,
+  "text": "Kodak emerged from bankruptcy in two thousand thirteen as a much smaller company, focused on commercial printing and imaging, and sold off many of its patents.",
+  "t0": 160.16,
+  "words": [
+   [
+    "kodak",
+    160.16
+   ],
+   [
+    "emerged",
+    160.52
+   ],
+   [
+    "from",
+    160.88
+   ],
+   [
+    "bankruptcy",
+    161.04
+   ],
+   [
+    "in",
+    161.6
+   ],
+   [
+    "two",
+    161.64
+   ],
+   [
+    "thousand",
+    161.84
+   ],
+   [
+    "thirteen",
+    162.12
+   ],
+   [
+    "as",
+    162.56
+   ],
+   [
+    "a",
+    162.64
+   ],
+   [
+    "much",
+    162.76
+   ],
+   [
+    "smaller",
+    162.96
+   ],
+   [
+    "company",
+    163.4
+   ],
+   [
+    "focused",
+    164.16
+   ],
+   [
+    "on",
+    164.56
+   ],
+   [
+    "commercial",
+    164.68
+   ],
+   [
+    "printing",
+    165.16
+   ],
+   [
+    "and",
+    165.48
+   ],
+   [
+    "imaging",
+    165.6
+   ],
+   [
+    "and",
+    166.6
+   ],
+   [
+    "sold",
+    166.8
+   ],
+   [
+    "off",
+    167.04
+   ],
+   [
+    "many",
+    167.24
+   ],
+   [
+    "of",
+    167.44
+   ],
+   [
+    "its",
+    167.56
+   ],
+   [
+    "patents",
+    167.8
+   ]
+  ],
+  "t1": 169.03
+ },
+ {
+  "i": 32,
+  "para": 12,
+  "text": "So what are the lessons?",
+  "t0": 169.28,
+  "words": [
+   [
+    "so",
+    169.28
+   ],
+   [
+    "what",
+    169.44
+   ],
+   [
+    "are",
+    169.6
+   ],
+   [
+    "the",
+    169.68
+   ],
+   [
+    "lessons",
+    169.84
+   ]
+  ],
+  "t1": 171.23
+ },
+ {
+  "i": 33,
+  "para": 13,
+  "text": "One.",
+  "t0": 171.48,
+  "words": [
+   [
+    "one",
+    171.48
+   ]
+  ],
+  "t1": 171.99
+ },
+ {
+  "i": 34,
+  "para": 13,
+  "text": "Having the invention isn't enough.",
+  "t0": 172.24,
+  "words": [
+   [
+    "having",
+    172.24
+   ],
+   [
+    "the",
+    172.48
+   ],
+   [
+    "invention",
+    172.6
+   ],
+   [
+    "isnt",
+    173.12
+   ],
+   [
+    "enough",
+    173.52
+   ]
+  ],
+  "t1": 173.87
+ },
+ {
+  "i": 35,
+  "para": 13,
+  "text": "Kodak had the technology first.",
+  "t0": 174.12,
+  "words": [
+   [
+    "kodak",
+    174.12
+   ],
+   [
+    "had",
+    174.72
+   ],
+   [
+    "the",
+    174.8
+   ],
+   [
+    "technology",
+    174.96
+   ],
+   [
+    "first",
+    175.64
+   ]
+  ],
+  "t1": 176.39
+ },
+ {
+  "i": 36,
+  "para": 13,
+  "text": "What mattered was whether it was willing to commit.",
+  "t0": 176.64,
+  "words": [
+   [
+    "what",
+    176.64
+   ],
+   [
+    "mattered",
+    176.8
+   ],
+   [
+    "was",
+    177.16
+   ],
+   [
+    "whether",
+    177.36
+   ],
+   [
+    "it",
+    177.56
+   ],
+   [
+    "was",
+    177.68
+   ],
+   [
+    "willing",
+    177.88
+   ],
+   [
+    "to",
+    178.12
+   ],
+   [
+    "commit",
+    178.32
+   ]
+  ],
+  "t1": 179.43
+ },
+ {
+  "i": 37,
+  "para": 14,
+  "text": "Two.",
+  "t0": 179.68,
+  "words": [
+   [
+    "two",
+    179.68
+   ]
+  ],
+  "t1": 180.27
+ },
+ {
+  "i": 38,
+  "para": 14,
+  "text": "Protecting your cash cow can be fatal.",
+  "t0": 180.52,
+  "words": [
+   [
+    "protecting",
+    180.52
+   ],
+   [
+    "your",
+    180.96
+   ],
+   [
+    "cash",
+    181.16
+   ],
+   [
+    "cow",
+    181.44
+   ],
+   [
+    "can",
+    181.68
+   ],
+   [
+    "be",
+    181.84
+   ],
+   [
+    "fatal",
+    182.0
+   ]
+  ],
+  "t1": 182.63
+ },
+ {
+  "i": 39,
+  "para": 14,
+  "text": "If you don't cannibalize your own product, someone else will.",
+  "t0": 182.88,
+  "words": [
+   [
+    "if",
+    182.88
+   ],
+   [
+    "you",
+    183.08
+   ],
+   [
+    "dont",
+    183.24
+   ],
+   [
+    "cannibalize",
+    183.48
+   ],
+   [
+    "your",
+    184.0
+   ],
+   [
+    "own",
+    184.16
+   ],
+   [
+    "product",
+    184.4
+   ],
+   [
+    "someone",
+    184.96
+   ],
+   [
+    "else",
+    185.52
+   ],
+   [
+    "will",
+    185.88
+   ]
+  ],
+  "t1": 186.79
+ },
+ {
+  "i": 40,
+  "para": 15,
+  "text": "Three.",
+  "t0": 187.04,
+  "words": [
+   [
+    "three",
+    187.04
+   ]
+  ],
+  "t1": 188.23
+ },
+ {
+  "i": 41,
+  "para": 15,
+  "text": "Know what business you're in.",
+  "t0": 188.48,
+  "words": [
+   [
+    "know",
+    188.48
+   ],
+   [
+    "what",
+    188.56
+   ],
+   [
+    "business",
+    188.76
+   ],
+   [
+    "youre",
+    189.16
+   ],
+   [
+    "in",
+    189.36
+   ]
+  ],
+  "t1": 189.99
+ },
+ {
+  "i": 42,
+  "para": 15,
+  "text": "Kodak thought it was in the film business.",
+  "t0": 190.24,
+  "words": [
+   [
+    "kodak",
+    190.24
+   ],
+   [
+    "thought",
+    190.6
+   ],
+   [
+    "it",
+    190.76
+   ],
+   [
+    "was",
+    190.88
+   ],
+   [
+    "in",
+    191.04
+   ],
+   [
+    "the",
+    191.08
+   ],
+   [
+    "film",
+    191.24
+   ],
+   [
+    "business",
+    191.52
+   ]
+  ],
+  "t1": 192.15
+ },
+ {
+  "i": 43,
+  "para": 15,
+  "text": "It was really in the business of capturing and sharing memories.",
+  "t0": 192.4,
+  "words": [
+   [
+    "it",
+    192.4
+   ],
+   [
+    "was",
+    192.6
+   ],
+   [
+    "really",
+    192.76
+   ],
+   [
+    "in",
+    193.12
+   ],
+   [
+    "the",
+    193.2
+   ],
+   [
+    "business",
+    193.32
+   ],
+   [
+    "of",
+    193.68
+   ],
+   [
+    "capturing",
+    193.92
+   ],
+   [
+    "and",
+    194.32
+   ],
+   [
+    "sharing",
+    194.56
+   ],
+   [
+    "memories",
+    194.88
+   ]
+  ],
+  "t1": 195.77
+ },
+ {
+  "i": 44,
+  "para": 15,
+  "text": "Smartphones and social media did that better.",
+  "t0": 196.02,
+  "words": [
+   [
+    "smartphones",
+    196.02
+   ],
+   [
+    "and",
+    197.16
+   ],
+   [
+    "social",
+    197.32
+   ],
+   [
+    "media",
+    197.6
+   ],
+   [
+    "did",
+    197.92
+   ],
+   [
+    "that",
+    198.16
+   ],
+   [
+    "better",
+    198.36
+   ]
+  ],
+  "t1": 199.31
+ },
+ {
+  "i": 45,
+  "para": 16,
+  "text": "Kodak didn't miss the future.",
+  "t0": 199.56,
+  "words": [
+   [
+    "kodak",
+    199.56
+   ],
+   [
+    "didnt",
+    199.92
+   ],
+   [
+    "miss",
+    200.2
+   ],
+   [
+    "the",
+    200.44
+   ],
+   [
+    "future",
+    200.64
+   ]
+  ],
+  "t1": 201.71
+ },
+ {
+  "i": 46,
+  "para": 16,
+  "text": "It saw it, built it... and then decided it wasn't ready.",
+  "t0": 201.96,
+  "words": [
+   [
+    "it",
+    201.96
+   ],
+   [
+    "saw",
+    202.28
+   ],
+   [
+    "it",
+    202.52
+   ],
+   [
+    "built",
+    203.2
+   ],
+   [
+    "it",
+    203.44
+   ],
+   [
+    "and",
+    204.28
+   ],
+   [
+    "then",
+    204.52
+   ],
+   [
+    "decided",
+    204.8
+   ],
+   [
+    "it",
+    205.12
+   ],
+   [
+    "wasnt",
+    205.28
+   ],
+   [
+    "ready",
+    205.64
+   ]
+  ],
+  "t1": 206.47
+ },
+ {
+  "i": 47,
+  "para": 16,
+  "text": "In business, sometimes the biggest risk is doing nothing.",
+  "t0": 206.72,
+  "words": [
+   [
+    "in",
+    206.72
+   ],
+   [
+    "business",
+    206.84
+   ],
+   [
+    "sometimes",
+    207.72
+   ],
+   [
+    "the",
+    208.12
+   ],
+   [
+    "biggest",
+    208.24
+   ],
+   [
+    "risk",
+    208.64
+   ],
+   [
+    "is",
+    208.92
+   ],
+   [
+    "doing",
+    209.12
+   ],
+   [
+    "nothing",
+    209.48
+   ]
+  ],
+  "t1": 210.59
+ },
+ {
+  "i": 48,
+  "para": 17,
+  "text": "Next video: the phone company that once owned forty percent of the world... and lost it all in a few years.",
+  "t0": 210.84,
+  "words": [
+   [
+    "next",
+    210.84
+   ],
+   [
+    "video",
+    211.42
+   ],
+   [
+    "the",
+    212.0
+   ],
+   [
+    "phone",
+    212.16
+   ],
+   [
+    "company",
+    212.48
+   ],
+   [
+    "that",
+    212.88
+   ],
+   [
+    "once",
+    213.12
+   ],
+   [
+    "owned",
+    213.32
+   ],
+   [
+    "forty",
+    213.6
+   ],
+   [
+    "percent",
+    213.9
+   ],
+   [
+    "of",
+    214.2
+   ],
+   [
+    "the",
+    214.36
+   ],
+   [
+    "world",
+    214.52
+   ],
+   [
+    "and",
+    215.56
+   ],
+   [
+    "lost",
+    215.8
+   ],
+   [
+    "it",
+    216.04
+   ],
+   [
+    "all",
+    216.16
+   ],
+   [
+    "in",
+    216.36
+   ],
+   [
+    "a",
+    216.48
+   ],
+   [
+    "few",
+    216.56
+   ],
+   [
+    "years",
+    216.84
+   ]
+  ],
+  "t1": 217.18
+ }
+]

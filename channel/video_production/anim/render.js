@@ -10,7 +10,7 @@ const FPS = 30;
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   page.on('pageerror', e => console.error('PAGEERR', e.message));
   page.on('console', m => { if (m.type() === 'error') console.error('CONSOLE', m.text()); });
-  await page.goto('file://' + path.join(__dirname, 'index.html'));
+  await page.goto('file://' + path.join(__dirname, 'index.html') + '?v=' + (process.env.VID || '01_blockbuster'));
   await page.evaluate(() => window.ready);
   if (mode === 'stills') {
     fs.mkdirSync(a1, { recursive: true });

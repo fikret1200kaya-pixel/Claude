@@ -1,11 +1,7 @@
 // ===== Main: asset loading + frame renderer =====
-window.ready = (async () => {
+window.mainReady = (async () => {
   await document.fonts.load('400 100px "Bebas Neue"');
-  await Promise.all([
-    loadImg('logo', 'assets/logo.png'), loadImg('chair', 'assets/chair.png'), loadImg('offer', 'assets/offer.png'),
-    loadImg('envelope', 'assets/envelope.png'), loadImg('closed', 'assets/closed.png'), loadImg('kodak', 'assets/kodak.png'),
-    loadImg('hastings', 'assets/people/hastings.jpg'), loadImg('randolph', 'assets/people/randolph.jpg'), loadImg('icahn', 'assets/people/icahn.jpg'), loadImg('antioco', 'assets/people/antioco.jpg'),
-  ]);
+  await Promise.all(Object.entries(VIDEO.images).map(([k, src]) => loadImg(k, src)));
   initLook();
   window.ok = true;
 })();

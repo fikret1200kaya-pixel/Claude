@@ -234,5 +234,5 @@ function drawOverlay(t, frame) {
   const g = grainC[frame % 4]; const ox = (frame * 37) % 40, oy = (frame * 53) % 30; ctx.drawImage(g, -ox, -oy, W + 80, H + 60); ctx.restore();
   // progress line + bug
   ctx.fillStyle = 'rgba(255,255,255,.08)'; ctx.fillRect(0, H - 6, W, 6); ctx.fillStyle = ORANGE; ctx.fillRect(0, H - 6, W * t / DATA.T, 6);
-  if (IMG.logo && t > 22) { ctx.save(); ctx.globalAlpha = .55; ctx.beginPath(); ctx.arc(W - 90, 90, 44, 0, 7); ctx.clip(); ctx.drawImage(IMG.logo, W - 126, 54, 72, 72); ctx.restore(); }
+  if (IMG.logo && t > (VIDEO.bugFrom || 0)) { ctx.save(); ctx.globalAlpha = .55; ctx.beginPath(); ctx.arc(W - 90, 90, 44, 0, 7); ctx.clip(); ctx.drawImage(IMG.logo, W - 126, 54, 72, 72); ctx.restore(); }
 }

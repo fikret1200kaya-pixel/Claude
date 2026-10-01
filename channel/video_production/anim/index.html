@@ -7,10 +7,17 @@ canvas{display:block}
 </style></head>
 <body>
 <canvas id="c" width="1920" height="1080"></canvas>
-<script src="data.js"></script>
-<script src="assets/people/credits.js"></script>
-<script src="engine.js"></script>
-<script src="scenes1.js"></script>
-<script src="scenes2.js"></script>
-<script src="main.js"></script>
+<script>
+// loader: index.html?v=<video folder>  (default 01_blockbuster)
+const VID = new URLSearchParams(location.search).get('v') || '01_blockbuster';
+function load(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('load ' + src)); document.body.appendChild(s); }); }
+window.ready = (async () => {
+  await load(`videos/${VID}/manifest.js`);
+  await load(`videos/${VID}/data.js`);
+  await load('engine.js');
+  for (const f of VIDEO.scripts) if (f !== 'data.js') await load(`videos/${VID}/${f}`);
+  await load('main.js');
+  await window.mainReady;
+})();
+</script>
 </body></html>
