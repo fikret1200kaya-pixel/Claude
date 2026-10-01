@@ -15,12 +15,16 @@ Common description footer (paste at the end of every description):
 In 2000, a small startup offered to sell itself to Blockbuster for $50 million. Blockbuster said no. Ten years later, Blockbuster was bankrupt. Here is the full story of the most expensive "no" in business history, and what every business can learn from it.
 
 Chapters:
-0:00 The $50 million offer
-0:30 The Blockbuster empire
-1:30 Netflix walks in
-2:30 Too late to change
-4:00 The collapse
-5:00 Three lessons
+0:00 The $50 million "no"
+0:23 The empire
+0:49 The hidden problem
+1:04 The challenger
+1:17 The offer
+1:33 The decision
+1:47 Too late
+2:39 The collapse
+3:11 The lessons
+3:47 The difference
 
 **Photo credits (paste into the description):**
 Photos via Wikimedia Commons, cropped:
@@ -105,4 +109,4 @@ Chapters:
 
 ---
 
-> Chapter timestamps above are estimates. Update them after the final edit.
+> Video 1 chapters match the final edit (v4). Chapters for videos 2-5 are estimates: update them after each edit.
