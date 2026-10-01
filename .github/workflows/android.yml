@@ -1,9 +1,7 @@
 name: Android APK
 
+# APK sürümü beklemede: yalnızca elle başlatılır (Actions > Android APK > Run workflow)
 on:
-  push:
-    branches: [main, master, 'claude/**']
-    paths: ['rts/**', 'android/**', '.github/workflows/android.yml']
   workflow_dispatch:
 
 permissions:
