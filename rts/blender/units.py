@@ -686,7 +686,7 @@ def render_look(look, outdir, dirs=range(8), only=None):
     reset()
     S = mats()
     fs = FRAME.get(look, 154)
-    setup_scene(fs, fs, USCALE, target=(0, 0, .45), samples=28)
+    setup_scene(fs, fs, USCALE, target=(0, 0, .45), samples=int(os.environ.get('SAMPLES', 28)))
     root = joint('root')
     J, kind = build(look, root, S)
     os.makedirs(os.path.join(outdir, look), exist_ok=True)
