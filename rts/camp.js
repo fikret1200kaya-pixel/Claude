@@ -2,8 +2,8 @@
 /* ====== Sefer haritası: parşömen üstünde Fatih'in seferleri ====== */
 const artURL = n => (typeof ART !== 'undefined' && ART.includes(n)) ? 'assets/art/' + n + '.jpg' : null;
 const ART_IMG = {}; // boyalı portreler oyun içinde de kullanılır
-if (typeof ART !== 'undefined') for (const n of ART) if (n.startsWith('p_')) { const im = new Image(); im.src = 'assets/art/' + n + '.jpg'; ART_IMG[n.slice(2)] = im; }
-const artPortrait = look => { const im = ART_IMG[look]; return im && im.complete && im.naturalWidth ? im : null; };
+if (typeof ART !== 'undefined') for (const n of ART) if (n.startsWith('p_')) { const im = new Image(); im.onload = () => { if (typeof ICONS !== 'undefined') ICONS.clear(); }; im.src = 'assets/art/' + n + '.jpg'; ART_IMG[n.slice(2)] = im; }
+const artPortrait = look => { const im = ART_IMG[look === 'sahi' ? 'top' : look]; return im && im.complete && im.naturalWidth ? im : null; };
 
 const CM = { lon0: 12, lon1: 42, lat0: 34.6, lat1: 48, k: Math.cos(41.5 * Math.PI / 180) };
 const GEO = {
