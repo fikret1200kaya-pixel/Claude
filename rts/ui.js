@@ -6,7 +6,7 @@ let cam = { x: 0, y: 0, z: 1 }, mouse = { x: 0, y: 0, in: false, down: false, sx
 let place = null, amovePending = false, keys = {}, lastClick = { t: 0, id: 0 };
 let terrainCv = null, fogSmall = null, fogBig = null, isoFog = null, chunks = new Map(), mmTile = null, cardSig = '', cardT = 0, running = false, lastT = 0, acc = 0;
 const UZ = .74;              // birim çizim ölçeği (binalara oranlı)
-let BAR_H = 168; const MF = 4 / 32;
+let BAR_H = 184; const MF = 4 / 32;
 
 function resize() { cv.width = innerWidth; cv.height = innerHeight; ctx.imageSmoothingEnabled = true; const b = $('bar'); if (b && b.offsetHeight) BAR_H = b.offsetHeight; }
 addEventListener('resize', resize); resize();
