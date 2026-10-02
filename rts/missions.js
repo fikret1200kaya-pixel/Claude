@@ -171,7 +171,7 @@ const MISSIONS = [
   /* ---------------- 5 ---------------- */
   /* ---------------- Trabzon 1461 ---------------- */
   {
-    title: 'Trabzon', date: 'Haziran–Ağustos 1461 — Karadeniz kıyısı', W: 84, H: 64, seed: 77, art: 'trabzon',
+    title: 'Trabzon', popBonus: 40, date: 'Haziran–Ağustos 1461 — Karadeniz kıyısı', W: 84, H: 64, seed: 77, art: 'trabzon',
     colors: ['#c0392b', '#7d3c98'], enemy: 'Trabzon Rum İmparatorluğu', sym: '✚',
     brief: `Bizans'ın son kalıntısı Trabzon Rum İmparatorluğu, Uzun Hasan'la ittifak kurmuş, Osmanlı'ya karşı Avrupa'dan haçlı yardımı bekliyor.\n\n1461 yazında Fatih, Karadeniz kıyısından ilerliyor: Candaroğulları'nın Sinop'u savaşmadan teslim oldu, donanma kıyı boyunca doğuya yelken açtı. Ordu ise Doğu Karadeniz'in sarp dağlarını aşarak şehre ulaştı.\n\nTrabzon'u karadan ve denizden kuşat: önce limandaki Trabzon donanmasını batır, sonra surları top ateşine tut.`,
     after: `İmparator David Komnenos, kuşatmanın ardından Ağustos 1461'de şehri teslim etti. Bizans'ın son parçası da tarihe karıştı; Karadeniz'in güney kıyısı tamamen Osmanlı'nın oldu.`,
@@ -211,7 +211,7 @@ const MISSIONS = [
   },
   /* ---------------- Eflak 1462 ---------------- */
   {
-    title: 'Eflak Seferi', date: '17 Haziran 1462 — Tırgovişte önleri', W: 84, H: 70, seed: 88, art: 'eflak', night: true,
+    title: 'Eflak Seferi', popBonus: 40, date: '17 Haziran 1462 — Tırgovişte önleri', W: 84, H: 70, seed: 88, art: 'eflak', night: true,
     colors: ['#c0392b', '#1f6f8b'], enemy: 'Eflak (III. Vlad — Kazıklı Voyvoda)', sym: '✚',
     brief: `Eflak Voyvodası III. Vlad, haracı kesti ve 1461-62 kışında Tuna boyundaki Osmanlı topraklarını yakıp yıktı. Fatih büyük bir orduyla Tuna'yı geçti; Vlad meydan savaşından kaçıp kuyuları zehirledi, ekinleri yaktı.\n\n17 Haziran 1462 gecesi Vlad, birkaç bin atlıyla Osmanlı ordugâhına ani bir gece baskını yapacak. Hedefi Sultan'ın otağı.\n\nKaranlıkta Otağ-ı Hümâyun'u koru; şafak sökünce Tırgovişte'ye yürü ve sarayı düşür.`,
     after: `Gece baskını Osmanlı ordusunu dağıtamadı. Ordu Tırgovişte'ye vardığında şehri boşaltılmış buldu. Vlad Macaristan'a kaçtı; Eflak tahtına kardeşi Radu getirildi ve Eflak yeniden Osmanlı'ya bağlandı.`,
@@ -248,7 +248,7 @@ const MISSIONS = [
   },
   /* ---------------- Eğriboz 1470 ---------------- */
   {
-    title: 'Eğriboz', date: 'Haziran–Temmuz 1470 — Eğriboz Adası', W: 88, H: 64, seed: 99, art: 'egriboz',
+    title: 'Eğriboz', popBonus: 50, date: 'Haziran–Temmuz 1470 — Eğriboz Adası', W: 88, H: 64, seed: 99, art: 'egriboz',
     colors: ['#c0392b', '#2471a3'], enemy: 'Venedik Cumhuriyeti', sym: '✚',
     brief: `Venedik'le savaş yıllardır sürüyor. Ege'deki en büyük Venedik üssü Eğriboz (Negroponte), anakaradan dar bir boğazla ayrılan adada.\n\nFatih karadan, Mahmud Paşa denizden geliyor. Osmanlı donanması tarihinde ilk kez Venedik'e bu kadar büyük bir güçle meydan okuyacak.\n\nÖnce boğazdaki Venedik donanmasını batır. Boğaz temizlenince gemilerden bir köprü kurulacak; ordu adaya geçip Eğriboz Kalesi'ni düşürecek.`,
     after: `12 Temmuz 1470'te Eğriboz düştü. Venedik'in Ege'deki en önemli üssü kaybedildi; Osmanlı donanması artık Akdeniz'de hesaba katılması gereken bir güçtü.`,
@@ -318,7 +318,7 @@ const MISSIONS = [
   /* ---------------- 6 ---------------- */
   /* ---------------- İşkodra 1478 ---------------- */
   {
-    title: 'İşkodra Kuşatması', date: 'Mayıs–Eylül 1478 — Arnavutluk', W: 80, H: 64, seed: 111, art: 'iskodra',
+    title: 'İşkodra Kuşatması', popBonus: 60, date: 'Mayıs–Eylül 1478 — Arnavutluk', W: 80, H: 64, seed: 111, art: 'iskodra',
     colors: ['#c0392b', '#2471a3'], enemy: 'Venedik (İşkodra muhafızları)', sym: '✚',
     brief: `Arnavutluk'ta Venedik'in elindeki son büyük kale: İşkodra, Rozafa tepesinde, gölle nehirlerin kucakladığı sarp bir kayalık üzerinde.\n\nFatih kuşatmaya bizzat geliyor. Dev toplar oracıkta, kuşatma alanında dökülecek; aylarca sürecek bir bombardıman başlıyor.\n\nSurlarda gedik aç ve burçları sustur. Venedik'in yardım ümidini kır.`,
     after: `Rozafa'nın muhafızları aylarca direndi; kale hücumla düşmedi. Ama Venedik, uzayan savaşa dayanamadı ve 25 Ocak 1479 İstanbul Antlaşması ile İşkodra'yı Osmanlı'ya bıraktı.`,

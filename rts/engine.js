@@ -708,7 +708,7 @@ function aiTarget(from, o) {
 /* ---------- ana adım ---------- */
 function popAndCap() {
   const p0 = G.players[0]; p0.pop = popUsedOwner(0); let cap = 0;
-  for (const b of G.blds) if (b.owner === 0 && b.built && b.d.pop) cap += b.d.pop; p0.cap = Math.min(200, cap);
+  for (const b of G.blds) if (b.owner === 0 && b.built && b.d.pop) cap += b.d.pop; p0.cap = Math.min(200, cap + (G.m.popBonus || 0));
   for (let o = 1; o < G.players.length; o++) G.players[o].pop = popUsedOwner(o);
 }
 function step(dt) {
