@@ -13,7 +13,7 @@
   --f-disp:'Cinzel',Georgia,'Times New Roman',serif;--f-body:'Crimson Pro',Georgia,'Times New Roman',serif}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:#0b0805;font-family:var(--f-body);font-size:16px;color:var(--paper);user-select:none}
-canvas#c{position:fixed;inset:0;display:block;touch-action:none;-webkit-tap-highlight-color:transparent;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M2 2 L20 9 L12 12 L9 20 Z' fill='%23f3d68a' stroke='%23301c08' stroke-width='1.5'/%3E%3C/svg%3E") 2 2,auto}
+canvas#c{position:fixed;inset:0;display:block;filter:saturate(1.1) contrast(1.05) sepia(.07);touch-action:none;-webkit-tap-highlight-color:transparent;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M2 2 L20 9 L12 12 L9 20 Z' fill='%23f3d68a' stroke='%23301c08' stroke-width='1.5'/%3E%3C/svg%3E") 2 2,auto}
 /* ---- ekranlar ---- */
 .screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:20;padding:20px 16px;text-align:center;background:#0b0805}
 .screen.on{display:flex}
@@ -32,7 +32,7 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 .card b{font-family:var(--f-disp);color:#6d1c15;letter-spacing:.04em}
 .card p:first-of-type::first-letter{font-family:var(--f-disp);font-size:3em;float:left;line-height:.9;margin:4px 8px 0 0;color:#8e2a22}
 /* ---- oyun arayüzü ---- */
-#vig{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 55%,rgba(10,5,0,.45))}
+#vig{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at 18% 8%,rgba(255,210,130,.13),rgba(255,210,130,0) 45%),radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 55%,rgba(10,5,0,.45))}
 .mtitle{text-align:center;margin-top:-2vh;text-shadow:0 2px 12px #000;display:flex;flex-direction:column;align-items:center;gap:4px}
 .tugra{font-size:34px;color:var(--gold);text-shadow:0 0 18px rgba(226,180,80,.6)}
 .mcols{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:min(1060px,100%)}
@@ -87,6 +87,34 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 .srow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
 #sdots{display:flex;gap:6px}#sdots i{width:9px;height:9px;border-radius:50%;background:rgba(90,24,16,.25);border:1px solid #7a5a2a}#sdots i.on{background:#8e2a22}
 #sbtns{display:flex;gap:8px;flex-wrap:wrap}
+/* ---- ilim ağacı ---- */
+#tree{position:fixed;inset:0;display:none;z-index:16;background:rgba(5,3,1,.72);align-items:center;justify-content:center;padding:16px;pointer-events:auto}
+.tbox{width:min(1280px,100%);max-height:100%;display:flex;flex-direction:column;background:url(assets/ui/parchment.jpg) center/cover,#e6d3a8;color:#2a1a0c;border:3px double #7a5a2a;box-shadow:0 0 0 5px rgba(20,10,4,.9),0 20px 60px #000}
+.thead{display:flex;gap:6px;align-items:center;padding:10px 12px;border-bottom:2px solid rgba(122,90,42,.5)}
+.ttab{font-family:var(--f-disp);font-weight:700;font-size:15px;background:rgba(90,24,16,.12);border:1px solid #8a6a3a;color:#5a1810;padding:6px 14px;cursor:pointer}.ttab.on{background:linear-gradient(#a8352a,#6d1c15);color:#fff3d6}
+#tbody{overflow:auto;padding:12px}
+.tcols{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.tcol{background:rgba(255,248,230,.35);border:1px solid rgba(122,90,42,.45);padding:6px}.tcol.nob{opacity:.6}
+.tcol h4{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:var(--f-disp);color:#5a1810;font-size:15px}.tcol h4 canvas{width:36px;height:36px}.tcol h4 small{display:block;font-family:var(--f-body);font-weight:400;font-style:italic;color:#7a5a2a;font-size:12px}
+.tc{display:flex;gap:8px;align-items:flex-start;padding:5px;margin:3px 0;border:1px solid rgba(122,90,42,.35);background:rgba(255,255,255,.35);font-size:13px;line-height:1.25}.tc.sub{margin-left:14px;border-left:3px solid #b08a4a}
+.tc canvas{width:34px;height:34px;flex:none}.tc b{display:block;font-family:var(--f-disp);font-size:13px;color:#3a1a08}.tc i{display:block}.tc em{display:block;font-style:normal;color:#6d4a20;font-size:12px}
+.tc.done{background:rgba(120,200,120,.35);border-color:#5a9a4a}.tc.busy{background:rgba(120,170,230,.3)}.tc.lock{opacity:.55}
+.tc em i.rf,.tc em i.rw,.tc em i.rg{display:inline-block;width:11px;height:11px;background-size:contain;vertical-align:-1px}
+.tnote{font-style:italic;color:#6d4a20;margin:10px 2px 0;font-size:14px}
+.ctab{width:100%;border-collapse:collapse;font-size:14px}.ctab th{font-family:var(--f-disp);color:#5a1810;text-align:left;border-bottom:2px solid #8a6a3a;padding:4px}.ctab td{border-bottom:1px solid rgba(122,90,42,.3);padding:4px;vertical-align:middle}.ctab canvas{width:40px;height:40px}.ctab .g{color:#2f6a22}.ctab .w{color:#8e2a22}.ctab small i{display:inline-block;width:10px;height:10px}
+#info .cnt{font-size:13px}#info .cnt .w{color:#ff9a7c}
+/* ---- kayıt yuvaları ---- */
+#slots{position:fixed;inset:0;display:none;z-index:40;background:rgba(5,3,1,.72);align-items:center;justify-content:center;padding:16px}
+.slbox{width:min(560px,100%)}#sll{padding:12px;display:grid;gap:8px}
+.slot{display:flex;gap:14px;align-items:center;text-align:left;font:inherit;color:#2a1a0c;background:rgba(255,248,230,.5);border:1px solid #8a6a3a;padding:10px 14px;cursor:pointer}.slot:hover{background:rgba(255,240,200,.85)}.slot:disabled{opacity:.5;cursor:default}
+.slot>span:first-child{font-family:var(--f-disp);font-weight:700;color:#5a1810;width:120px;flex:none}
+/* ---- öğretici ---- */
+#tut{position:absolute;right:12px;top:96px;width:min(340px,40vw);display:none;pointer-events:auto;background:url(assets/ui/parchment.jpg) center/cover,#e6d3a8;color:#2a1a0c;border:2px solid #7a5a2a;box-shadow:0 0 0 3px rgba(20,10,4,.85),0 10px 30px rgba(0,0,0,.6);padding:8px 12px 10px;font-size:15px;line-height:1.4;animation:sin .5s ease-out}
+#tut .tth{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-disp);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8e2a22}
+#tut .tth button{background:none;border:0;font-size:16px;cursor:pointer;color:#5a1810}
+#tut h4{margin:2px 0 4px;font-family:var(--f-disp);color:#5a1810;font-size:17px}#tut p{margin:0 0 8px}
+#tut .ttf{display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:8px}
+@media (max-height:540px){#tut{top:40px;right:6px;font-size:12.5px;width:min(280px,38vw)}#tut h4{font-size:14px}}
 #hud{position:fixed;inset:0;pointer-events:none;display:none;z-index:10}
 #hud.on{display:block}
 .wood{background:linear-gradient(180deg,#5a3c22,#3a2616 40%,#2a1a0e);border:2px solid #1a0d05;box-shadow:inset 0 0 0 1px rgba(243,214,138,.35),inset 0 2px 6px rgba(255,220,160,.12)}
@@ -151,9 +179,10 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
   <div id="top" class="wood">
     <span class="i" title="Yiyecek"><i class="ri rf"></i><b id="rf">0</b></span><span class="i" title="Odun"><i class="ri rw"></i><b id="rw">0</b></span><span class="i" title="Altın"><i class="ri rg"></i><b id="rg">0</b></span><span class="i" title="Nüfus"><i class="ri rp"></i><b id="rp">0/0</b></span>
     <span class="i btnlike" id="iwb" title="Boştaki reayalar — tıkla veya B" onclick="findIdle(true)">⚒ <b id="iw">0</b></span><span class="i btnlike" title="Boştaki askerler — tıkla veya N" onclick="findIdle(false)">⚔ <b id="im">0</b></span>
-    <span class="sp"></span><span class="i">⏱ <b id="rt">0:00</b></span><span class="i">Hız <b id="spd">1x</b></span>
+    <span class="i btnlike" title="İlimler ve birim üstünlükleri — I" onclick="openTree()">📜 İlimler</span><span class="sp"></span><span class="i">⏱ <b id="rt">0:00</b></span><span class="i">Hız <b id="spd">1x</b></span>
   </div>
   <div id="objs"></div>
+  <div id="tut"></div>
   <div class="nav" data-d="0,-1" style="left:50%;top:44px;transform:translateX(-50%)">▲</div>
   <div class="nav" data-d="0,1" style="left:50%;bottom:178px;transform:translateX(-50%)">▼</div>
   <div class="nav" data-d="-1,0" style="left:6px;top:50%">◀</div>
@@ -168,8 +197,14 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
   </div>
 </div>
 
+<div id="slots"><div class="tbox slbox"><div class="thead"><h3 id="slh" style="margin:0;font-family:var(--f-disp);color:#5a1810"></h3><span style="flex:1"></span><button class="btn sm" onclick="closeSlots()">Kapat ✕</button></div><div id="sll"></div></div></div>
+
+<div id="tree"><div class="tbox"><div class="thead"><button class="ttab" data-t="ilim" onclick="treeTab('ilim')">İlimler</button><button class="ttab" data-t="ust" onclick="treeTab('ust')">Birim Üstünlükleri</button><span style="flex:1"></span><button class="btn sm" onclick="closeTree()">Kapat ✕</button></div><div id="tbody"></div></div></div>
+
 <div id="pause"><h2>Duraklatıldı</h2>
   <button class="btn" onclick="togglePause()">Devam</button>
+  <button class="btn" onclick="openSlots('save')">💾 Kaydet</button>
+  <button class="btn" onclick="openSlots('load')">📂 Kayıt Yükle</button>
   <button class="btn" onclick="restartMission()">Görevi Yeniden Başlat</button>
   <button class="btn" onclick="toMenu()">Ana Menü</button>
   <div class="sub" style="max-width:560px;font-size:16px">Sol tık: seç / kutu seç · Sağ tık: hareket, saldır, kaynak topla · V: saldırarak ilerle · S: dur · G: mevzi · H: Sultan'a git · B: boştaki reaya · N: boştaki askerler · Delete: seçileni yok et · Ctrl+1..9: grup · Ok tuşları / ekran kenarı: kaydır · Tekerlek: yakınlaş · P / Esc: duraklat · . ve ,: hız</div>
@@ -182,12 +217,13 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
     <div class="mbtns">
       <button class="mbtn" onclick="showCamp()"><svg class="shd"><use href="#sh-crescent"/></svg><span>Sefer-i Hümâyun<small>Tarihî seferler</small></span></button>
       <button class="mbtn" onclick="showSkirmish()"><svg class="shd"><use href="#sh-swords"/></svg><span>Serbest Savaş<small>Rastgele harita, müttefik ve düşmanlar</small></span></button>
+      <button class="mbtn" id="mload" onclick="openSlots('load')" hidden><svg class="shd"><use href="#sh-scroll"/></svg><span>Kayıtlı Oyun<small>Kaldığın yerden devam et</small></span></button>
       <button class="mbtn" id="mepi" onclick="showEpilogue()" hidden><svg class="shd"><use href="#sh-scroll"/></svg><span>Epilog<small>Hünkârçayırı, 1481</small></span></button>
     </div>
     <div class="mdiff"><div class="lbl">Zorluk</div>
       <div class="seg" id="diffseg"><button data-v="0">Kolay</button><button data-v="1">Normal</button><button data-v="2">Zor</button></div>
       <div class="mcap" id="diffcap"></div></div>
-    <button class="linkbtn" onclick="if(confirm('Sefer ilerlemesi silinsin mi?'))resetProg()">İlerlemeyi sıfırla</button>
+    <div style="display:flex;gap:14px;justify-content:center"><button class="linkbtn" id="tutbtn" onclick="setTut(!tutOn())">Öğretici: Açık</button><button class="linkbtn" onclick="if(confirm('Sefer ilerlemesi silinsin mi?'))resetProg()">İlerlemeyi sıfırla</button></div>
   </nav>
 </div>
 
@@ -259,8 +295,11 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 <script src="assets/sprites.js"></script>
 <script src="gfx.js"></script>
 <script src="ui.js"></script>
+<script src="tree.js"></script>
 <script src="assets/art/art.js"></script>
 <script src="camp.js"></script>
+<script src="save.js"></script>
+<script src="tutorial.js"></script>
 <script src="main.js"></script>
 </body>
 </html>

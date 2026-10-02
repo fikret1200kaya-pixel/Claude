@@ -28,7 +28,7 @@ function makeSkirmish(o) {
   const m = {
     title: 'Serbest Savaş', date: SK_MAPS[type] + ' haritası · ' + DIFF[o.diff].name, W, H: W, scale: 1, seed, nPlayers: N, team, diff: o.diff, skirmish: o,
     colors: facs.map(f => f.color), enemy: enemies.map(e => e.name).join(', '), sym: enemies[0] ? enemies[0].sym : '', factions: facs,
-    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'ocak', 'dokum', 'kule', 'cami', 'medrese', 'pazar'], train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'yeniceri', 'top', 'molla'] },
+    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'demirhane', 'ocak', 'dokum', 'tersane', 'kule', 'cami', 'medrese', 'pazar'], train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'yeniceri', 'top', 'molla', 'balikci', 'kadirga', 'bastarda'] },
     start: Object.assign({}, SK_RES[o.res] || SK_RES.normal), heroLose: false, noFog: !!o.reveal,
     winText: 'Bütün düşmanlar yenildi. Zafer Osmanlı\'nın!',
     after: 'Serbest savaş kazanıldı. Yeni bir harita ve rakiplerle tekrar dene.',

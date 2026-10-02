@@ -11,11 +11,11 @@ function setDiff(v) { try { localStorage.setItem('fatih_diff', String(v)); } cat
 function uiDiff() { const v = getDiff(); document.querySelectorAll('#diffseg button').forEach(b => b.classList.toggle('on', +b.dataset.v === v)); $('diffcap').textContent = ['Düşman yavaş toplanır, saldırıları küçük; başlangıç kaynağın fazla.', 'Tarihî denge.', 'Düşman hızlı ve kalabalık saldırır, askerleri daha dayanıklı.'][v]; }
 document.querySelectorAll('#diffseg button').forEach(b => b.onclick = () => setDiff(+b.dataset.v));
 function buildMenu() {
-  uiDiff(); $('mepi').hidden = prog() < MISSIONS.length;
+  uiDiff(); uiTut(); $('mepi').hidden = prog() < MISSIONS.length; $('mload').hidden = !hasAnySave();
   const p = prog(); $('mlist').innerHTML = '';
   MISSIONS.forEach((m, i) => {
     const d = document.createElement('div'); d.className = 'mi' + (i > p ? ' lock' : '');
-    d.innerHTML = `<span class="num">${['I', 'II', 'III', 'IV', 'V', 'VI'][i]}</span><div style="flex:1"><b>${m.title}</b><small>${m.date}</small></div><span>${i < p ? '✔' : i > p ? '🔒' : '▶'}</span>`;
+    d.innerHTML = `<span class="num">${ROMAN[i]}</span><div style="flex:1"><b>${m.title}</b><small>${m.date}</small></div><span>${i < p ? '✔' : i > p ? '🔒' : '▶'}</span>`;
     d.onclick = () => showBrief(i); $('mlist').appendChild(d);
   });
   if (p >= MISSIONS.length) { const d = document.createElement('div'); d.className = 'mi'; d.innerHTML = '<div><b>Epilog</b><small>Hünkârçayırı, 1481</small></div><span>📜</span>'; d.onclick = showEpilogue; $('mlist').appendChild(d); }
@@ -26,9 +26,9 @@ function showBrief(i) {
   $('bt').textContent = (i + 1) + '. ' + m.title; $('bd').textContent = m.date + ' — Düşman: ' + m.enemy;
   $('bx').textContent = m.brief;
   $('bo').innerHTML = m.objectives.map(o => `<li>${o.text}${o.opt ? ' (isteğe bağlı)' : ''}</li>`).join('');
-  $('bw').textContent = i === 5 ? 'Gedik Ahmed Paşa ölürse görev kaybedilir.' : 'Sultan (komutan) ölürse görev kaybedilir.' + (m.timeLimit ? ' Süre sınırı: ' + fmtT(m.timeLimit) + '.' : '');
-  const pc = $('bpor'); pc.hidden = !drawPortrait(pc, i === 5 ? 'pasa' : 'fatih', i === 5 ? 'sipahi' : 'fatih');
-  $('brief').style.background = `linear-gradient(180deg,rgba(8,4,2,.2),rgba(8,4,2,.7)), ${artBg('brief' + (i + 1))}`;
+  $('bw').textContent = m.title === 'Otranto' ? 'Gedik Ahmed Paşa ölürse görev kaybedilir.' : 'Sultan (komutan) ölürse görev kaybedilir.' + (m.timeLimit ? ' Süre sınırı: ' + fmtT(m.timeLimit) + '.' : '');
+  const pc = $('bpor'); pc.hidden = !drawPortrait(pc, m.title === 'Otranto' ? 'pasa' : 'fatih', m.title === 'Otranto' ? 'sipahi' : 'fatih');
+  $('brief').style.background = `linear-gradient(180deg,rgba(8,4,2,.2),rgba(8,4,2,.7)), ${artBg(mArt(i))}`;
   $('bgo').onclick = () => startMission(i);
   show('brief');
 }
@@ -44,14 +44,14 @@ function startSkirmish(again) {
 }
 function startGame(m) {
   m.objectives.forEach(o => o.ok = false);
-  newGame(m); G.rng = makeRng(m.seed); renderBase(); m.setup(); scatterNature(); buildTerrain();
+  newGame(m); G.rng = makeRng(m.seed); renderBase(); m.setup(); scatterNature(); scatterFish(); buildTerrain();
   const q = new URLSearchParams(location.search);
   if (q.has('cheat')) { Object.assign(G.players[0], { f: 9999, w: 9999, g: 9999 }); }
   if (q.has('nofog')) m.noFog = true;
   updVis(); popAndCap();
   cam = { x: 0, y: 0, z: 1 }; if (G.hero) centerOn(G.hero.x, G.hero.y); else centerOn(G.W * TILE / 2, G.H * TILE / 2);
   G.sel = G.hero ? [G.hero] : []; place = null; amovePending = false; cardSig = '';
-  show('game'); resize(); if (G.hero) centerOn(G.hero.x, G.hero.y); uiSpeed(); uiObjectives(); msg(m.date + ' — ' + m.title, 'good');
+  show('game'); resize(); if (G.hero) centerOn(G.hero.x, G.hero.y); uiSpeed(); uiObjectives(); msg(m.date + ' — ' + m.title, 'good'); tutStart();
   lastT = performance.now(); acc = 0; if (!running) { running = true; requestAnimationFrame(frame); }
 }
 function restartMission() { $('pause').style.display = 'none'; if (curMission < 0) startSkirmish(true); else startMission(curMission); }
@@ -101,6 +101,6 @@ function drawMenuBg() {
 }
 drawMenuBg();
 loadBlender(() => { // Blender sprite atlasları yüklendikten sonra başla
-  if (BL.ok) Object.assign(BH, { pazar: 70, cami: 150, medrese: 70, saray: 130, ev: 52, ambar: 48, tarla: 10, kisla: 74, ahir: 62, ocak: 84, dokum: 96, kule: 112, burc: 96, sur: 46, kapi: 52, kale: 120, hisar: 130, kamp: 84, ayasofya: 112 });
+  if (BL.ok) Object.assign(BH, { demirhane: 80, tersane: 62, pazar: 70, cami: 150, medrese: 70, saray: 130, ev: 52, ambar: 48, tarla: 10, kisla: 74, ahir: 62, ocak: 84, dokum: 96, kule: 112, burc: 96, sur: 46, kapi: 52, kale: 120, hisar: 130, kamp: 84, ayasofya: 112 });
   const q = new URLSearchParams(location.search); if (q.has('m')) startMission(+q.get('m') - 1);
 });

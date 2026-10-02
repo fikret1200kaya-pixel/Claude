@@ -76,7 +76,7 @@ function drawUnit(c, u) {
   drawSpr(c, spr, sx, sy, 64, 86); if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; drawSpr(c, spr, sx, sy, 64, 86, .35); c.globalCompositeOperation = 'source-over'; } }
   if (u.carry && u.carry.amt > 0 && u.d.worker) { c.fillStyle = ['', '#8a5a2a', '#f2c230', '#c0405a'][u.carry.type]; c.beginPath(); c.arc(sx - 7 * cam.z, sy - 18 * cam.z, 3.4 * cam.z, 0, 7); c.fill(); c.strokeStyle = OUT; c.lineWidth = 1; c.stroke(); }
 }
-const unitTop = u => UZ * (u.d.cls === 'cav' || u.d.cls === 'hero' ? 62 : u.d.look === 'sahi' ? 52 : u.d.cls === 'sie' ? 38 : 50);
+const unitTop = u => UZ * (u.d.cls === 'ship' ? (u.d.look === 'balikci' ? 46 : u.d.look === 'bastarda' ? 110 : 95) : u.d.cls === 'cav' || u.d.cls === 'hero' ? 62 : u.d.look === 'sahi' ? 52 : u.d.cls === 'sie' ? 38 : 50);
 function bScreen(b) { const s = buildingSprite(b.type, b.owner, b.type === 'ayasofya' && G.flags.captured ? 'cap' : ''); const [ox, oy] = w2s(b.tx * TILE, b.ty * TILE); return { s, ox, oy, dx: ox - s.meta.ox * cam.z, dy: oy - s.meta.oy * cam.z }; }
 const bName = b => b.type === 'ayasofya' && G.flags.captured ? 'ayasofya_cap' : b.type;
 function drawBuildingBL(c, b) {
@@ -119,8 +119,16 @@ function drawBuilding(c, b) {
   const hpf = b.hp / b.maxhp;
   if (hpf < .6 && !b.d.landmark) { const n = hpf < .3 ? 5 : 2, hb = BH[b.type] || 30; for (let i = 0; i < n; i++) { const rx = hash2(b.id, i, 1), ry = hash2(b.id, i, 2), wx = (b.tx + .2 + rx * (b.w - .4)) * TILE, wy = (b.ty + .2 + ry * (b.h - .4)) * TILE, [fx, fy] = w2s(wx, wy, hb * (.4 + hash2(b.id, i, 3) * .4)); const fl = Math.sin(G.t * 13 + i * 3) * .2 + 1; const g = c.createRadialGradient(fx, fy, 1, fx, fy - 6 * z, 12 * z * fl); g.addColorStop(0, 'rgba(255,240,150,.95)'); g.addColorStop(.4, 'rgba(255,130,30,.8)'); g.addColorStop(1, 'rgba(200,40,0,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(fx, fy - 6 * z, 7 * z * fl, 13 * z * fl, 0, 0, 7); c.fill(); for (let k = 0; k < 3; k++) { const ph = (G.t * .5 + k / 3 + rx) % 1; c.fillStyle = `rgba(40,35,30,${.5 * (1 - ph)})`; c.beginPath(); c.arc(fx + ph * 10 * z, fy - (14 + ph * 46) * z, (5 + ph * 10) * z, 0, 7); c.fill(); } } }
 }
+function drawFish(c, sx, sy, z, h) {   // balık sürüsü: dönen gölgeler, halkalar, ara sıra sıçrama
+  const t = G.t * (.8 + h * .4) + h * 20;
+  c.fillStyle = 'rgba(20,48,66,.5)';
+  for (let k = 0; k < 4; k++) { const a = t + k * 1.7, x = sx + Math.cos(a) * 9 * z, y = sy + Math.sin(a) * 4.5 * z; c.save(); c.translate(x, y); c.rotate(a + Math.PI / 2); c.beginPath(); c.ellipse(0, 0, 5 * z, 1.8 * z, 0, 0, 7); c.fill(); c.beginPath(); c.moveTo(-5 * z, 0); c.lineTo(-8 * z, -2 * z); c.lineTo(-8 * z, 2 * z); c.fill(); c.restore(); }
+  const ph = (t * .4) % 1; c.strokeStyle = `rgba(220,240,255,${.5 * (1 - ph)})`; c.lineWidth = 1.2; c.beginPath(); c.ellipse(sx, sy, (4 + ph * 14) * z, (2 + ph * 7) * z, 0, 0, 7); c.stroke();
+  const j = (t * .23 + h) % 3; if (j < .35) { const q = j / .35, x = sx + (h - .5) * 16 * z, y = sy - Math.sin(q * Math.PI) * 10 * z; c.fillStyle = 'rgba(200,215,225,.95)'; c.save(); c.translate(x, y); c.rotate(-1 + q * 2); c.beginPath(); c.ellipse(0, 0, 4 * z, 1.6 * z, 0, 0, 7); c.fill(); c.restore(); }
+}
 function drawRes(c, tx, ty, r) {
   const [sx, sy] = w2s(tx * TILE + 16, ty * TILE + 16), z = cam.z, v = (hash2(tx, ty, 9) * 6) | 0;
+  if (r === 4) { drawFish(c, sx, sy, z, hash2(tx, ty, 2)); return; }
   if (BL.ok) {
     const nm = r === 1 ? 'tree' + v : r === 2 ? 'mine' + (v % 3) : 'berry' + (v % 3);
     if (r === 1) { const sway = Math.sin(G.t * 1.3 + tx * .7 + ty * .3) * .02; c.save(); c.translate(sx, sy); c.transform(1, 0, sway, 1, 0, 0); blStatic(c, nm, null, 0, 0, z); c.restore(); }
@@ -184,6 +192,7 @@ function render() {
     const g = c.createRadialGradient(sx, sy, R0 * .1, sx, sy, R0); g.addColorStop(0, 'rgba(20,30,40,.16)'); g.addColorStop(1, 'rgba(20,30,40,0)');
     c.fillStyle = g; c.beginPath(); c.ellipse(sx, sy, R0 * 1.5, R0 * .75, 0, 0, 7); c.fill();
   }
+  if (G.m.night && !G.flags.dawn) { c.fillStyle = 'rgba(8,16,48,.42)'; c.fillRect(0, 0, W, H); }   // gece
   drawFog(c);
   // sağlık çubukları
   for (const it of L) { const e = it.e; if (!e || e.d.landmark) continue; const sel = G.sel.includes(e); if (e.hp >= e.maxhp && !sel && !(e.kind === 'b' && !e.built)) continue; if (e.kind === 'u') { const [sx, sy] = w2s(e.x, e.y, unitTop(e)); bar(c, sx, sy, 24 * z, e.hp / e.maxhp); } else { const [sx, sy] = w2s(e.x, e.y, (BH[e.type] || 30) + 14); bar(c, sx, sy, Math.min(e.w * 30, 80) * z, e.hp / e.maxhp); if (!e.built) bar(c, sx, sy + 6, Math.min(e.w * 30, 80) * z, e.prog, '#e8b030'); } }
@@ -213,7 +222,7 @@ function drawMini() {
   for (let i = 0; i < W * H; i++) {
     let r, g, b; const t = G.terrain[i], res = G.res[i];
     if (t === 1) { r = 44; g = 96; b = 140; } else if (t === 2) { r = 150; g = 120; b = 80; } else if (t === 3) { r = 200; g = 180; b = 130; } else if (t === 4) { r = 140; g = 130; b = 115; } else { r = 82; g = 122; b = 50; }
-    if (res === 1) { r = 34; g = 74; b = 30; } else if (res === 2) { r = 240; g = 200; b = 40; } else if (res === 3) { r = 170; g = 60; b = 80; }
+    if (res === 1) { r = 34; g = 74; b = 30; } else if (res === 2) { r = 240; g = 200; b = 40; } else if (res === 3) { r = 170; g = 60; b = 80; } else if (res === 4) { r = 120; g = 190; b = 220; }
     if (!G.m.noFog) { if (!G.exp[i]) { r = g = b = 0; } else if (!G.vis[i]) { r *= .55; g *= .55; b *= .55; } }
     d[i * 4] = r; d[i * 4 + 1] = g; d[i * 4 + 2] = b; d[i * 4 + 3] = 255;
   }
@@ -230,11 +239,12 @@ function canPlace(type, tx, ty) {
   const d = BUILDS[type];
   for (let y = ty; y < ty + d.h; y++) for (let x = tx; x < tx + d.w; x++) { if (!inb(x, y)) return false; const i = idx(x, y); if (G.blkT[i] || G.occ[i] || !G.exp[i] && !G.m.noFog) return false; }
   if (d.zone) { const z = G.zone; if (!z || tx < z.x0 || ty < z.y0 || tx + d.w - 1 > z.x1 || ty + d.h - 1 > z.y1) return false; }
+  if (d.dock) { let w = 0; for (let x = tx - 1; x <= tx + d.w; x++) for (let y = ty - 1; y <= ty + d.h; y++) if (inb(x, y) && G.terrain[idx(x, y)] === 1) w++; if (w < 2) return false; }
   return true;
 }
 function tryPlace(shift) {
   const t = place.type, d = BUILDS[t], p = G.players[0];
-  if (!place.ok) { msg(d.zone ? 'Hisar yalnızca işaretli alana kurulabilir.' : 'Buraya inşa edilemez.', 'warn'); return; }
+  if (!place.ok) { msg(d.zone ? 'Hisar yalnızca işaretli alana kurulabilir.' : d.dock ? 'Tersane kıyıya, suya bitişik kurulmalı.' : 'Buraya inşa edilemez.', 'warn'); return; }
   if (!afford(p, d.cost)) { msg('Yetersiz kaynak!', 'warn'); return; }
   const vills = G.sel.filter(e => e.kind === 'u' && e.d.worker && e.owner === 0); if (!vills.length) { place = null; return; }
   pay(p, d.cost); const b = addBuilding(t, 0, place.tx, place.ty, { built: false });
@@ -256,7 +266,7 @@ function entAtScreen(sx, sy, ownOnly) {
 function resAtScreen(sx, sy) {
   const g = s2w(sx, sy), z = cam.z; let best = null, bd = -1e9;
   const cx = (g.x / TILE) | 0, cy = (g.y / TILE) | 0;
-  for (let k = -1; k <= 3; k++) for (let o = -1; o <= 1; o++) { const tx = cx + k + o, ty = cy + k - o; if (!inb(tx, ty)) continue; const i = idx(tx, ty), r = G.res[i]; if (!r || (!G.exp[i] && !G.m.noFog)) continue; const [bx, by] = w2s(tx * TILE + 16, ty * TILE + 16), top = r === 1 ? 62 : r === 2 ? 34 : 18, hw = r === 1 ? 18 : 22; if (Math.abs(sx - bx) <= hw * z && sy >= by - top * z && sy <= by + 10 * z) { if (tx + ty > bd) { bd = tx + ty; best = [tx, ty]; } } }
+  for (let k = -1; k <= 3; k++) for (let o = -1; o <= 1; o++) { const tx = cx + k + o, ty = cy + k - o; if (!inb(tx, ty)) continue; const i = idx(tx, ty), r = G.res[i]; if (!r || (!G.exp[i] && !G.m.noFog)) continue; const [bx, by] = w2s(tx * TILE + 16, ty * TILE + 16), top = r === 1 ? 62 : r === 2 ? 34 : 18, hw = r === 1 ? 18 : r === 4 ? 26 : 22; if (Math.abs(sx - bx) <= hw * z && sy >= by - top * z && sy <= by + 10 * z) { if (tx + ty > bd) { bd = tx + ty; best = [tx, ty]; } } }
   return best;
 }
 function selectUnits(list, add) { if (add) { for (const e of list) if (!G.sel.includes(e)) G.sel.push(e); } else G.sel = list.slice(); cardSig = ''; updateCard(); }
@@ -271,7 +281,8 @@ function commandAt(sx, sy) {
     if (t.d.farm && sel.some(u => u.d.worker)) { for (const u of sel) if (u.d.worker) orderFarm(u, t); fxPing(t.x, t.y); return; }
   }
   const rs = resAtScreen(sx, sy);
-  if (rs && sel.some(u => u.d.worker)) { for (const u of sel) if (u.d.worker) orderGather(u, rs[0], rs[1]); else orderMove(u, rs[0] * TILE + 16, rs[1] * TILE + 16); fxPing(rs[0] * TILE + 16, rs[1] * TILE + 16, '#ffd24d'); return; }
+  const fish = rs && G.res[idx(rs[0], rs[1])] === 4, gat = u => fish ? u.d.fisher : u.d.worker;
+  if (rs && sel.some(gat)) { for (const u of sel) if (gat(u)) orderGather(u, rs[0], rs[1]); else orderMove(u, rs[0] * TILE + 16, rs[1] * TILE + 16); fxPing(rs[0] * TILE + 16, rs[1] * TILE + 16, '#ffd24d'); return; }
   moveGroup(sel, g.x, g.y); fxPing(g.x, g.y);
 }
 function moveGroup(sel, wx, wy) {
@@ -363,6 +374,9 @@ addEventListener('keydown', e => {
   keys[e.key.toLowerCase()] = true; if (!G || !running) return;
   const k = e.key.toLowerCase();
   if (k.startsWith('arrow')) e.preventDefault();
+  if ($('tree').style.display === 'flex') { if (k === 'escape' || k === 'i') closeTree(); return; }
+  if (k === 'i') { openTree(); return; }
+  if (k === 'f5') { e.preventDefault(); saveGame('1'); return; }
   if (k === 'escape') { if (place) place = null; else if (amovePending) amovePending = false; else togglePause(); return; }
   if (k === 'p') { togglePause(); return; }
   if (k === 'home') { goHome(); return; }
@@ -404,7 +418,8 @@ function scrollCam(dt) {
 let cardBtns = [];
 const ICONS = new Map();
 function icon(kind, type, owner) { owner = owner || 0; const k = kind + type + owner + (type === 'ayasofya' && G.flags.captured ? 'c' : ''); if (!ICONS.has(k)) ICONS.set(k, kind === 't' ? techIcon(type) : (BL.ok && blIcon(kind, type, owner)) || iconCanvas(kind, type, owner)); return ICONS.get(k); }
-const TGLYPH = { cografya: '🧭', tip: '⚕', topcu: '💣', zirh: '🛡' };
+const TGLYPH = { cografya: '🧭', tip: '⚕', topcu: '💣', zirh: '⛓', lamel: '🛡', balta: '🪓', kazma: '⛏', saban: '🌾', kagni: '🛞', kilic: '🗡', kilic2: '⚔', atzirhi: '🐎', temren: '➶', kemankes: '🏹', talim: '🥁', turkmen: '🐴', fitil: '🔥', mimari: '📐', hendese: '📏', ag: '🎣', kalafat: '⚓', pusula: '🧭' };
+const techAvail = id => !G.m.avail.noTech || !G.m.avail.noTech.includes(id);
 function techIcon(id) { const cv = mkCanvas(48, 48), c = cv.getContext('2d'); const g = c.createRadialGradient(24, 20, 4, 24, 24, 30); g.addColorStop(0, '#5a3c22'); g.addColorStop(1, '#1a0f07'); c.fillStyle = g; c.fillRect(0, 0, 48, 48); c.strokeStyle = '#d9b25e'; c.lineWidth = 2; c.strokeRect(3, 3, 42, 42); c.font = '24px serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#f3d68a'; c.fillText(TGLYPH[id] || '✦', 24, 25); return cv; }
 const icH = (kind, type, owner) => `<canvas class="ic" width="48" height="48" data-ic="${kind}|${type}|${owner || 0}"></canvas>`;
 function fillIcons(root) { root.querySelectorAll('canvas[data-ic]').forEach(cv => { const [k, t, o] = cv.dataset.ic.split('|'); const im = icon(k, t, +o || 0); cv.getContext('2d').drawImage(im, 0, 0, im.width, im.height, 0, 0, cv.width, cv.height); }); }
@@ -441,13 +456,10 @@ function buildCard() {
     btn('Odun sat', 'e', () => { trade(0, 'w', false); cardSig = ''; }, { w: 100 }, '100 odun sat → ' + Math.round(pr('w') * .75) + ' altın', p.w < 100, 'sellw');
     btn('Yiyecek sat', 'r', () => { trade(0, 'f', false); cardSig = ''; }, { f: 100 }, '100 yiyecek sat → ' + Math.round(pr('f') * .75) + ' altın', p.f < 100, 'sellf');
   }
-  if (blds.length === 1 && blds[0].built && blds[0].d.techs) {
-    const b = blds[0], hk = ['q', 'w', 'e', 'r']; let i = 0;
-    for (const id of b.d.techs) { const T = TECHS[id]; if (hasTech(0, id)) continue; const busy = G.blds.some(x => x.owner === 0 && x.queue.some(q => q.type === 'T:' + id)); btn(T.name, hk[i++], () => { queueTech(b, id); cardSig = ''; }, T.cost, T.desc + ' (' + T.time + ' sn)', busy || !afford(p, T.cost), 't|' + id); }
-  }
-  if (blds.length === 1 && blds[0].built && blds[0].d.trains) {
-    const b = blds[0], hk = ['q', 'w', 'e', 'r']; let i = 0;
-    for (const t of b.d.trains || []) { if (!av.train.includes(t)) continue; const d = UNITS[t]; const dis = !afford(p, d.cost) || p.pop + d.pop > p.cap; btn(d.name, hk[i++], () => { queueTrain(b, t); cardSig = ''; }, d.cost, d.desc + ' (' + d.pop + ' nüfus, ' + d.time + ' sn)', dis, 'u|' + t); }
+  if (blds.length === 1 && blds[0].built && (blds[0].d.trains || blds[0].d.techs)) {
+    const b = blds[0], hk = ['q', 'w', 'e', 'r', 't', 'a', 'f', 'z', 'x', 'c', 'y', 'u']; let i = 0;
+    for (const t of b.d.trains || []) { if (!av.train.includes(t)) continue; const d = UNITS[t]; const dis = !afford(p, d.cost) || p.pop + d.pop > p.cap; btn(d.name, hk[i++], () => { queueTrain(b, t); cardSig = ''; }, d.cost, d.desc + (d.str ? '\n▲ Güçlü: ' + d.str + '\n▼ Zayıf: ' + d.weak : '') + '\n(' + d.pop + ' nüfus, ' + d.time + ' sn)', dis, 'u|' + t); }
+    if (b.owner === 0) for (const id of b.d.techs || []) { const T = TECHS[id]; if (hasTech(0, id) || !techAvail(id)) continue; const busy = G.blds.some(x => x.owner === 0 && x.queue.some(q => q.type === 'T:' + id)), rq = !techReqOk(0, id); btn(T.name, hk[i++], () => { queueTech(b, id); cardSig = ''; }, T.cost, T.desc + (rq ? '\n(Önce: ' + TECHS[T.req].name + ')' : '') + ' (' + T.time + ' sn)', busy || rq || !afford(p, T.cost), 't|' + id); }
   }
 }
 function updateCard() {
@@ -461,8 +473,8 @@ function updateCard() {
   else if (one) {
     const d = one.d;
     let h = `<div class="por"><canvas class="ic" width="96" height="96" data-ic="${one.kind === 'u' ? 'u' : 'b'}|${one.type}|${one.owner}"></canvas></div><div class="tx"><h3>${one.name}</h3><div class="hp"><i style="width:${Math.max(0, one.hp / one.maxhp * 100)}%"></i></div><div>Can: ${Math.ceil(one.hp)} / ${one.maxhp}</div>`;
-    if (one.kind === 'u') { h += `<div>⚔ ${d.atk}${d.bonus ? ' (+' + Object.entries(d.bonus).map(([k, v]) => v + ' ' + { cav: 'atlı', arc: 'okçu' }[k]).join(',') + ')' : ''} · ⛨ ${d.armor} · ➶ ${d.range ? Math.round(d.range / TILE) + ' kare' : 'yakın'}</div>`; if (one.carry && one.carry.amt) h += `<div>Taşıyor: ${one.carry.amt}</div>`; if (one.aura) h += '<div class="g">Komutan etkisi: +%20 saldırı</div>'; h += `<div class="d">${one.desc || d.desc || ''}</div>`; }
-    else { if (!one.built) h += `<div>İnşaat: %${Math.floor(one.prog * 100)}</div>`; else if (one.queue.length) h += '<div>Üretim: ' + one.queue.map((q, i) => `<span class="q" data-i="${i}" title="${qName(q)} — iptal et">${q.type.startsWith('T:') ? icH('b', 'medrese') : icH('u', q.type)}${i === 0 ? '%' + Math.floor(q.t / qTime(q) * 100) : ''}</span>`).join(' ') + '</div>'; if (one.owner === 0 && one.d.trains) h += '<div class="d">Sağ tık: toplanma noktası</div>'; if (one.d.techs) h += '<div class="d">İlimler: ' + one.d.techs.map(t => (hasTech(0, t) ? '✔ ' : '') + TECHS[t].name).join(' · ') + '</div>'; if (one.d.desc) h += `<div class="d">${one.d.desc}</div>`; }
+    if (one.kind === 'u') { h += `<div title="Saldırı · yakın dövüş zırhı / ok zırhı · menzil">⚔ ${Math.round(one.atk * 10) / 10}${d.bonus ? ' <small>(' + Object.entries(d.bonus).map(([k, v]) => '+' + v + ' ' + CLSN[k]).join(', ') + ')</small>' : ''} · 🛡 ${one.ma}/${one.pa} · ➶ ${d.range ? Math.round(rangeOf(one) / TILE) + ' kare' : 'yakın'}</div>`; if (d.str) h += `<div class="cnt"><span class="g">▲ ${d.str}</span> · <span class="w">▼ ${d.weak}</span></div>`; if (one.carry && one.carry.amt) h += `<div>Taşıyor: ${one.carry.amt}</div>`; if (one.aura) h += '<div class="g">Komutan etkisi: +%20 saldırı</div>'; h += `<div class="d">${one.desc || d.desc || ''}</div>`; }
+    else { if (!one.built) h += `<div>İnşaat: %${Math.floor(one.prog * 100)}</div>`; else if (one.queue.length) h += '<div>Üretim: ' + one.queue.map((q, i) => `<span class="q" data-i="${i}" title="${qName(q)} — iptal et">${q.type.startsWith('T:') ? icH('t', q.type.slice(2)) : icH('u', q.type)}${i === 0 ? '%' + Math.floor(q.t / qTime(q) * 100) : ''}</span>`).join(' ') + '</div>'; if (one.owner === 0 && one.d.trains) h += '<div class="d">Sağ tık: toplanma noktası</div>'; if (one.d.techs) h += '<div class="d">İlimler: ' + one.d.techs.map(t => (hasTech(0, t) ? '✔ ' : '') + TECHS[t].name).join(' · ') + '</div>'; if (one.d.desc) h += `<div class="d">${one.d.desc}</div>`; }
     info.innerHTML = h + '</div>'; fillIcons(info);
     info.querySelectorAll('.q').forEach(q => q.onclick = () => { const i = +q.dataset.i, it = one.queue[i]; if (!it) return; one.queue.splice(i, 1); const c = qCost(it); G.players[0].f += c.f || 0; G.players[0].w += c.w || 0; G.players[0].g += c.g || 0; });
   } else {

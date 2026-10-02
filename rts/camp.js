@@ -19,7 +19,8 @@ const GEO = {
   cities: [['Bursa', 29.06, 40.18], ['Trabzon', 39.72, 41], ['Konya', 32.5, 37.87], ['Buda', 19.04, 47.5], ['Venedik', 12.33, 45.44], ['Atina', 23.73, 37.98], ['Sofya', 23.32, 42.7], ['Varna', 27.9, 43.2], ['Kefe', 35.38, 45.03]],
 };
 // görev konumları: [boylam, enlem, etiket ofseti x, y (px)]
-const CAMP_PTS = [[26.56, 41.68, -10, -34], [29.06, 41.1, 26, -30], [28.95, 41.0, -36, 26], [20.46, 44.82, 0, -34], [39.8, 40.0, 0, -34], [18.49, 40.15, 26, 20]];
+const CAMP_XY = { 'Tahta Çıkış': [26.56, 41.68, -10, -34], 'Boğazkesen': [29.06, 41.1, 26, -30], 'İstanbul\'un Fethi': [28.95, 41.0, -36, 26], 'Belgrad Kuşatması': [20.46, 44.82, 0, -34], 'Trabzon': [39.72, 41.0, -10, -36], 'Eflak Seferi': [25.46, 44.93, 0, -34], 'Eğriboz': [23.6, 38.46, -30, 22], 'Otlukbeli': [39.8, 40.0, 26, 26], 'İşkodra Kuşatması': [19.51, 42.07, -34, -16], 'Otranto': [18.49, 40.15, 26, 20] };
+const CAMP_PTS = MISSIONS.map(m => CAMP_XY[m.title] || [30, 40, 0, -30]);
 let campSel = 0, campHit = [];
 function campProj(W, H) {
   const gw = (CM.lon1 - CM.lon0) * CM.k, gh = CM.lat1 - CM.lat0, s = Math.min(W / gw, H / gh) * .98;
@@ -80,7 +81,7 @@ function drawCampMap() {
     x.save(); x.translate(bx, by); x.beginPath(); x.moveTo(-r, -r); x.lineTo(r, -r); x.lineTo(r, 0); x.quadraticCurveTo(r, r * .9, 0, r * 1.35); x.quadraticCurveTo(-r, r * .9, -r, 0); x.closePath();
     x.fillStyle = lock ? '#6a6258' : done ? '#5e1a12' : '#a8352a'; x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 6; x.shadowOffsetY = 2; x.fill(); x.shadowColor = 'transparent';
     x.strokeStyle = lock ? '#3a342c' : '#e2b450'; x.lineWidth = 2.5; x.stroke();
-    x.fillStyle = lock ? '#cfc6b6' : '#fff3c4'; x.font = `900 ${r * .95}px Cinzel,serif`; x.fillText(['I', 'II', 'III', 'IV', 'V', 'VI'][i], 0, -1);
+    x.fillStyle = lock ? '#cfc6b6' : '#fff3c4'; x.font = `900 ${r * .95}px Cinzel,serif`; x.font = `900 ${r * (i > 8 ? .7 : .95)}px Cinzel,serif`; x.fillText(ROMAN[i], 0, -1);
     if (done) { x.font = `700 ${r * .7}px serif`; x.fillStyle = '#f3d68a'; x.fillText('✔', r * .95, -r * .95); }
     x.restore();
     x.font = `700 ${fs * .95}px Cinzel,Georgia,serif`; x.fillStyle = lock ? 'rgba(60,40,20,.55)' : '#5a1810';
@@ -91,9 +92,9 @@ function drawCampMap() {
 function campSelect(i) {
   campSel = i; const m = MISSIONS[i], p = prog(), lock = i > p;
   $('ctl').textContent = m.title; $('cdt').textContent = m.date; $('cdx').textContent = m.brief.split('\n')[0];
-  $('cnum').textContent = ['I', 'II', 'III', 'IV', 'V', 'VI'][i];
-  const art = artURL('brief' + (i + 1)); $('cprev').style.backgroundImage = `linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.45)), url(${art || 'assets/camp_bg.jpg'})`;
-  drawPortrait($('cpor'), i === 5 ? 'pasa' : 'fatih', i === 5 ? 'sipahi' : 'fatih');
+  $('cnum').textContent = ROMAN[i];
+  const art = artURL(mArt(i)); $('cprev').style.backgroundImage = `linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.45)), url(${art || 'assets/camp_bg.jpg'})`;
+  drawPortrait($('cpor'), m.title === 'Otranto' ? 'pasa' : 'fatih', m.title === 'Otranto' ? 'sipahi' : 'fatih');
   $('cgo').disabled = lock; $('cgo').textContent = lock ? '🔒 Önceki seferi tamamla' : 'Brifinge Geç ▸'; $('cgo').onclick = () => showBrief(i);
   document.querySelectorAll('#mlist .mi').forEach((d, k) => d.classList.toggle('sel', k === i));
   drawCampMap();
@@ -116,7 +117,7 @@ $('cmapc').addEventListener('dblclick', e => { if (campSel <= prog()) showBrief(
 addEventListener('resize', () => { if ($('camp').classList.contains('on')) drawCampMap(); });
 
 /* ====== Bölüm sonu: resimli hikâye + sonraki seferin ön gösterimi ====== */
-const STORY = [
+const STORY_A = [
   ["Şubat 1451. II. Murad'ın ölüm haberi Manisa'ya ulaştığında Şehzade Mehmed atına atladı: \"Beni seven ardımdan gelsin!\" Günler sonra Edirne'de ikinci kez tahta oturdu.",
     "Karamanoğlu İbrahim Bey genç sultanı sınamak için ayaklandı. Mehmed ordusunu Anadolu'ya yürüttü; Karaman beyi barış dilemek zorunda kaldı.",
     "Avrupa sarayları onu tecrübesiz bir genç sanıyordu. Yanıldıklarını anlamaları uzun sürmeyecekti."],
@@ -136,23 +137,27 @@ const STORY = [
     "İki haftalık kuşatmanın ardından 11 Ağustos'ta Otranto düştü. Roma'da telaş başladı; Papa şehri terk etmeyi düşündü.",
     "Ertesi bahar Fatih yeni bir sefere çıktı. Ama ordunun hedefi hiçbir zaman açıklanmayacaktı..."],
 ];
-const TEASE = [
+const TEASE_A = [
   "Boğaz'ın en dar yerinde, Bizans'ın gözü önünde bir hisar yükselecek. Hisarı Bizans tamamlanmadan bitirebilecek misin?",
   "Bin yıllık surlar, Orban'ın dev topları ve 53 gün sürecek bir kuşatma. Tarihin akışı değişmek üzere.",
   "Tuna kıyısında Macaristan'ın anahtarı: Belgrad. Hunyadi Yanoş ve haçlı ordusu yaklaşıyor.",
   "Doğuda Akkoyunlu Uzun Hasan güçleniyor. İki büyük ordu Otlukbeli'nde karşılaşacak.",
   "Gedik Ahmed Paşa'nın donanması Adriyatik'i geçiyor. Hedef İtalya kıyısı: Otranto.",
 ];
-const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+const OLD6 = ['Tahta Çıkış', 'Boğazkesen', 'İstanbul\'un Fethi', 'Belgrad Kuşatması', 'Otlukbeli', 'Otranto'];
+const STORY = {}, TEASE = {}; OLD6.forEach((t, i) => { STORY[t] = STORY_A[i]; if (i) TEASE[t] = TEASE_A[i - 1]; });
+const mStory = m => m.story || STORY[m.title] || [], mTease = m => m.tease || TEASE[m.title] || '';
+const mArt = (i) => MISSIONS[i].art || 'brief' + (i + 1);
 let storyQ = [], storyK = 0;
 const artBg = (name, pos) => `url(${artURL(name) || 'assets/camp_bg.jpg'}) ${pos || 'center'}/cover no-repeat, url(assets/camp_bg.jpg) center/cover no-repeat`;
 function showStory(i, r) {
   const m = MISSIONS[i], st = `Süre: ${fmtT(G.t)} · Düşman kaybı: ${G.stats.kills} · Kayıplarımız: ${G.stats.lost}`;
-  const kick = `${ROMAN[i]}. Sefer · ${m.title}`, img = 'brief' + (i + 1);
+  const kick = `${ROMAN[i]}. Sefer · ${m.title}`, img = mArt(i);
   storyQ = [{ img, pos: '50% 50%', kick, title: r.hist ? 'Tarihî Sonuç' : 'Zafer!', text: r.text, foot: st }];
-  STORY[i].forEach((t, k) => storyQ.push({ img, pos: ['20% 40%', '80% 60%', '50% 30%'][k], kick, title: m.date, text: t }));
+  mStory(m).forEach((t, k) => storyQ.push({ img, pos: ['20% 40%', '80% 60%', '50% 30%'][k], kick, title: m.date, text: t }));
   const n = i + 1;
-  if (n < MISSIONS.length) { const nm = MISSIONS[n]; storyQ.push({ img: 'brief' + (n + 1), pos: '50% 50%', kick: 'Sıradaki Sefer', title: `${ROMAN[n]}. ${nm.title}`, text: TEASE[i], sub: nm.date, next: n }); }
+  if (n < MISSIONS.length) { const nm = MISSIONS[n]; storyQ.push({ img: mArt(n), pos: '50% 50%', kick: 'Sıradaki Sefer', title: `${ROMAN[n]}. ${nm.title}`, text: mTease(nm), sub: nm.date, next: n }); }
   else storyQ.push({ img: 'epilog', pos: '50% 50%', kick: 'Son', title: 'Hünkârçayırı, 1481', text: 'Cihan Padişahı\'nın son yolculuğu.', next: -1 });
   storyK = 0; show('story'); storyGo(0);
 }

@@ -500,7 +500,54 @@ def b_pazar(S, cap):
     flag(S, 1.3, -1.3, .08, 1.5)
 
 
-BUILD = dict(saray=(b_saray, 3, 3.9), ev=(b_ev, 2, 1.6), ambar=(b_ambar, 2, 1.4), tarla=(b_tarla, 2, .4), kisla=(b_kisla, 3, 2.0),
+def b_demirhane(S, cap):
+    box(2.8, 2.8, .1, (0, 0, .05), S['stone_d'])
+    box(2.2, 1.8, .85, (-.1, -.2, .52), S['stone'])
+    timber_wall(S, -1.2, -1.1, 1.0, .7, .95, 1.4)
+    band(-1.15, -1.05, .95, .65, .9, S['team'], .07)
+    pyramid(2.45, 2.15, .75, (-.1, -.2, 1.4), S['roof_d'], ridge=.9)
+    cyl(.26, 2.6, (-.85, -.9, 1.3), S['stone_d'], v=12); cyl(.3, .12, (-.85, -.9, 2.6), S['stone'], v=12)
+    box(.08, .7, .45, (1.0, -.2, .35), S['glow']); arch(S, ('y', .71), -.4, .1, .45, .5, mat=S['wood_d'])
+    window(('y', .76), .3, .5, .14, .2, S)
+    # açık hava ocağı, örs ve silah sergisi
+    box(.5, .5, .35, (.85, .9, .18), S['stone_d']); box(.36, .36, .04, (.85, .9, .37), S['glow'])
+    box(.3, .12, .12, (.25, 1.05, .2), S['iron']); box(.12, .1, .14, (.25, 1.05, .07), S['iron']); cyl(.06, .14, (.42, 1.05, .2), S['iron'], rot=(0, PI / 2, 0), r2=0)
+    for k in range(5):
+        cyl(.012, 1.0, (-1.05 + k * .14, 1.2, .55), S['wood'], rot=(.2, 0, 0), v=6); box(.06, .02, .2, (-1.05 + k * .14, 1.3, 1.05), S['iron'], rot=(.2, 0, 0))
+    box(.8, .05, .05, (-.77, 1.12, .8), S['timber'])
+    cyl(.14, .5, (-.2, 1.15, .25), S['iron'], v=12); ball(.12, (-.2, 1.15, .6), S['iron'], sc=(1, 1, .9))   # zırh sehpası
+    for x in (1.1, 1.25):
+        cyl(.13, .26, (x, -1.15, .13), S['wood_d'], v=12)
+    flag(S, 1.2, -1.25, .08, 1.7)
+
+
+def b_tersane(S, cap):
+    box(2.9, 2.9, .06, (0, 0, .03), S['wood'])
+    for y in (-1.2, -.6, 0, .6, 1.2):
+        box(2.9, .05, .07, (0, y, .07), S['wood_d'])
+    # kızak üstünde yapımı süren gemi
+    loft([(-1.0, .04, .04, .18), (-.8, .16, .26, .2), (0, .2, .36, .2), (.8, .16, .24, .22), (1.05, .05, .04, .3)], S['wood'], axis='x', loc=(0, .3, 0))
+    for x in (-.6, -.35, -.1, .15, .4, .65):
+        for sy in (1, -1):
+            box(.04, .04, .42, (x, .3 + sy * .33, .52), S['wood_d'], rot=(sy * -.35, 0, 0))
+    box(1.9, .06, .05, (0, .3, .22), S['wood_d'])
+    cyl(.025, .5, (1.05, .3, .5), S['wood_d'], rot=(0, -.6, 0), v=6)
+    for x in (-.9, -.3, .3, .9):
+        for yy in (-.25, .85):
+            cyl(.03, 1.2, (x, yy, .6), S['wood_d'], v=6)
+    box(2.0, .04, .04, (0, -.25, 1.2), S['wood_d']); box(2.0, .04, .04, (0, .85, 1.2), S['wood_d'])
+    # depo ve kalafat ocağı
+    box(1.0, .8, .7, (-.85, -1.0, .4), S['stone']); prism(1.15, 1.0, .45, (-.85, -1.0, .75), S['roof'], S['stone'])
+    box(.36, .36, .2, (.9, -1.05, .1), S['stone_d']); cyl(.2, .2, (.9, -1.05, .3), S['iron'], v=14); box(.3, .3, .03, (.9, -1.05, .41), S['dark'])
+    for (x, y) in ((.3, -1.1), (.55, -1.2), (.4, -.9)):
+        cyl(.1, .22, (x, y, .11), S['wood_d'], v=10)
+    for k in range(4):
+        box(1.0, .1, .08, (.2 + (k % 2) * .1, -1.35 + k * .04, .1 + k * .08), S['wood'])
+    cyl(.02, 2.1, (1.3, 1.3, 1.05), S['wood_d'], v=6); box(.6, .04, .04, (1.0, 1.3, 1.9), S['wood_d']); cyl(.006, .9, (.75, 1.3, 1.45), S['dark'], v=4)
+    flag(S, -1.3, 1.3, .08, 1.8)
+
+
+BUILD = dict(saray=(b_saray, 3, 3.9), demirhane=(b_demirhane, 3, 2.7), tersane=(b_tersane, 3, 2.2), ev=(b_ev, 2, 1.6), ambar=(b_ambar, 2, 1.4), tarla=(b_tarla, 2, .4), kisla=(b_kisla, 3, 2.0),
              ahir=(b_ahir, 3, 1.8), ocak=(b_ocak, 3, 2.3), dokum=(b_dokum, 3, 2.6), kule=(b_kule, 2, 3.4), burc=(b_burc, 2, 3.3),
              sur=(b_sur, 1, 1.4), kapi=(b_kapi, 1, 1.5), kale=(b_kale, 4, 4.0), hisar=(b_hisar, 4, 3.9), kamp=(b_kamp, 3, 2.3),
              ayasofya=(b_ayasofya, 5, 3.0), ayasofya_cap=(lambda S, c: b_ayasofya(S, True), 5, 4.6), cami=(b_cami, 3, 4.0), medrese=(b_medrese, 3, 2.0), pazar=(b_pazar, 3, 2.0))

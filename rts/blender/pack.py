@@ -38,12 +38,21 @@ def shelf_pack(items, width):
     return pos, y + rowh + 1
 
 
+def grade(im):
+    """Menüdeki boyalı resimlere uyum: sıcak altın ışık, biraz daha doygun ve kontrastlı."""
+    from PIL import ImageEnhance
+    a = im.getchannel('A'); rgb = im.convert('RGB')
+    rgb = ImageEnhance.Color(rgb).enhance(1.12); rgb = ImageEnhance.Contrast(rgb).enhance(1.05)
+    r, g, b = rgb.split(); r = r.point(lambda v: min(255, int(v * 1.045 + 2))); b = b.point(lambda v: int(v * .93))
+    out = Image.merge('RGB', (r, g, b)).convert('RGBA'); out.putalpha(a); return out
+
+
 def pack_group(entries, width, out_png, out_mask):
     """entries: {key: (color_img, mask_img, anchor_x, anchor_y)} -> {key: [x,y,w,h,ax,ay]}"""
     crops = {}
     for k, (c, m, ax, ay) in entries.items():
         bb = bbox(c)
-        crops[k] = (c.crop(bb), m.crop(bb) if m is not None else None, ax - bb[0], ay - bb[1])
+        crops[k] = (grade(c.crop(bb)), m.crop(bb) if m is not None else None, ax - bb[0], ay - bb[1])
     pos, H = shelf_pack([(k, v[0].width, v[0].height) for k, v in crops.items()], width)
     atlas = Image.new('RGBA', (width, H), (0, 0, 0, 0)); matlas = Image.new('RGBA', (width, H), (255, 255, 255, 0))
     meta = {}

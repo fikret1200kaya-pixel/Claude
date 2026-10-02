@@ -216,11 +216,11 @@ function bakeTerrain() {
   const W = G.W, H = G.H, T = LITE ? 16 : 32, cv = mkCanvas(W * T, H * T), c = cv.getContext('2d'), seed = G.m.seed, r = makeRng(seed + 5);
   // 1) kara renk haritası (W×H) -> pürüzsüz büyütme
   const base = mkCanvas(W, H), bc = base.getContext('2d'), id = bc.createImageData(W, H);
-  const grass = [[92, 132, 52], [112, 148, 58], [78, 118, 48]], dirtc = [168, 132, 84], sandc = [214, 192, 140];
+  const grass = [[96, 128, 50], [126, 146, 60], [78, 108, 44]], sun = [176, 168, 86], dirtc = [176, 138, 86], sandc = [222, 198, 146];
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     const i = y * W + x, t = G.terrain[i]; const n = fbm(x * .12, y * .12, seed), n2 = fbm(x * .5, y * .5, seed + 9);
     let col; if (t === 4) { col = [150, 140, 122].map(v => v * (.9 + n2 * .14)); } else if (t === 2) { col = dirtc.map((v, k) => v * (.88 + n2 * .22)); } else if (t === 3 || t === 1) col = sandc.map(v => v * (.92 + n2 * .1));
-    else { const g = n < .45 ? mixv(grass[2], grass[0], n / .45) : mixv(grass[0], grass[1], (n - .45) / .55); col = g.map(v => v * (.9 + n2 * .2)); }
+    else { let g = n < .45 ? mixv(grass[2], grass[0], n / .45) : mixv(grass[0], grass[1], (n - .45) / .55); const n3 = fbm(x * .05 + 7, y * .05, seed + 3); if (n3 > .55) g = mixv(g, sun, Math.min(.55, (n3 - .55) * 2.2)); col = g.map(v => v * (.9 + n2 * .2)); }
     id.data[i * 4] = col[0]; id.data[i * 4 + 1] = col[1]; id.data[i * 4 + 2] = col[2]; id.data[i * 4 + 3] = 255;
   }
   bc.putImageData(id, 0, 0); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high'; c.drawImage(base, 0, 0, W * T, H * T);
@@ -230,7 +230,7 @@ function bakeTerrain() {
     const n = t === 0 ? 7 : t === 4 ? 12 : 3;
     for (let k = 0; k < n; k++) {
       const px = x * T + r() * T, py = y * T + r() * T;
-      if (t === 0) { const dark = r() < .5; c.strokeStyle = dark ? 'rgba(40,80,30,.35)' : 'rgba(190,220,110,.28)'; c.lineWidth = 1; const h = 3 + r() * 4; c.beginPath(); c.moveTo(px, py); c.lineTo(px - 1.5, py - h); c.moveTo(px, py); c.lineTo(px + .5, py - h * 1.1); c.moveTo(px, py); c.lineTo(px + 2, py - h * .8); c.stroke(); }
+      if (t === 0) { const q = r(), col = q < .35 ? 'rgba(52,82,30,.26)' : q < .7 ? 'rgba(118,146,58,.24)' : q < .9 ? 'rgba(196,196,104,.22)' : 'rgba(170,140,72,.2)'; c.fillStyle = col; c.beginPath(); c.ellipse(px, py, 2.5 + r() * 3.5, 1 + r() * 1.1, -.5 + r() * .5, 0, 7); c.fill(); if (r() < .3) { c.strokeStyle = 'rgba(46,76,28,.3)'; c.lineWidth = 1; c.beginPath(); c.moveTo(px, py); c.lineTo(px - 1, py - 3 - r() * 3); c.stroke(); } }
       else if (t === 2) { c.fillStyle = r() < .5 ? 'rgba(90,60,30,.25)' : 'rgba(230,200,150,.22)'; c.beginPath(); c.ellipse(px, py, 1 + r() * 2, .8 + r(), 0, 0, 7); c.fill(); }
       else if (t === 4) { c.strokeStyle = 'rgba(60,50,40,.28)'; c.lineWidth = 1; c.strokeRect(((px / 8) | 0) * 8, ((py / 6) | 0) * 6, 8, 6); }
       else { c.fillStyle = 'rgba(160,130,80,.18)'; c.fillRect(px, py, 2, 1); }
@@ -248,13 +248,13 @@ function bakeTerrain() {
     const src = blc.getImageData(0, 0, mw, mh).data, ov = mkCanvas(mw, mh), oc = ov.getContext('2d'), oi = oc.createImageData(mw, mh), od = oi.data;
     for (let py = 0; py < mh; py++) for (let px = 0; px < mw; px++) {
       const i = py * mw + px; let v = src[i * 4] / 255; const nz = (fbm(px * .09, py * .09, seed + 40) - .5) * .22; const th = .5 + nz; const o = i * 4;
-      if (v > th) { const dep = Math.min(1, (v - th) / .4); const sh = [70 + (-30) * dep, 160 + (-70) * dep, 170 + (-50) * dep]; const rip = (fbm(px * .22, py * .22, seed + 77) - .5) * 26; od[o] = sh[0] + rip * .4; od[o + 1] = sh[1] + rip * .7; od[o + 2] = sh[2] + rip; od[o + 3] = 255; if (v - th < .045) { const f = 1 - (v - th) / .045; od[o] = od[o] + (255 - od[o]) * f * .85; od[o + 1] = od[o + 1] + (255 - od[o + 1]) * f * .85; od[o + 2] = od[o + 2] + (255 - od[o + 2]) * f * .85; } }
+      if (v > th) { const dep = Math.min(1, (v - th) / .4); const sh = [84 - 50 * dep, 168 - 82 * dep, 186 - 50 * dep]; const rip = (fbm(px * .22, py * .22, seed + 77) - .5) * 26; od[o] = sh[0] + rip * .4; od[o + 1] = sh[1] + rip * .7; od[o + 2] = sh[2] + rip; od[o + 3] = 255; if (v - th < .045) { const f = 1 - (v - th) / .045; od[o] = od[o] + (255 - od[o]) * f * .85; od[o + 1] = od[o + 1] + (255 - od[o + 1]) * f * .85; od[o + 2] = od[o + 2] + (255 - od[o + 2]) * f * .85; } }
       else if (v > th - .2) { const f = (v - (th - .2)) / .2; od[o] = 205; od[o + 1] = 186; od[o + 2] = 138; od[o + 3] = 255 * Math.min(1, f * 1.4) * .9; if (f > .7) { od[o] = 150; od[o + 1] = 130; od[o + 2] = 95; od[o + 3] = 120 * (f - .7) / .3 + od[o + 3] * .5; } }
     }
     oc.putImageData(oi, 0, 0); c.drawImage(ov, 0, 0, W * T, H * T);
   }
   // 4) hafif ışık: sol üstten sıcak, sağ alttan soğuk
-  const g = c.createLinearGradient(0, 0, W * T, H * T); g.addColorStop(0, 'rgba(255,240,200,.07)'); g.addColorStop(1, 'rgba(20,30,60,.10)'); c.fillStyle = g; c.fillRect(0, 0, W * T, H * T);
+  const g = c.createLinearGradient(0, 0, W * T, H * T); g.addColorStop(0, 'rgba(255,226,160,.10)'); g.addColorStop(1, 'rgba(30,30,70,.10)'); c.fillStyle = g; c.fillRect(0, 0, W * T, H * T);
   return cv;
 }
 function mixv(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
@@ -422,6 +422,7 @@ function iconCanvas(kind, type, colIdx) { // buton portreleri
    Takım rengi: (yarı çözünürlüklü) maske renge boyanıp 'multiply' ile karenin kendisine uygulanır;
    sonuç kare başına küçük bir tuvalde, boyutu sınırlı bir önbellekte (LRU) tutulur.            */
 const LITE = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) || /[?&]lite/.test(location.search);
+if (LITE) document.getElementById('c').style.filter = 'none';
 const BL = { ok: false, imgs: {}, cache: new Map(), cap: LITE ? 700 : 2500 };
 const LS = () => (LITE && window.SPRITES && SPRITES.lite) || 1;                 // telefonda küçük atlaslar
 const lsrc = src => LS() < 1 ? src.replace('.png', '_l.png') : src;
@@ -494,7 +495,7 @@ function blPortrait(look, owner) {
 function blIcon(kind, type, owner) {
   if (kind === 'u') { const p = blPortrait(UNITS[type].look, owner); if (p) return p; }
   const cv = mkCanvas(48, 48), c = cv.getContext('2d'); c.fillStyle = '#2a1c10'; c.fillRect(0, 0, 48, 48);
-  if (kind === 'u') { const look = UNITS[type].look, big = UNITS[type].cls === 'cav' || UNITS[type].cls === 'hero' || UNITS[type].cls === 'sie'; if (!blUnit(c, look, owner, 1, 'idle', 0, 24, big ? 50 : 54, big ? .8 : 1.05)) return null; }
+  if (kind === 'u') { const look = UNITS[type].look, cl = UNITS[type].cls, big = cl === 'cav' || cl === 'hero' || cl === 'sie'; if (!blUnit(c, look, owner, 1, 'idle', 0, 24, cl === 'ship' ? 40 : big ? 50 : 54, cl === 'ship' ? (look === 'balikci' ? .75 : .42) : big ? .8 : 1.05)) return null; }
   else { const nm = type === 'ayasofya' && G.flags.captured ? 'ayasofya_cap' : type, f = SPRITES.statics.f[nm]; if (!f) return null; const [, , w, h, ax, ay] = f; const k = Math.min(44 / w, 44 / h) * SPRITES.statics.scale; blStatic(c, nm, owner, 24 - (w / 2 - ax) * k / SPRITES.statics.scale, 46 - (h - ay) * k / SPRITES.statics.scale, k); }
   return cv;
 }

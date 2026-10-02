@@ -29,6 +29,8 @@ def mats():
         leather=MX('leather', (.36, .21, .1), 'leather'), wood=MX('wood', (.46, .28, .14), 'wood'), fur=MX('fur', (.36, .24, .14), 'fur'), ermine=MX('ermine', (.95, .93, .88), 'fur'),
         ruby=MX('ruby', (.75, .03, .06), 'plain', rough=.08), emerald=MX('emerald', (.03, .55, .25), 'plain', rough=.08),
         horse=MX('horse', (.48, .26, .12), 'coat'), horse_w=MX('horse_w', (.93, .91, .87), 'coat'), horse_g=MX('horse_g', (.6, .6, .58), 'coat'), horse_b=MX('horse_b', (.13, .085, .06), 'coat'),
+        hullw=MX('hullw', (.3, .19, .1), 'wood', scale=.5), deck=MX('deck', (.62, .45, .28), 'wood', scale=.4),
+        sail=MX('sail', (.92, .9, .86), 'cloth', team=T, scale=.6), netm=MX('netm', (.75, .7, .55), 'mail', metal=.01, rough=.8, scale=.4),
         flash=M('flash', (1, .8, .3), .5, emit=(1, .7, .2)),
     )
 
@@ -411,6 +413,8 @@ def build(look, root, S):
             cape(Jh['chest'], S, S['team_d'], S['red'])
             sword(Jh['handR'], S, curved=False); shield(Jh['shL'], S, 1, .2, S['team_pat'], kind='heater'); kind = 'swing'
         J = dict(Jh); J.update({'h_' + k: v for k, v in H.items()}); J['rider'] = True
+    elif look in ('kadirga', 'bastarda', 'balikci'):
+        J = ship(root, S, look); kind = 'ship'
     elif look in ('top', 'sahi'):
         k = 1. if look == 'top' else 1.55
         car = joint('car', (0, 0, 0), root); J['car'] = car
@@ -450,6 +454,119 @@ def build(look, root, S):
     return J, kind
 
 
+
+# ------------------------------------------------------------ gemiler
+def sailor(parent, S, x, y, z, k):
+    j = joint('crew%d' % k, (x, y, z), parent)
+    loft([(0, .07, .07), (.16, .065, .07), (.26, .05, .06)], S['team'] if k % 2 else S['red'], j, v=10)
+    ball(.05, (0, 0, .32), S['skin'], j); ball(.06, (0, 0, .38), S['white'], j, sc=(1, 1, .75))
+    return j
+
+
+def ship(root, S, look):
+    """Kadırga / baştarda / balıkçı kayığı. Gövde +X yönüne bakar."""
+    J = {'ship': True}
+    L, B, Hh, nO = {'kadirga': (3.0, .42, .34, 9), 'bastarda': (3.8, .55, .42, 12), 'balikci': (1.25, .3, .2, 1)}[look]
+    hull = joint('hull', (0, 0, 0), root); J['hull'] = hull
+    wood, dark = S['wood'], S['hullw']
+    rings = [(-.5, .1, .04, .55), (-.44, .5, .55, .3), (-.3, .52, .9, .12), (0, .5, 1, .0), (.28, .5, .9, .06), (.42, .44, .55, .2), (.5, .14, .06, .5)]
+    loft([(t * L, a * Hh, b * B, Hh * .5 + du * Hh) for (t, a, b, du) in rings], dark, hull, axis='x', v=18)
+    # takım renkli boya şeridi ve küpeşte
+    loft([(t * L, a * Hh * .32, b * B * 1.015, Hh * .78 + du * Hh) for (t, a, b, du) in rings[1:-1]], S['team'], hull, axis='x', v=18, cap=(False, False))
+    zd = Hh * .95
+    loft([(-.42 * L, .02, B * .5, zd), (.4 * L, .02, B * .5, zd)], S['deck'], hull, axis='x', v=12)
+    if look == 'balikci':
+        for s in (1, -1):
+            o = joint('oar' + ('L' if s > 0 else 'R') + '0', (0, s * B * .9, zd), hull); J[o.name] = o
+            cyl(.015, .9, (0, s * .35, -.12), wood, o, rot=(s * 1.2, 0, 0), v=6)
+        g = joint('fisher', (-.15, 0, zd - .3), hull); g.scale = (.6, .6, .6)
+        Jf = human(g, S, dict(tunic=S['cream'], vest=S['team'], sash=S['brown'], skirt=S['cream'], skirt_len=.25, hat='straw', beard=S['mane']))
+        J.update({'f_' + k: v for k, v in Jf.items()})
+        net = joint('net', (.35, 0, zd + .2), hull); J['net'] = net
+        ball(.22, (0, 0, 0), S['netm'], net, sc=(1, 1, .4)); net.scale = (.001, .001, .001)
+        box(.3, .25, .08, (-.35, 0, zd + .04), S['straw'], hull)   # balık sepeti
+        cyl(.015, .9, (.2, 0, zd + .45), wood, hull, v=6)
+        J['pp'] = joint('pp', (0, 0, .4), root)
+        return J
+    # kürekler
+    xs = [(-.32 + .64 * k / max(1, nO - 1)) * L for k in range(nO)]
+    for s, n in ((1, 'L'), (-1, 'R')):
+        for k, x in enumerate(xs):
+            o = joint('oar%s%d' % (n, k), (x, s * B * .98, zd), hull); J[o.name] = o
+            cyl(.014, 1.15, (0, s * .5, -.25), wood, o, rot=(s * 1.12, 0, 0), v=6)
+            box(.1, .02, .12, (0, s * .98, -.5), wood, o, rot=(s * 1.12, 0, 0))
+    # direk ve latin yelkeni
+    mast = joint('mast', (.12 * L, 0, zd), hull)
+    cyl(.045, 2.4 if look == 'bastarda' else 2.0, (0, 0, 1.1 if look == 'bastarda' else .95), wood, mast, v=10)
+    top = 2.25 if look == 'bastarda' else 1.9
+    A, Bp, C = (-1.15, 0, .55), (1.0, 0, top + .45), (.1, 0, .35)
+    if look == 'bastarda':
+        A, Bp, C = (-1.4, 0, .6), (1.2, 0, top + .55), (.1, 0, .4)
+    n, vs, fs = 8, [], []
+    for i in range(n + 1):
+        for j in range(n + 1 - i):
+            u, v = i / n, j / n; w = 1 - u - v
+            bul = .32 * math.sin(math.pi * min(1, u + w * .5)) * math.sin(math.pi * min(1, v + w * .5)) * (1 - w * .6)
+            vs.append(tuple(A[q] * w + Bp[q] * u + C[q] * v + (bul if q == 1 else 0) for q in range(3)))
+    def vid(i, j): return sum(n + 1 - k for k in range(i)) + j
+    for i in range(n):
+        for j in range(n - i):
+            fs.append((vid(i, j), vid(i + 1, j), vid(i, j + 1)))
+            if j < n - i - 1:
+                fs.append((vid(i + 1, j), vid(i + 1, j + 1), vid(i, j + 1)))
+    sl = mesh(vs, fs, S['sail'], mast, smooth=True); md = sl.modifiers.new('s', 'SOLIDIFY'); md.thickness = .012
+    Lg = math.dist(A, Bp); ang = math.atan2(Bp[0] - A[0], Bp[2] - A[2])
+    cyl(.022, Lg + .2, ((A[0] + Bp[0]) / 2, 0, (A[2] + Bp[2]) / 2), wood, mast, rot=(0, ang, 0), v=8)
+    # kıç köşkü, sayeban ve sancak
+    k = joint('kosk', (-.4 * L, 0, zd), hull)
+    box(.5, B * 1.1, .28, (0, 0, .14), S['wood'], k, bevel=.02)
+    loft([(.3, .02, B * .6), (.5, .14, B * .6, -.05)], S['team'], k, axis='z', v=12)
+    for sx in (.22, -.22):
+        for sy in (B * .5, -B * .5):
+            cyl(.012, .3, (sx, sy, .42), S['gold'], k, v=6)
+    cyl(.015, 1.0, (-.3, 0, .8), wood, k, v=6); ball(.05, (-.3, 0, 1.32), S['gold'], k)
+    mesh([(0, 0, 0), (.5, 0, -.08), (.42, 0, -.2), (.5, 0, -.32), (0, 0, -.3)], [(0, 1, 2, 4), (2, 3, 4)], S['team'], k, loc=(-.3, 0, 1.25))
+    ball(.06, (-.3 + .08, 0, .5), S['gold'], k)   # fener
+    # pruva: mahmuz ve top
+    loft([(.48 * L, .06, .05, Hh * .55), (.62 * L, .012, .012, Hh * .5)], S['bronze'], hull, axis='x', v=8)
+    bow = joint('bow', (.38 * L, 0, zd + .08), hull)
+    for yy in ((0,) if look == 'kadirga' else (-.18, 0, .18)):
+        cyl(.06, .55, (.15, yy, 0), S['bronze'], bow, rot=(0, PI / 2, 0), r2=.045, v=12)
+    fl = joint('flash', (.5, 0, 0), bow); J['flash'] = fl
+    ball(.2, (0, 0, 0), S['flash'], fl, sc=(1.6, 1, 1)); fl.scale = (.001, .001, .001)
+    # tayfa
+    for q in range(8 if look == 'kadirga' else 12):
+        sailor(hull, S, (-.3 + .55 * ((q * .37) % 1)) * L, (q % 3 - 1) * B * .32, zd, q)
+    J['pp'] = joint('pp', (0, 0, .6), root)
+    return J
+
+
+def pose_ship(look, J, act, f, root):
+    root.rotation_euler.x = 0; root.rotation_euler.y = 0; root.location.z = 0
+    oars = [v for k, v in J.items() if k.startswith('oar')]
+    for o in oars:
+        o.rotation_euler = (0, 0, 0)
+    if 'flash' in J:
+        J['flash'].scale = (.001, .001, .001)
+    if 'net' in J:
+        J['net'].scale = (.001, .001, .001)
+    if act == 'walk':
+        ph = f / WALK * 2 * PI
+        for o in oars:
+            s = 1 if 'L' in o.name else -1
+            o.rotation_euler = (s * math.cos(ph) * .12, 0, s * math.sin(ph) * .38)
+        root.rotation_euler.y = math.sin(ph) * .015
+    elif act == 'atk':
+        if look == 'balikci':
+            t = f / (ATK - 1); sc = max(.001, min(1, t * 1.8)); J['net'].scale = (sc, sc, sc); J['net'].location.x = .35 + t * .4
+            g = {k[2:]: v for k, v in J.items() if k.startswith('f_')}
+            g['shR'].rotation_euler = (0, -2.2 + 2 * t, 0); g['shL'].rotation_euler = (0, -2.0 + 1.8 * t, 0)
+        elif f in (1, 2):
+            sc = 1.0 if f == 1 else .6; J['flash'].scale = (sc, sc, sc)
+    elif act == 'dead':
+        root.rotation_euler.x = .45; root.location.z = -.25
+
+
 # ------------------------------------------------------------ pozlar
 def reset_pose(J):
     for k, o in J.items():
@@ -475,6 +592,8 @@ def walk_human(J, ph, arms=True):
 
 
 def pose(look, kind, J, act, f, root):
+    if kind == 'ship':
+        return pose_ship(look, J, act, f, root)
     root.rotation_euler.x = 0; root.location.z = 0
     if kind == 'cannon':
         car = J['car']
@@ -554,8 +673,8 @@ def pose(look, kind, J, act, f, root):
 
 # ------------------------------------------------------------ render
 USCALE = 1.2
-FRAME = {k: int(v * USCALE) // 2 * 2 for k, v in {'sahi': 208, 'top': 160, 'sipahi': 176, 'sovalye': 176, 'fatih': 160, 'komutan': 160, 'akinci': 160, 'reaya': 128, 'azap': 128, 'okcu': 128, 'yeniceri': 128, 'molla': 128}.items()}
-LOOKS = ['reaya', 'azap', 'okcu', 'yeniceri', 'sipahi', 'sovalye', 'fatih', 'komutan', 'top', 'sahi', 'molla', 'akinci']
+FRAME = {k: int(v * USCALE) // 2 * 2 for k, v in {'kadirga': 280, 'bastarda': 330, 'balikci': 150, 'sahi': 208, 'top': 160, 'sipahi': 176, 'sovalye': 176, 'fatih': 160, 'komutan': 160, 'akinci': 160, 'reaya': 128, 'azap': 128, 'okcu': 128, 'yeniceri': 128, 'molla': 128}.items()}
+LOOKS = ['reaya', 'azap', 'okcu', 'yeniceri', 'sipahi', 'sovalye', 'fatih', 'komutan', 'top', 'sahi', 'molla', 'akinci', 'balikci', 'kadirga', 'bastarda']
 
 
 def frames():
@@ -614,12 +733,14 @@ def render_portrait(look, outdir, size=160):
     pose(look, kind, J, 'idle', 0, root)
     bpy.data.objects['catcher'].hide_render = True
     bpy.context.view_layer.update()
-    if kind == 'cannon':
+    if kind == 'ship':
+        head = J['pp'].matrix_world @ Vector((0, 0, 0)) if look != 'balikci' else J['f_hd'].matrix_world @ Vector((0, 0, .15))
+    elif kind == 'cannon':
         head = J['g_hd'].matrix_world @ Vector((0, 0, .15))
     else:
         head = J['hd'].matrix_world @ Vector((0, 0, .15))
     cam = sc.camera; cam.data.type = 'PERSP'; cam.data.lens = 85; cam.data.sensor_fit = 'AUTO'
-    cam.location = head + Vector((1.45, .8, .22))
+    cam.location = head + Vector((1.45, .8, .22)) * (4.2 if kind == 'ship' and look != 'balikci' else 1)
     d = head + Vector((0, 0, .06)) - cam.location; cam.rotation_euler = d.to_track_quat('-Z', 'Y').to_euler()
     bpy.ops.object.light_add(type='AREA', location=head + Vector((.8, -.6, .5))); L = bpy.context.object; L.data.energy = 25; L.data.size = .6
     L.rotation_euler = (head - L.location).to_track_quat('-Z', 'Y').to_euler()
