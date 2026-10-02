@@ -2,11 +2,11 @@
 /* ====== FATİH — Kampanya: Tahta çıkıştan ölüme ====== */
 function crew(type, owner, n, tx, ty, o, cols) { cols = cols || 6; const bx = sc(tx), by = sc(ty); for (let i = 0; i < n; i++) { const [x, y] = freeTileNear(bx + i % cols, by + ((i / cols) | 0)); addUnit(type, owner, x * TILE + TILE / 2, y * TILE + TILE / 2, Object.assign({}, o)); } }
 function houses(owner, tx, ty, cols, rows) { const bx = sc(tx), by = sc(ty); for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) addBuilding('ev', owner, bx + c * 3, by + r * 3); }
-function setupAI(cfg) { G.ai = Object.assign({ n: 0, next: cfg.wave ? cfg.wave.first : 0 }, cfg); Object.assign(G.players[1], cfg.res || {}); G.players[1].cap = cfg.popCap; }
+function setupAI(cfg) { const o = cfg.owner || 1; G.ai = Object.assign({ owner: o, n: 0, next: cfg.wave ? cfg.wave.first : 0 }, cfg); G.ais.push(G.ai); Object.assign(G.players[o], cfg.res || {}); G.players[o].cap = cfg.popCap; }
 const wallCount = () => G.blds.filter(b => b.owner === 1 && (b.type === 'sur' || b.type === 'kapi')).length;
 const alive = (owner, type, label) => G.blds.some(b => b.owner === owner && b.type === type && (!label || b.name === label));
 const spawnWave = (owner, list, tx, ty, target) => { list.forEach(([t, n, o]) => { for (let i = 0; i < n; i++) { const u = U(t, owner, tx + (Math.random() * 4 | 0), ty + (Math.random() * 6 | 0), Object.assign({ ai: 'wave' }, o)); if (target) orderAmove(u, target.x, target.y); } }); };
-const BUILD_ALL = ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'ocak', 'dokum', 'kule', 'cami', 'medrese'];
+const BUILD_ALL = ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'ocak', 'dokum', 'kule', 'cami', 'medrese', 'pazar'];
 
 const MISSIONS = [
   /* ---------------- 1 ---------------- */
@@ -15,7 +15,7 @@ const MISSIONS = [
     colors: ['#c0392b', '#2e8b57'], enemy: 'Karamanoğulları',
     brief: `II. Murad'ın vefatıyla 19 yaşındaki Şehzade Mehmed, Edirne'de ikinci kez tahta çıkıyor. İlk saltanatı (1444–1446) çocuk yaşta ve kısa sürmüştü; bu kez dünya onu tecrübesiz bir genç olarak görüyor.\n\nFırsatı kaçırmayan Karamanoğlu İbrahim Bey, Anadolu'daki sınır boylarına akın düzenliyor. Genç Sultan'ın ilk işi, otoritesini kanıtlamak.\n\nÖnce ekonomini kur: Reayaları ağaçlara, altın madenine ve yaban meyvesine gönder. Sonra bir Kışla kurup ordunu topla ve Karaman Kampı'nı yık.`,
     after: `Karaman tehdidi bastırıldı. Genç Sultan, ilk sınavını geçti; gözünü artık çok daha büyük bir hedefe dikmişti: Doğu Roma'nın başkenti Konstantiniyye.`,
-    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'kule', 'cami', 'medrese'], train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'molla'] },
+    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'kule', 'cami', 'medrese', 'pazar'], train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'molla'] },
     start: { f: 350, w: 300, g: 100 }, winText: 'Karaman Kampı yıkıldı. Sultan\'ın otoritesi sağlandı!',
     setup() {
       setWater(28, 26, 33, 31); forest(4, 40, 4); forest(20, 36, 5); forest(22, 52, 4); forest(44, 6, 3); forest(58, 22, 4); forest(36, 44, 4); forest(10, 22, 4);
@@ -46,7 +46,7 @@ const MISSIONS = [
     colors: ['#c0392b', '#6c3fa0'], enemy: 'Bizans', sym: '✚',
     brief: `İstanbul'u fethetmek için önce Boğaz'ın kontrolü şart. Anadolu yakasında atası Yıldırım Bayezid'in yaptırdığı Anadoluhisarı var; Sultan Mehmed tam karşısına, Rumeli yakasına bir hisar inşa etmeye karar veriyor.\n\nHisar yaklaşık dört buçuk ayda tamamlanacak ve Karadeniz'den gelen yardımı kesecek; adı "Boğazkesen" olacak.\n\nAltın ve odun topla, işaretli alana Rumeli Hisarı'nı kur. Bizans akıncıları inşaatı bozmaya çalışacak: işçileri koru. Hisar bitince Bizans karakolunu yık.`,
     after: `Rumeli Hisarı 31 Ağustos 1452'de tamamlandı. Boğaz artık Osmanlı'nın elindeydi; ilk gemi geçişi denemesinde top ateşiyle batırılan bir Venedik gemisi, İstanbul'a yardımın yolunun kapandığını gösterdi.`,
-    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'kule', 'cami', 'medrese', 'hisar'], train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'molla'] },
+    avail: { build: ['ev', 'ambar', 'tarla', 'kisla', 'ahir', 'kule', 'cami', 'medrese', 'pazar', 'hisar'], train: ['reaya', 'azap', 'okcu', 'sipahi', 'akinci', 'molla'] },
     start: { f: 450, w: 700, g: 350 }, winText: 'Boğaz Osmanlı\'nın! Rumeli Hisarı ayakta, Bizans karakolu yıkıldı.',
     zone: { x0: 50, y0: 25, x1: 57, y1: 35 },
     setup() {

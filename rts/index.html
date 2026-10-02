@@ -18,7 +18,7 @@ canvas#c{position:fixed;inset:0;display:block;touch-action:none;-webkit-tap-high
 .screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:20;padding:20px 16px;text-align:center;background:#0b0805}
 .screen.on{display:flex}
 #mbg{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
-h1{font-family:var(--f-disp);font-weight:900;font-size:clamp(44px,8vw,96px);letter-spacing:.16em;margin:0;line-height:1;background:linear-gradient(#fff3c4,#e2b450 45%,#8a5a1a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #1a0d04) drop-shadow(0 0 24px rgba(226,180,80,.35))}
+h1{font-family:var(--f-disp);font-weight:900;font-size:clamp(48px,9vw,112px);letter-spacing:.16em;margin:0;line-height:1;background:linear-gradient(#fff3c4,#e2b450 45%,#8a5a1a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #1a0d04) drop-shadow(0 0 24px rgba(226,180,80,.35))}
 h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;text-wrap:balance}
 .sub{opacity:.85;font-style:italic;font-size:18px;text-wrap:balance}
 .btn{font-family:var(--f-disp);font-weight:700;letter-spacing:.06em;background:linear-gradient(#a8352a,#6d1c15 60%,#4e130e);color:#fff3d6;border:2px solid var(--gold);border-radius:3px;padding:10px 24px;font-size:16px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 3px 0 #1a0d04,0 0 0 3px rgba(0,0,0,.4)}
@@ -33,6 +33,16 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 .card p:first-of-type::first-letter{font-family:var(--f-disp);font-size:3em;float:left;line-height:.9;margin:4px 8px 0 0;color:#8e2a22}
 /* ---- oyun arayüzü ---- */
 #vig{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 55%,rgba(10,5,0,.45))}
+.mtitle{text-align:center;margin-top:-2vh;text-shadow:0 2px 12px #000;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tugra{font-size:34px;color:var(--gold);text-shadow:0 0 18px rgba(226,180,80,.6)}
+.mcols{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:min(1060px,100%)}
+.mbox{flex:1 1 380px;min-width:0;max-width:600px;background:linear-gradient(rgba(24,14,7,.86),rgba(12,7,3,.9));border:1px solid var(--gold-lo);border-top:3px solid var(--gold);padding:14px 18px;text-align:left;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.mbox h3{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.08em}.mcap{opacity:.75;font-style:italic;margin:2px 0 10px;font-size:15px}
+.btn.big{width:100%;font-size:19px;padding:12px}
+.seg{display:flex;gap:0;border:1px solid var(--gold-lo);margin-top:6px}.seg button{flex:1;font-family:var(--f-disp);background:rgba(0,0,0,.35);color:var(--paper);border:0;border-right:1px solid var(--gold-lo);padding:8px;cursor:pointer;font-size:14px}.seg button:last-child{border-right:0}.seg button.on{background:linear-gradient(#a8352a,#6d1c15);color:#fff3d6}
+.card.sk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 22px;max-width:640px}.card.sk label{display:flex;flex-direction:column;gap:4px;font-family:var(--f-disp);color:#6d1c15;font-size:14px}.card.sk select{font:inherit;font-family:var(--f-body);font-size:16px;padding:6px;background:#fbf3df;border:1px solid #8a6a3a;color:#2a1a0c}.card.sk .chk{flex-direction:row;align-items:center;grid-column:1/-1}
+.mi .num{font-family:var(--f-disp);color:var(--gold);font-size:22px;width:34px;flex:none;text-align:center}
+@media(max-width:700px){.card.sk{grid-template-columns:1fr}}
 #hud{position:fixed;inset:0;pointer-events:none;display:none;z-index:10}
 #hud.on{display:block}
 .wood{background:linear-gradient(180deg,#5a3c22,#3a2616 40%,#2a1a0e);border:2px solid #1a0d05;box-shadow:inset 0 0 0 1px rgba(243,214,138,.35),inset 0 2px 6px rgba(255,220,160,.12)}
@@ -44,6 +54,8 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 .rg{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='8' fill='%23f2c230' stroke='%237a5a10' stroke-width='1.4'/%3E%3Ccircle cx='10' cy='10' r='5.4' fill='none' stroke='%23a8741a'/%3E%3Cpath d='M7 6.5a4 4 0 1 0 0 7a3.2 3.2 0 1 1 0-7z' fill='%23a8741a'/%3E%3C/svg%3E")}
 .rp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='6' r='3.6' fill='%23efe0bd' stroke='%23321a08'/%3E%3Cpath d='M3 19c0-5 3-8 7-8s7 3 7 8z' fill='%23c0392b' stroke='%23321a08'/%3E%3C/svg%3E")}
 #objs{position:absolute;left:12px;top:50px;max-width:340px;background:rgba(18,10,5,.82);border:1px solid var(--gold-lo);border-top:3px solid var(--gold);padding:8px 14px;font-size:15px;line-height:1.45;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+#hud .nav{position:absolute;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--gold-hi);background:rgba(20,10,4,.55);border:1px solid var(--gold-lo);border-radius:50%;pointer-events:auto;cursor:pointer;user-select:none;touch-action:none;opacity:.7}
+#hud .nav:hover{opacity:1;background:rgba(60,30,10,.8)}
 #objs h4{margin:0 0 4px;font-family:var(--f-disp);color:var(--gold);letter-spacing:.06em}#objs .ok{color:#9be09b;text-decoration:line-through;opacity:.75}#objs .tl{color:#ffb15c;margin-top:4px}
 #log{position:absolute;left:50%;transform:translateX(-50%);top:50px;width:min(580px,52vw);pointer-events:none;text-align:center}
 #log .m{background:rgba(18,10,5,.85);border:1px solid var(--gold-lo);margin:3px 0;padding:4px 12px;font-size:16px;text-shadow:0 1px 0 #000}
@@ -98,6 +110,11 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
     <span class="sp"></span><span class="i">⏱ <b id="rt">0:00</b></span><span class="i">Hız <b id="spd">1x</b></span>
   </div>
   <div id="objs"></div>
+  <div class="nav" data-d="0,-1" style="left:50%;top:44px;transform:translateX(-50%)">▲</div>
+  <div class="nav" data-d="0,1" style="left:50%;bottom:178px;transform:translateX(-50%)">▼</div>
+  <div class="nav" data-d="-1,0" style="left:6px;top:50%">◀</div>
+  <div class="nav" data-d="1,0" style="right:6px;top:50%">▶</div>
+  <div class="nav home" onclick="goHome()" title="Ana binaya git (Home)" style="right:6px;top:calc(50% + 52px)">⌂</div>
   <div id="log"></div>
   <div id="ctl"><button class="btn sm" onclick="G.speed=Math.max(1,G.speed-1);uiSpeed()" title="Yavaşlat">−</button><button class="btn sm" onclick="G.speed=Math.min(4,G.speed+1);uiSpeed()" title="Hızlandır">+</button><button class="btn sm" onclick="togglePause()">Menü</button></div>
   <div id="bar" class="wood">
@@ -115,10 +132,35 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 </div>
 
 <div id="menu" class="screen on">
-  <h1>FATİH</h1>
-  <div class="sub">Bir Sultanın Hikâyesi — Tahta Çıkıştan Vefata, 1451–1481</div>
-  <div class="mlist" id="mlist"></div>
-  <div><button class="btn sm" onclick="resetProg()">İlerlemeyi sıfırla</button></div>
+  <div class="mtitle"><div class="tugra">☪</div><h1>FATİH</h1><div class="sub">Bir Sultanın Hikâyesi — Tahta Çıkıştan Vefata, 1451–1481</div></div>
+  <div class="mcols">
+    <section class="mbox">
+      <h3>Sefer-i Hümâyun</h3><div class="mcap">Fatih Sultan Mehmed'in hayatı, altı tarihî sefer</div>
+      <div class="mlist" id="mlist"></div>
+    </section>
+    <section class="mbox">
+      <h3>Serbest Savaş</h3><div class="mcap">Rastgele harita, istediğin kadar düşman ve müttefik</div>
+      <button class="btn big" onclick="showSkirmish()">⚔ Savaş Kur</button>
+      <h3 style="margin-top:18px">Zorluk</h3>
+      <div class="seg" id="diffseg"><button data-v="0">Kolay</button><button data-v="1">Normal</button><button data-v="2">Zor</button></div>
+      <div class="mcap" id="diffcap"></div>
+      <div style="margin-top:14px"><button class="btn sm" onclick="resetProg()">İlerlemeyi sıfırla</button></div>
+    </section>
+  </div>
+</div>
+
+<div id="skirm" class="screen">
+  <h2>Serbest Savaş</h2><div class="sub">Haritayı ve rakipleri seç; yapay zekâ kendi köyünü kurar, ordu basar ve saldırır.</div>
+  <div class="card sk">
+    <label>Harita<select id="skmap"><option value="rastgele">Rastgele</option><option value="ova">Ova</option><option value="orman">Orman</option><option value="nehir">Nehir (iki yaka)</option><option value="gol">Göl</option><option value="kiyi">Kıyı</option></select></label>
+    <label>Büyüklük<select id="sksize"><option value="kucuk">Küçük</option><option value="orta" selected>Orta</option><option value="buyuk">Büyük</option></select></label>
+    <label>Düşman sayısı<select id="skenemy"><option>1</option><option selected>2</option><option>3</option></select></label>
+    <label>Müttefik sayısı<select id="skally"><option>0</option><option selected>1</option><option>2</option></select></label>
+    <label>Zorluk<select id="skdiff"><option value="0">Kolay</option><option value="1" selected>Normal</option><option value="2">Zor</option></select></label>
+    <label>Başlangıç kaynağı<select id="skres"><option value="dusuk">Düşük</option><option value="normal" selected>Normal</option><option value="yuksek">Yüksek</option></select></label>
+    <label class="chk"><input type="checkbox" id="skreveal"> Harita baştan açık</label>
+  </div>
+  <div><button class="btn" onclick="startSkirmish()">Savaşa Başla</button> <button class="btn" onclick="toMenu()">Menü</button></div>
 </div>
 
 <div id="brief" class="screen">
@@ -139,6 +181,7 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 
 <script src="engine.js"></script>
 <script src="missions.js"></script>
+<script src="skirmish.js"></script>
 <script src="assets/sprites.js"></script>
 <script src="gfx.js"></script>
 <script src="ui.js"></script>

@@ -391,10 +391,34 @@ def n_decor(S, v):
         blob(.3, (0, 0, .1), S['rock'], sc=(1.3, 1, .6), sub=2, disp=.4, seed=v * 3, tex_scale=2)
 
 
+def b_pazar(S, cap):
+    box(2.9, 2.9, .08, (0, 0, .04), S['stone_d'])
+    # bedesten (kubbeli kapalı çarşı) arkada
+    box(1.3, 1.3, .8, (-.6, -.6, .48), S['stone_w']); dome(S, -.6, -.6, .88, .45, S['lead'], fin=None)
+    arch(S, ('x', .055), -.6, .08, .3, .4, mat=S['wood_d']); arch(S, ('y', .055), -.6, .08, .3, .4, mat=S['wood_d'])
+    # tenteli dükkânlar
+    for (x, y, r) in ((.75, -.75, 0), (.75, .35, 0), (-.45, .8, PI / 2)):
+        for (dx, dy) in ((-.35, -.3), (.35, -.3), (-.35, .3), (.35, .3)):
+            cyl(.03, .62, (x + dx, y + dy, .31), S['wood_d'], v=6)
+        bpy.ops.mesh.primitive_plane_add(size=1); o = bpy.context.object; o.scale = (.85, .75, 1); o.location = (x, y, .66); o.rotation_euler = (0, .12, r)
+        o.data.materials.append(S['team']); o.data.materials.append(S['white'])
+        bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.subdivide(number_cuts=5); bpy.ops.object.mode_set(mode='OBJECT')
+        for i, p in enumerate(o.data.polygons):
+            p.material_index = int((p.center.x + .5) * 6) % 2
+        box(.75, .45, .25, (x, y, .13), S['wood'])
+        for k in range(3):
+            ball(.07, (x - .2 + k * .2, y, .3), [S['red'], S['straw'], S['leaf2']][k], sc=(1, 1, .7), seg=10)
+    for (x, y) in ((.1, -.1), (.25, .05), (-.05, .1)):
+        ball(.13, (x, y, .13), S['straw'], sc=(1, 1, 1.2))
+    for (x, y) in ((1.2, 1.1), (1.0, 1.25)):
+        box(.22, .22, .22, (x, y, .11), S['wood'], rot=(0, 0, .3))
+    flag(S, 1.3, -1.3, .08, 1.5)
+
+
 BUILD = dict(saray=(b_saray, 3, 3.9), ev=(b_ev, 2, 1.6), ambar=(b_ambar, 2, 1.4), tarla=(b_tarla, 2, .4), kisla=(b_kisla, 3, 2.0),
              ahir=(b_ahir, 3, 1.8), ocak=(b_ocak, 3, 2.3), dokum=(b_dokum, 3, 2.6), kule=(b_kule, 2, 3.4), burc=(b_burc, 2, 3.3),
              sur=(b_sur, 1, 1.4), kapi=(b_kapi, 1, 1.5), kale=(b_kale, 4, 4.0), hisar=(b_hisar, 4, 3.9), kamp=(b_kamp, 3, 2.3),
-             ayasofya=(b_ayasofya, 5, 3.0), ayasofya_cap=(lambda S, c: b_ayasofya(S, True), 5, 4.6), cami=(b_cami, 3, 4.0), medrese=(b_medrese, 3, 2.0))
+             ayasofya=(b_ayasofya, 5, 3.0), ayasofya_cap=(lambda S, c: b_ayasofya(S, True), 5, 4.6), cami=(b_cami, 3, 4.0), medrese=(b_medrese, 3, 2.0), pazar=(b_pazar, 3, 2.0))
 
 
 # ------------------------------------------------------------ doğa

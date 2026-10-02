@@ -40,6 +40,7 @@ const BUILDS = {
   burc: { name: 'Burç', w: 2, h: 2, hp: 1600, atk: 11, range: 230, rate: 1.7, vision: 7, tower: true },
   kale: { name: 'Kale', w: 4, h: 4, hp: 4500, atk: 16, range: 256, rate: 1.5, pop: 20, trains: ['azap', 'okcu', 'sovalye'], vision: 9, tower: true },
   kamp: { name: 'Ordugâh', w: 3, h: 3, hp: 1300, pop: 20, trains: ['azap', 'okcu', 'sipahi', 'sovalye'], vision: 7, drop: true },
+  pazar: { name: 'Pazar', w: 3, h: 3, hp: 1100, cost: { w: 175 }, time: 35, market: true, vision: 6, desc: 'Ticaret: odun, yiyecek ve altını birbirine çevir. Fiyatlar alışverişe göre değişir.' },
   ayasofya: { name: 'Ayasofya', w: 5, h: 5, hp: 99999, landmark: true, vision: 4 },
 };
 
@@ -63,6 +64,9 @@ const sfmt = c => Object.entries(c).map(([k, v]) => v + ' ' + RESN[k]).join(', '
 
 /* ---------- durum ---------- */
 let G = null;
+const isEnemy = (a, b) => a !== b && G.team[a] !== G.team[b];
+const ally = o => G.team[o] === G.team[0];
+const DIFF = [{ name: 'Kolay', inc: .55, wave: .65, hp: .85, start: 1.4 }, { name: 'Normal', inc: 1, wave: 1, hp: 1, start: 1 }, { name: 'Zor', inc: 1.6, wave: 1.4, hp: 1.15, start: .85 }];
 const PF = {};
 
 function newGame(m) {
@@ -72,7 +76,7 @@ function newGame(m) {
     m, W, H, t: 0, nid: 0, ents: [], byId: new Map(), blds: [],
     terrain: new Uint8Array(n), res: new Uint8Array(n), amt: new Uint16Array(n),
     blkT: new Uint8Array(n), occ: new Int32Array(n), vis: new Uint8Array(n), exp: new Uint8Array(n),
-    players: [{ f: 0, w: 0, g: 0, pop: 0, cap: 0 }, { f: 0, w: 0, g: 0, pop: 0, cap: 999 }],
+    players: Array.from({ length: m.nPlayers || 2 }, (_, i) => ({ f: 0, w: 0, g: 0, pop: 0, cap: i ? 999 : 0, tech: {} })), team: m.team || [0, 1], ais: [], alerts: {}, diff: m.diff == null ? 1 : m.diff, market: { f: 100, w: 100 },
     colors: m.colors, proj: [], fx: [], navVer: 0, sel: [], groups: {}, speed: 1, paused: false,
     msgs: [], done: false, flags: {}, evDone: {}, trDone: {}, ai: null, ctick: 0, vtick: 0, otick: 0, atick: 0,
     cells: null, cw: Math.ceil(W * TILE / 64), ch: Math.ceil(H * TILE / 64), alert: null, hero: null,
@@ -81,7 +85,7 @@ function newGame(m) {
   };
   G.cells = Array.from({ length: G.cw * G.ch }, () => []);
   pfInit();
-  Object.assign(G.players[0], m.start || {}); G.players[0].tech = {}; G.players[1].tech = {};
+  Object.assign(G.players[0], m.start || {}); const ds = DIFF[G.diff].start; for (const k of ['f', 'w', 'g']) G.players[0][k] = Math.round(G.players[0][k] * ds);
   return G;
 }
 function msg(text, cls) { G.msgs.push({ text, cls: cls || '', t: 0 }); if (G.msgs.length > 6) G.msgs.shift(); if (typeof uiMsg === 'function') uiMsg(); }
@@ -136,9 +140,11 @@ function addUnit(type, owner, x, y, o) {
   Object.assign(u, o || {});
   if (u.guard && !u.home) u.home = { x, y };
   G.ents.push(u); G.byId.set(u.id, u);
+  if (owner !== 0 && G.team[owner] !== G.team[0] && DIFF[G.diff].hp !== 1 && !u.d.worker) { u.hp = u.maxhp = Math.round(u.maxhp * DIFF[G.diff].hp); }
   if (d.hero && owner === 0 && !G.hero) G.hero = u;
   return u;
 }
+const u_isWorker = t => !!UNITS[t].worker;
 function freeTileNear(tx, ty) {
   for (let r = 0; r <= 8; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue; const x = tx + dx, y = ty + dy; if (inb(x, y) && !G.blkT[idx(x, y)] && !G.occ[idx(x, y)]) return [x, y]; }
   return [tx, ty];
@@ -177,9 +183,9 @@ function applyDmg(t, dmg, src) {
   if (t.dead || t.d.landmark) return;
   t.hp -= dmg; t.hit = .15;
   if (t.hp <= 0) { kill(t, src); return; }
-  if (t.owner === 1 && src && src.owner === 0) G.alert = { x: src.x, y: src.y, t: G.t };
-  if (t.kind === 'u' && src && src.owner !== t.owner && src.kind === 'u' && t.d.atk && !t.d.worker && !t.hold && (t.order.t === 'idle')) { t.order = { t: 'attack', tid: src.id, auto: true }; t.rp = 0; }
-  if (src && src.owner !== t.owner && src.kind === 'u' && !src.dead && G.t - (t.callT || -9) > 1.5) {   // yardım çağrısı: yakındaki boştaki askerler karşılık verir
+  if (src && isEnemy(t.owner, src.owner)) G.alerts[t.owner] = { x: src.x, y: src.y, t: G.t };
+  if (t.kind === 'u' && src && isEnemy(t.owner, src.owner) && src.kind === 'u' && t.d.atk && !t.d.worker && !t.hold && (t.order.t === 'idle')) { t.order = { t: 'attack', tid: src.id, auto: true }; t.rp = 0; }
+  if (src && isEnemy(t.owner, src.owner) && src.kind === 'u' && !src.dead && G.t - (t.callT || -9) > 1.5) {   // yardım çağrısı: yakındaki boştaki askerler karşılık verir
     t.callT = G.t; const R = (t.d.hero ? 10 : 6) * TILE;
     unitsNear(t.x, t.y, R, a => { if (a.owner === t.owner && a !== t && a.atk && !a.d.worker && !a.d.hero && !a.hold && a.order.t === 'idle') { a.order = { t: 'attack', tid: src.id, auto: true }; a.rp = 0; } });
   }
@@ -208,8 +214,8 @@ function tcost(i, owner, soft) {
   if (G.blkT[i]) return -1;
   const bid = G.occ[i]; if (!bid) return 1;
   const b = G.byId.get(bid); if (!b) return 1;
-  if (b.d.gate && b.owner === owner) return 1;
-  if (b.owner === owner || !soft || b.d.landmark) return -1;
+  if (b.d.gate && !isEnemy(owner, b.owner)) return 1;
+  if (!isEnemy(owner, b.owner) || !soft || b.d.landmark) return -1;
   return 25;
 }
 const LOSO = [[0, 0], [10, 10], [-10, 10], [10, -10], [-10, -10]];
@@ -318,16 +324,16 @@ function attackStep(u, t, dt, brk) {
     if (u.cd <= 0) { doAttack(u, t); u.cd = u.rate; }
     return;
   }
-  if (u.hold) { u.order = { t: 'idle' }; return; }
+  if (u.hold && u.order.auto) { u.order = { t: 'idle' }; return; }
   u.rp -= dt; u.tgt = t.id;
   if (!u.path || u.rp <= 0) { setPath(u, t.x, t.y, true); u.rp = .6; u.tgt = t.id; }
   if (stepMove(u, dt) && !inRange(u, t)) { u.path = null; }
 }
 function acquire(u, radius, bld) {
   let best = null, bs = 1e9; const o = u.owner;
-  unitsNear(u.x, u.y, radius, e => { if (e.owner === o) return; const d = Math.hypot(e.x - u.x, e.y - u.y); const sc = d + (e.d.worker ? 60 : 0); if (sc < bs) { bs = sc; best = e; } });
+  unitsNear(u.x, u.y, radius, e => { if (!isEnemy(o, e.owner)) return; const d = Math.hypot(e.x - u.x, e.y - u.y); const sc = d + (e.d.worker ? 60 : 0); if (sc < bs) { bs = sc; best = e; } });
   for (const b of G.blds) {
-    if (b.owner === o || b.dead || b.d.landmark) continue;
+    if (!isEnemy(o, b.owner) || b.dead || b.d.landmark) continue;
     if (!bld && !b.d.atk) continue; if (b.d.wall) continue;
     const d = rectDist(u.x, u.y, b); if (d > radius) continue;
     const sc = d + (b.d.atk ? 30 : 160); if (sc < bs) { bs = sc; best = b; }
@@ -340,15 +346,15 @@ function idleThink(u, dt) {
   if (u.scan <= 0) {
     u.scan = .5 + Math.random() * .2;
     const rad = u.hold ? (u.d.range || 10) + u.r : u.d.vision * TILE;
-    const t = acquire(u, rad, u.owner === 1);
+    const t = acquire(u, rad, u.owner !== 0);
     if (t) { u.order = { t: 'attack', tid: t.id, auto: true }; u.rp = 0; return; }
     if (u.guard && u.home && Math.hypot(u.x - u.home.x, u.y - u.home.y) > 40) { u.order = { t: 'move', x: u.home.x, y: u.home.y }; setPath(u, u.home.x, u.home.y, false); }
-    else if (u.owner === 1 && u.rally && !u.guard && Math.hypot(u.x - u.rally.x, u.y - u.rally.y) > 90) { u.order = { t: 'move', x: u.rally.x, y: u.rally.y }; setPath(u, u.rally.x, u.rally.y, false); }
+    else if (u.owner !== 0 && u.rally && !u.guard && Math.hypot(u.x - u.rally.x, u.y - u.rally.y) > 90) { u.order = { t: 'move', x: u.rally.x, y: u.rally.y }; setPath(u, u.rally.x, u.rally.y, false); }
   }
 }
 function updAmove(u, dt) {
   const o = u.order; u.scan -= dt;
-  if (u.scan <= 0) { u.scan = .4 + Math.random() * .2; const t = u.hold ? null : acquire(u, u.d.vision * TILE, true); const nid = t ? t.id : 0; if (nid !== o.tid) { o.tid = nid; if (!nid) setPath(u, o.x, o.y, true); } }
+  if (u.scan <= 0) { u.scan = .4 + Math.random() * .2; const t = acquire(u, u.d.vision * TILE, true); const nid = t ? t.id : 0; if (nid !== o.tid) { o.tid = nid; if (!nid) setPath(u, o.x, o.y, true); } }
   if (o.tid) { const t = G.byId.get(o.tid); if (!t || t.dead) { o.tid = 0; setPath(u, o.x, o.y, true); } else { attackStep(u, t, dt, false); return; } }
   if (stepMove(u, dt)) u.order = { t: 'idle' };
 }
@@ -425,7 +431,7 @@ function updUnit(u, dt) {
   switch (o.t) {
     case 'idle': idleThink(u, dt); break;
     case 'move': if (stepMove(u, dt)) u.order = { t: 'idle' }; break;
-    case 'attack': { const t = G.byId.get(o.tid); if (!t || t.dead || t.owner === u.owner) { u.order = { t: 'idle' }; u.path = null; u.scan = 0; break; } if (o.auto && Math.hypot(t.x - u.x, t.y - u.y) > u.d.vision * TILE * 2 && !(t.kind === 'b')) { u.order = { t: 'idle' }; break; } attackStep(u, t, dt, false); break; }
+    case 'attack': { const t = G.byId.get(o.tid); if (!t || t.dead || !isEnemy(u.owner, t.owner)) { u.order = { t: 'idle' }; u.path = null; u.scan = 0; break; } if (o.auto && Math.hypot(t.x - u.x, t.y - u.y) > u.d.vision * TILE * 2 && !(t.kind === 'b')) { u.order = { t: 'idle' }; break; } attackStep(u, t, dt, false); break; }
     case 'amove': updAmove(u, dt); break;
     case 'gather': updGather(u, dt); break;
     case 'build': updBuildOrder(u, dt); break;
@@ -437,10 +443,16 @@ function popUsedOwner(o) { let n = 0; for (const e of G.ents) { if (e.dead || e.
 const afford = (p, c) => (p.f >= (c.f || 0)) && (p.w >= (c.w || 0)) && (p.g >= (c.g || 0));
 const pay = (p, c, s) => { s = s || 1; p.f -= (c.f || 0) * s; p.w -= (c.w || 0) * s; p.g -= (c.g || 0) * s; };
 function hasBuilt(owner, type) { return G.blds.some(b => b.owner === owner && b.type === type && b.built); }
+function trade(o, res, buy) {     // 100 birim al/sat; fiyat 100 birimin altın değeri
+  const p = G.players[o], M = G.market, price = Math.round(M[res]);
+  if (buy) { if (p.g < price) { if (o === 0) msg('Yetersiz altın!', 'warn'); return false; } p.g -= price; p[res] += 100; M[res] = Math.min(300, M[res] + 6); }
+  else { if (p[res] < 100) { if (o === 0) msg('Yetersiz ' + RESN[res].toLowerCase() + '!', 'warn'); return false; } p[res] -= 100; p.g += Math.round(price * .75); M[res] = Math.max(25, M[res] - 6); }
+  return true;
+}
 function queueTech(b, id) {
   const p = G.players[b.owner], T = TECHS[id];
   if (hasTech(b.owner, id) || G.blds.some(x => x.owner === b.owner && x.queue.some(q => q.type === 'T:' + id))) { msg('Bu ilim zaten araştırılıyor.', 'warn'); return false; }
-  if (b.queue.length >= 5) { msg('Sıra dolu.', 'warn'); return false; }
+  if (b.queue.length >= 15) { msg('Sıra dolu.', 'warn'); return false; }
   if (!afford(p, T.cost)) { msg('Yetersiz kaynak!', 'warn'); return false; }
   pay(p, T.cost); b.queue.push({ type: 'T:' + id, t: 0 }); return true;
 }
@@ -453,7 +465,7 @@ function applyTech(o, id) {
 function queueTrain(b, type, silent) {
   const p = G.players[b.owner], d = UNITS[type];
   if (!b.built) return false;
-  if (b.queue.length >= 5) { if (!silent) msg('Üretim sırası dolu.', 'warn'); return false; }
+  if (b.queue.length >= 15) { if (!silent) msg('Üretim sırası dolu (15).', 'warn'); return false; }
   if (!afford(p, d.cost)) { if (!silent) msg('Yetersiz kaynak!', 'warn'); return false; }
   if (popUsedOwner(b.owner) + d.pop > p.cap) { if (!silent) msg('Nüfus sınırı! Ev inşa et.', 'warn'); return false; }
   pay(p, d.cost); b.queue.push({ type, t: 0 }); return true;
@@ -477,7 +489,7 @@ function updBuilding(b, dt) {
     if (q.t >= qTime(q) && q.type.startsWith('T:')) { b.queue.shift(); applyTech(b.owner, q.type.slice(2)); }
     else if (q.t >= qTime(q)) {
       b.queue.shift(); const s = spawnSpot(b);
-      const o = {}; if (b.owner === 1) { o.ai = 'army'; o.rally = b.rally || { x: b.x, y: b.y + b.h * TILE / 2 + 60 }; }
+      const o = {}; if (b.owner !== 0) { o.ai = u_isWorker(q.type) ? null : 'army'; o.rally = b.rally || { x: b.x, y: b.y + b.h * TILE / 2 + 60 }; }
       const u = addUnit(q.type, b.owner, s.x, s.y, o);
       if (b.rally && b.owner === 0) { const rt = G.res[idx(clamp((b.rally.x / TILE) | 0, 0, G.W - 1), clamp((b.rally.y / TILE) | 0, 0, G.H - 1))]; if (u.d.worker && rt) orderGather(u, (b.rally.x / TILE) | 0, (b.rally.y / TILE) | 0); else orderMove(u, b.rally.x, b.rally.y); }
       if (b.owner === 0) { if (G.t - G.readyT > 2.5) { msg(u.d.name + ' hazır.', 'good'); G.readyT = G.t; } if (typeof uiBeep === 'function') uiBeep(); }
@@ -487,7 +499,7 @@ function updBuilding(b, dt) {
   if (b.d.atk) {
     b.cd -= dt;
     if (b.cd <= 0) {
-      let best = null, bd = 1e9; unitsNear(b.x, b.y, b.d.range + b.w * 16, e => { if (e.owner === b.owner) return; const d = Math.hypot(e.x - b.x, e.y - b.y); if (d < bd) { bd = d; best = e; } });
+      let best = null, bd = 1e9; unitsNear(b.x, b.y, b.d.range + b.w * 16, e => { if (!isEnemy(b.owner, e.owner)) return; const d = Math.hypot(e.x - b.x, e.y - b.y); if (d < bd) { bd = d; best = e; } });
       if (best) { G.proj.push({ x: b.x, y: b.y - 30, sx: b.x, sy: b.y, d0: bd || 1, tid: best.id, tx: best.x, ty: best.y, dmg: Math.max(1, b.d.atk - armorOf(best)), owner: b.owner, kind: 'arrow', sp: 520, splash: 0, src: b.id }); b.cd = b.d.rate; } else b.cd = .3;
     }
   }
@@ -501,7 +513,7 @@ function updProj(dt) {
       const src = G.byId.get(p.src);
       if (p.splash) {
         G.fx.push({ k: 'boom', x: p.tx, y: p.ty, t: 0, life: .5, r: p.splash });
-        unitsNear(p.tx, p.ty, p.splash, e => { if (e.owner !== p.owner) applyDmg(e, Math.max(1, p.srcAtk * .5 - armorOf(e)), src); });
+        unitsNear(p.tx, p.ty, p.splash, e => { if (isEnemy(p.owner, e.owner)) applyDmg(e, Math.max(1, p.srcAtk * .5 - armorOf(e)), src); });
         if (t && !t.dead && t.kind === 'b') applyDmg(t, p.dmg, src);
         else if (t && !t.dead && t.kind === 'u') { /* birim zaten sıçramadan etkilendi */ }
       } else if (t && !t.dead) applyDmg(t, p.dmg, src);
@@ -515,7 +527,7 @@ function updVis() {
   G.fogDirty = true; G.vis.fill(0); const W = G.W, H = G.H;
   if (G.m.noFog) { G.vis.fill(1); G.exp.fill(1); return; }
   for (const e of G.ents) {
-    if (e.owner !== 0 || e.dead) continue; const r = e.d.vision || 6, cx = (e.x / TILE) | 0, cy = (e.y / TILE) | 0, r2 = r * r;
+    if (!ally(e.owner) || e.dead) continue; const r = e.d.vision || 6, cx = (e.x / TILE) | 0, cy = (e.y / TILE) | 0, r2 = r * r;
     for (let y = Math.max(0, cy - r); y <= Math.min(H - 1, cy + r); y++) for (let x = Math.max(0, cx - r); x <= Math.min(W - 1, cx + r); x++) if ((x - cx) ** 2 + (y - cy) ** 2 <= r2) { const i = y * W + x; G.vis[i] = 1; G.exp[i] = 1; }
   }
 }
@@ -523,34 +535,73 @@ const visAt = (x, y) => G.vis[idx(clamp((x / TILE) | 0, 0, G.W - 1), clamp((y / 
 const expAt = (x, y) => G.exp[idx(clamp((x / TILE) | 0, 0, G.W - 1), clamp((y / TILE) | 0, 0, G.H - 1))] === 1;
 
 /* ---------- Yapay zekâ ---------- */
-function aiTick(dt) {
-  const ai = G.ai; if (!ai) return;
-  const p = G.players[1];
-  p.f += ai.income.f * dt; p.w += ai.income.w * dt; p.g += ai.income.g * dt; p.cap = ai.popCap;
+function aiTick(dt) { for (const ai of G.ais) aiPlayer(ai, dt); }
+function aiPlayer(ai, dt) {
+  const o = ai.owner, p = G.players[o], df = G.team[o] === G.team[0] ? DIFF[1] : DIFF[G.diff];
+  if (!G.blds.some(b => b.owner === o) && !G.ents.some(u => u.owner === o && u.kind === 'u' && !u.dead)) return;
+  p.f += ai.income.f * df.inc * dt; p.w += ai.income.w * df.inc * dt; p.g += ai.income.g * df.inc * dt;
+  if (!ai.builder) p.cap = ai.popCap;
+  if (ai.builder) aiEconomy(ai, p);
   // üretim
-  const keys = Object.keys(ai.comp), tot = keys.reduce((a, k) => a + ai.comp[k], 0);
+  const keys = Object.keys(ai.comp);
+  const mil = G.ents.filter(e => e.kind === 'u' && e.owner === o && !e.dead && !e.d.worker).length;
   for (const b of G.blds) {
-    if (b.owner !== 1 || !b.built || !b.d.trains || b.queue.length >= 2) continue;
+    if (b.owner !== o || !b.built || !b.d.trains || b.queue.length >= 2) continue;
+    if (ai.builder && mil >= (ai.maxArmy || 60)) break;
     const opts = keys.filter(k => b.d.trains.includes(k)); if (!opts.length) continue;
     let r = G.rng() * opts.reduce((a, k) => a + ai.comp[k], 0), pick = opts[0]; for (const k of opts) { r -= ai.comp[k]; if (r <= 0) { pick = k; break; } }
     queueTrain(b, pick, true);
   }
-  const army = G.ents.filter(e => e.kind === 'u' && e.owner === 1 && !e.dead && e.ai === 'army');
+  const army = G.ents.filter(e => e.kind === 'u' && e.owner === o && !e.dead && e.ai === 'army');
   const idleArmy = army.filter(u => u.order.t === 'idle');
   const wave = ai.wave;
   if (wave && G.t >= ai.next) {
-    const need = Math.max(3, Math.round(wave.size + wave.grow * ai.n));
+    const need = Math.max(3, Math.round((wave.size + wave.grow * ai.n) * df.wave));
     if (idleArmy.length >= need || (G.t >= ai.next + 90 && idleArmy.length >= 3)) {
-      const tgt = aiTarget(); if (tgt) { for (const u of idleArmy) { u.ai = 'wave'; orderAmove(u, tgt.x, tgt.y); } ai.n++; ai.next = G.t + wave.interval; if (typeof onWave === 'function') onWave(ai.n); msg('Düşman saldırıya geçti!', 'warn'); }
+      const tgt = aiTarget(null, o); if (tgt) { for (const u of idleArmy) { u.ai = 'wave'; orderAmove(u, tgt.x, tgt.y); } ai.n++; ai.next = G.t + wave.interval; if (isEnemy(0, o)) msg((ai.name ? ai.name + ' ' : 'Düşman ') + 'saldırıya geçti!', 'warn'); else msg((ai.name || 'Müttefik') + ' saldırıya geçti.', 'good'); }
     }
   }
-  if (wave) for (const u of G.ents) if (u.kind === 'u' && u.owner === 1 && u.ai === 'wave' && u.order.t === 'idle' && !u.dead) { const t = aiTarget(u); if (t) orderAmove(u, t.x, t.y); }
-  if (G.alert && G.t - G.alert.t < 6) { for (const u of idleArmy) if (Math.hypot(u.x - G.alert.x, u.y - G.alert.y) < 22 * TILE) orderAmove(u, G.alert.x, G.alert.y); }
+  if (wave) for (const u of G.ents) if (u.kind === 'u' && u.owner === o && u.ai === 'wave' && u.order.t === 'idle' && !u.dead) { const t = aiTarget(u, o); if (t) orderAmove(u, t.x, t.y); }
+  const al = G.alerts[o]; if (al && G.t - al.t < 6) { for (const u of idleArmy) if (Math.hypot(u.x - al.x, u.y - al.y) < 22 * TILE) orderAmove(u, al.x, al.y); }
+  // müttefik: oyuncunun üssü saldırı altındaysa yardıma koş
+  if (!isEnemy(0, o) && o !== 0) { const pa = G.alerts[0]; if (pa && G.t - pa.t < 6) for (const u of idleArmy) if (Math.hypot(u.x - pa.x, u.y - pa.y) < 40 * TILE) orderAmove(u, pa.x, pa.y); }
 }
-function aiTarget(from) {
-  let best = null, bd = 1e12; const ref = from || (G.blds.find(b => b.owner === 1 && b.d.trains) || { x: 0, y: 0 });
-  for (const b of G.blds) if (b.owner === 0 && !b.d.wall) { const sc = Math.hypot(b.x - ref.x, b.y - ref.y) - (b.d.drop ? 200 : 0); if (sc < bd) { bd = sc; best = b; } }
-  if (!best) for (const e of G.ents) if (e.owner === 0 && e.kind === 'u' && !e.dead) { best = e; break; }
+const AI_ORDER = ['ev', 'kisla', 'ambar', 'ev', 'tarla', 'ahir', 'ev', 'kule', 'tarla', 'ocak', 'ev', 'cami', 'ev', 'dokum', 'ev', 'kisla', 'ev', 'tarla', 'kule', 'ev', 'ahir', 'ev', 'ev'];
+function aiEconomy(ai, p) {
+  const o = ai.owner, base = G.blds.find(b => b.owner === o && b.type === 'saray' && b.built) || G.blds.find(b => b.owner === o && b.d.drop);
+  let cap = 0; for (const b of G.blds) if (b.owner === o && b.built && b.d.pop) cap += b.d.pop; p.cap = Math.min(200, cap);
+  const workers = G.ents.filter(u => u.kind === 'u' && u.owner === o && u.d.worker && !u.dead);
+  if (base && workers.length < ai.workers && base.queue.length < 2) queueTrain(base, 'reaya', true);
+  for (const u of workers) if (u.order.t === 'idle') autoNext(u, base);
+  if (!base || G.t < (ai.buildT || 0)) return;
+  const site = G.blds.find(b => b.owner === o && !b.built);
+  if (site) { // inşaatta birkaç işçi olsun
+    const on = workers.filter(u => u.order.t === 'build' && u.order.bid === site.id).length;
+    if (on < 2) { const w = workers.find(u => u.order.t !== 'build'); if (w) orderBuild(w, site); }
+    return;
+  }
+  let type = popUsedOwner(o) >= p.cap - 3 ? 'ev' : AI_ORDER[ai.bi || 0];
+  if (!type) { ai.bi = 0; type = 'ev'; }
+  const d = BUILDS[type]; if (!afford(p, d.cost)) return;
+  const spot = aiSpot(base, d); if (!spot) { ai.bi = (ai.bi || 0) + 1; return; }
+  pay(p, d.cost); const b = addBuilding(type, o, spot[0], spot[1], { built: false });
+  if (type === AI_ORDER[ai.bi || 0]) ai.bi = (ai.bi || 0) + 1;
+  workers.slice(0, 3).forEach(u => orderBuild(u, b)); ai.buildT = G.t + 3;
+}
+function aiSpot(base, d) {
+  for (let r = 4; r < 18; r++) for (let k = 0; k < 24; k++) {
+    const a = G.rng() * Math.PI * 2, tx = Math.round(base.tx + base.w / 2 + Math.cos(a) * r - d.w / 2), ty = Math.round(base.ty + base.h / 2 + Math.sin(a) * r - d.h / 2);
+    let ok = true;
+    for (let y = ty - 1; y <= ty + d.h && ok; y++) for (let x = tx - 1; x <= tx + d.w && ok; x++) if (!inb(x, y) || G.blkT[idx(x, y)] || G.occ[idx(x, y)] || G.terrain[idx(x, y)] === 1) ok = false;
+    if (ok) return [tx, ty];
+  }
+  return null;
+}
+function aiTarget(from, o) {
+  o = o == null ? 1 : o;
+  let best = null, bd = 1e12; const ref = from || (G.blds.find(b => b.owner === o && b.d.trains) || { x: G.W * TILE / 2, y: G.H * TILE / 2 });
+  for (const b of G.blds) if (isEnemy(o, b.owner) && !b.d.wall && !b.d.landmark) { const sc = Math.hypot(b.x - ref.x, b.y - ref.y) - (b.d.drop ? 200 : 0); if (sc < bd) { bd = sc; best = b; } }
+  if (!best) for (const e of G.ents) if (e.kind === 'u' && !e.dead && isEnemy(o, e.owner)) { const d = Math.hypot(e.x - ref.x, e.y - ref.y); if (d < bd) { bd = d; best = e; } }
   return best;
 }
 
@@ -558,7 +609,7 @@ function aiTarget(from) {
 function popAndCap() {
   const p0 = G.players[0]; p0.pop = popUsedOwner(0); let cap = 0;
   for (const b of G.blds) if (b.owner === 0 && b.built && b.d.pop) cap += b.d.pop; p0.cap = Math.min(200, cap);
-  G.players[1].pop = popUsedOwner(1);
+  for (let o = 1; o < G.players.length; o++) G.players[o].pop = popUsedOwner(o);
 }
 function step(dt) {
   if (G.done) return;
@@ -586,7 +637,7 @@ function step(dt) {
   G.vtick -= dt; if (G.vtick <= 0) { G.vtick = .3; updVis(); G.dirtyMini = true; }
   G.atick -= dt; if (G.atick <= 0) { G.atick = 1; aiTick(1); }
   G.ctick -= dt; if (G.ctick <= 0) { G.ctick = .5; checkMission(.5); }
-  G.ltick -= dt; if (G.ltick <= 0) { G.ltick = 1; lifeTick(); }
+  G.ltick -= dt; if (G.ltick <= 0) { G.ltick = 1; lifeTick(); for (const k of ['f', 'w']) G.market[k] += (100 - G.market[k]) * .01; }
   for (const m of G.msgs) m.t += dt; G.msgs = G.msgs.filter(m => m.t < 9);
 }
 function lifeTick() {

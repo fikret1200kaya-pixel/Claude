@@ -5,6 +5,7 @@ const mini = $('mini'), mctx = mini.getContext('2d');
 let cam = { x: 0, y: 0, z: 1 }, mouse = { x: 0, y: 0, in: false, down: false, sx: 0, sy: 0, drag: false };
 let place = null, amovePending = false, keys = {}, lastClick = { t: 0, id: 0 };
 let terrainCv = null, fogSmall = null, fogBig = null, isoFog = null, chunks = new Map(), mmTile = null, cardSig = '', cardT = 0, running = false, lastT = 0, acc = 0;
+const UZ = .74;              // birim çizim ölçeği (binalara oranlı)
 let BAR_H = 168; const MF = 4 / 32;
 
 function resize() { cv.width = innerWidth; cv.height = innerHeight; ctx.imageSmoothingEnabled = true; const b = $('bar'); if (b && b.offsetHeight) BAR_H = b.offsetHeight; }
@@ -68,13 +69,14 @@ function unitAct(u) {
 function drawSpr(c, spr, sx, sy, ax, ay, alpha) { const z = cam.z; if (alpha != null) c.globalAlpha = alpha; c.drawImage(spr, sx - ax * z, sy - ay * z, spr.width * z, spr.height * z); c.globalAlpha = 1; }
 function drawUnit(c, u) {
   const [sx, sy] = w2s(u.x, u.y), [act, fr] = unitAct(u);
-  if (u.d.hero && u.owner === 0) { c.strokeStyle = 'rgba(231,185,58,.7)'; c.lineWidth = 2; c.beginPath(); c.ellipse(sx, sy, 22 * cam.z, 11 * cam.z, 0, 0, 7); c.stroke(); }
-  if (BL.ok && blUnit(c, u.d.look, u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z)) { if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; blUnit(c, u.d.look, u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z, .3); c.globalCompositeOperation = 'source-over'; } }
+  if (u.d.hero && u.owner === 0) { c.strokeStyle = 'rgba(231,185,58,.7)'; c.lineWidth = 2; c.beginPath(); c.ellipse(sx, sy, 17 * cam.z, 8.5 * cam.z, 0, 0, 7); c.stroke(); }
+  if (u.owner !== 0 && ally(u.owner)) { c.fillStyle = 'rgba(255,215,90,.25)'; c.beginPath(); c.ellipse(sx, sy, 9 * cam.z, 4.5 * cam.z, 0, 0, 7); c.fill(); }
+  if (BL.ok && blUnit(c, u.d.look, u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z * UZ)) { if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; blUnit(c, u.d.look, u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z * UZ, .3); c.globalCompositeOperation = 'source-over'; } }
   else { const spr = unitSprite(u.d.look, u.owner, facingDir(u.face || 0), act, fr);
   drawSpr(c, spr, sx, sy, 64, 86); if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; drawSpr(c, spr, sx, sy, 64, 86, .35); c.globalCompositeOperation = 'source-over'; } }
   if (u.carry && u.carry.amt > 0 && u.d.worker) { c.fillStyle = ['', '#8a5a2a', '#f2c230', '#c0405a'][u.carry.type]; c.beginPath(); c.arc(sx - 7 * cam.z, sy - 18 * cam.z, 3.4 * cam.z, 0, 7); c.fill(); c.strokeStyle = OUT; c.lineWidth = 1; c.stroke(); }
 }
-const unitTop = u => (u.d.cls === 'cav' || u.d.cls === 'hero' ? 62 : u.d.look === 'sahi' ? 52 : u.d.cls === 'sie' ? 38 : 50);
+const unitTop = u => UZ * (u.d.cls === 'cav' || u.d.cls === 'hero' ? 62 : u.d.look === 'sahi' ? 52 : u.d.cls === 'sie' ? 38 : 50);
 function bScreen(b) { const s = buildingSprite(b.type, b.owner, b.type === 'ayasofya' && G.flags.captured ? 'cap' : ''); const [ox, oy] = w2s(b.tx * TILE, b.ty * TILE); return { s, ox, oy, dx: ox - s.meta.ox * cam.z, dy: oy - s.meta.oy * cam.z }; }
 const bName = b => b.type === 'ayasofya' && G.flags.captured ? 'ayasofya_cap' : b.type;
 function drawBuildingBL(c, b) {
@@ -139,8 +141,8 @@ function drawProj(c, p) {
 }
 function drawFx(c, f) {
   const a = 1 - f.t / f.life, z = cam.z;
-  if (f.k === 'corpse' && BL.ok && SPRITES.units[f.look]) { if (f.owner !== 0 && !visAt(f.x, f.y)) return; const [sx, sy] = w2s(f.x, f.y); blUnit(c, f.look, f.owner, facingDir(f.face), 'dead', 0, sx, sy, z, Math.min(1, a * 3)); }
-  else if (f.k === 'corpse') { if (f.owner !== 0 && !visAt(f.x, f.y)) return; const [sx, sy] = w2s(f.x, f.y); const spr = unitSprite(f.look, f.owner, facingDir(f.face), 'idle', 0); c.save(); c.globalAlpha = Math.min(1, a * 3) * .85; c.translate(sx, sy); c.scale(z, z * .45); c.rotate(1.35); c.drawImage(spr, -64, -86); c.restore(); c.fillStyle = `rgba(90,15,10,${.35 * a})`; c.beginPath(); c.ellipse(sx + 4 * z, sy + 2 * z, 10 * z, 4 * z, 0, 0, 7); c.fill(); }
+  if (f.k === 'corpse' && BL.ok && SPRITES.units[f.look]) { if (!ally(f.owner) && !visAt(f.x, f.y)) return; const [sx, sy] = w2s(f.x, f.y); blUnit(c, f.look, f.owner, facingDir(f.face), 'dead', 0, sx, sy, z * UZ, Math.min(1, a * 3)); }
+  else if (f.k === 'corpse') { if (!ally(f.owner) && !visAt(f.x, f.y)) return; const [sx, sy] = w2s(f.x, f.y); const spr = unitSprite(f.look, f.owner, facingDir(f.face), 'idle', 0); c.save(); c.globalAlpha = Math.min(1, a * 3) * .85; c.translate(sx, sy); c.scale(z, z * .45); c.rotate(1.35); c.drawImage(spr, -64, -86); c.restore(); c.fillStyle = `rgba(90,15,10,${.35 * a})`; c.beginPath(); c.ellipse(sx + 4 * z, sy + 2 * z, 10 * z, 4 * z, 0, 0, 7); c.fill(); }
   else if (f.k === 'rubble') { for (let i = 0; i < 6 * f.w * f.h; i++) { const wx = (f.tx + hash2(f.id, i, 1) * f.w) * TILE, wy = (f.ty + hash2(f.id, i, 2) * f.h) * TILE, [sx, sy] = w2s(wx, wy), r = (3 + hash2(f.id, i, 3) * 6) * z; c.fillStyle = `rgba(${110 + hash2(f.id, i, 4) * 50 | 0},${100 + hash2(f.id, i, 4) * 40 | 0},85,${Math.min(1, a * 4)})`; c.beginPath(); c.moveTo(sx - r, sy); c.lineTo(sx - r * .3, sy - r * .8); c.lineTo(sx + r, sy - r * .3); c.lineTo(sx + r * .6, sy + r * .4); c.closePath(); c.fill(); } }
   else if (f.k === 'puff') { const [sx, sy] = w2s(f.x, f.y, 10 + f.t * 40); c.fillStyle = `rgba(110,100,90,${.6 * a})`; c.beginPath(); c.arc(sx, sy, f.r * (1 + f.t) * z, 0, 7); c.fill(); }
   else if (f.k === 'boom') { const [sx, sy] = w2s(f.x, f.y); const R = f.r * (.4 + f.t * 2) * z; const g = c.createRadialGradient(sx, sy - 8 * z, 1, sx, sy - 8 * z, R); g.addColorStop(0, `rgba(255,245,180,${a})`); g.addColorStop(.35, `rgba(255,140,30,${.85 * a})`); g.addColorStop(1, 'rgba(120,40,0,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(sx, sy - 6 * z, R, R * .75, 0, 0, 7); c.fill(); c.strokeStyle = `rgba(255,255,255,${.4 * a})`; c.lineWidth = 2; c.beginPath(); c.ellipse(sx, sy, R * 1.3, R * .65, 0, 0, 7); c.stroke(); for (let k = 0; k < 4; k++) { c.fillStyle = `rgba(70,60,55,${.5 * a})`; c.beginPath(); c.arc(sx + (k - 1.5) * 9 * z, sy - (16 + f.t * 60 + k * 4) * z, (8 + f.t * 16) * z, 0, 7); c.fill(); } }
@@ -159,20 +161,20 @@ function render() {
   // su parıltısı
   for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) { const i = idx(tx, ty); if (G.terrain[i] !== 1 || !G.exp[i] && !G.m.noFog) continue; const h = hash2(tx, ty, 3); if (h > .45) continue; const ph = (G.t * .5 + h * 10) % 1; if (ph > .5) continue; const [sx, sy] = w2s(tx * TILE + h * 30, ty * TILE + hash2(tx, ty, 8) * 30); if (!onScr(sx, sy, 20)) continue; const a = Math.sin(ph * 2 * Math.PI) * .45; c.strokeStyle = `rgba(230,245,255,${a})`; c.lineWidth = 1.4; c.beginPath(); c.moveTo(sx - 7 * z, sy); c.quadraticCurveTo(sx, sy - 2.5 * z, sx + 7 * z, sy); c.stroke(); }
   // zemin katmanı: tarla ve harabeler, cesetler
-  for (const b of G.blds) if (!b.dead && b.d.farm && (b.owner === 0 || expAt(b.x, b.y))) drawBuilding(c, b);
+  for (const b of G.blds) if (!b.dead && b.d.farm && (ally(b.owner) || expAt(b.x, b.y))) drawBuilding(c, b);
   for (const f of G.fx) if (f.k === 'rubble' || f.k === 'corpse') drawFx(c, f);
   // seçim halkaları (birimlerin altında)
-  for (const e of G.sel) { if (e.dead) continue; const col = e.owner === 0 ? '#7dff8a' : '#ff6a5a'; if (e.kind === 'u') { const [sx, sy] = w2s(e.x, e.y), pr = 1 + Math.sin(G.t * 6) * .06; c.strokeStyle = col; c.lineWidth = 2; if (!LITE) { c.shadowColor = col; c.shadowBlur = 8; } c.beginPath(); c.ellipse(sx, sy, (e.r + 7) * z * pr, (e.r + 7) * z * .5 * pr, 0, 0, 7); c.stroke(); c.shadowBlur = 0; } else diamond(c, e.tx, e.ty, e.w, e.h, col, 'rgba(120,255,140,.08)', 2); }
+  for (const e of G.sel) { if (e.dead) continue; const col = e.owner === 0 ? '#7dff8a' : ally(e.owner) ? '#ffd75a' : '#ff6a5a'; if (e.kind === 'u') { const [sx, sy] = w2s(e.x, e.y), pr = 1 + Math.sin(G.t * 6) * .06; c.strokeStyle = col; c.lineWidth = 2; if (!LITE) { c.shadowColor = col; c.shadowBlur = 8; } c.beginPath(); c.ellipse(sx, sy, (e.r * UZ + 5) * z * pr, (e.r * UZ + 5) * z * .5 * pr, 0, 0, 7); c.stroke(); c.shadowBlur = 0; } else diamond(c, e.tx, e.ty, e.w, e.h, col, 'rgba(120,255,140,.08)', 2); }
   // derinliğe göre sırala
   const L = [];
   for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) { const i = idx(tx, ty), r = G.res[i]; if (!r || (!G.exp[i] && !G.m.noFog)) continue; L.push({ k: (tx + ty + 1) * TILE, t: 0, tx, ty, r }); }
-  for (const b of G.blds) { if (b.dead || b.d.farm) continue; if (b.owner !== 0 && !expAt(b.x, b.y)) continue; L.push({ k: b.x + b.y + (b.w + b.h) * 6, t: 1, e: b }); }
+  for (const b of G.blds) { if (b.dead || b.d.farm) continue; if (!ally(b.owner) && !expAt(b.x, b.y)) continue; L.push({ k: b.x + b.y + (b.w + b.h) * 6, t: 1, e: b }); }
   if (BL.ok) for (const dc of G.decor) { if (dc.tx < tx0 || dc.tx > tx1 || dc.ty < ty0 || dc.ty > ty1) continue; if (!G.m.noFog && !G.exp[idx(dc.tx, dc.ty)]) continue; if (G.occ[idx(dc.tx, dc.ty)]) continue; L.push({ k: (dc.tx + dc.ty) * TILE, t: 3, e: null, dc }); }
-  for (const u of G.ents) { if (u.kind !== 'u' || u.dead) continue; if (u.owner !== 0 && !visAt(u.x, u.y)) continue; const [sx, sy] = w2s(u.x, u.y); if (!onScr(sx, sy, 80)) continue; L.push({ k: u.x + u.y, t: 2, e: u }); }
+  for (const u of G.ents) { if (u.kind !== 'u' || u.dead) continue; if (!ally(u.owner) && !visAt(u.x, u.y)) continue; const [sx, sy] = w2s(u.x, u.y); if (!onScr(sx, sy, 80)) continue; L.push({ k: u.x + u.y, t: 2, e: u }); }
   L.sort((a, b) => a.k - b.k);
   for (const it of L) { if (it.t === 0) drawRes(c, it.tx, it.ty, it.r); else if (it.t === 1) drawBuilding(c, it.e); else if (it.t === 3) { const [dx, dy] = w2s(it.dc.tx * TILE + 16 + it.dc.ox, it.dc.ty * TILE + 16 + it.dc.oy); blStatic(c, 'decor' + it.dc.v, null, dx, dy, z); } else drawUnit(c, it.e); }
   // mermiler ve efektler
-  for (const p of G.proj) { if (p.owner !== 0 && !visAt(p.x, p.y)) continue; drawProj(c, p); }
+  for (const p of G.proj) { if (!ally(p.owner) && !visAt(p.x, p.y)) continue; drawProj(c, p); }
   for (const f of G.fx) if (f.k !== 'rubble' && f.k !== 'corpse') drawFx(c, f);
   // bulut gölgeleri
   for (let k = 0; k < 4; k++) {
@@ -218,8 +220,8 @@ function drawMini() {
   tc.putImageData(img, 0, 0);
   const m = mctx; m.setTransform(1, 0, 0, 1, 0, 0); m.clearRect(0, 0, mini.width, mini.height); m.imageSmoothingEnabled = false;
   m.setTransform(4, 2, -4, 2, H * 4, 0); m.drawImage(mmTile, 0, 0);
-  for (const bl of G.blds) { if (bl.owner !== 0 && !expAt(bl.x, bl.y)) continue; m.fillStyle = bl.owner === 0 ? '#5aaaff' : bl.d.landmark ? '#fff0a0' : G.colors[bl.owner]; m.fillRect(bl.tx, bl.ty, bl.w, bl.h); }
-  for (const u of G.ents) { if (u.kind !== 'u' || u.dead) continue; if (u.owner !== 0 && !visAt(u.x, u.y)) continue; m.fillStyle = u.owner === 0 ? '#7dff8a' : '#ff3a2a'; m.fillRect(u.x / TILE - .7, u.y / TILE - .7, 1.5, 1.5); }
+  for (const bl of G.blds) { if (!ally(bl.owner) && !expAt(bl.x, bl.y)) continue; m.fillStyle = bl.owner === 0 ? '#5aaaff' : bl.d.landmark ? '#fff0a0' : G.colors[bl.owner]; m.fillRect(bl.tx, bl.ty, bl.w, bl.h); }
+  for (const u of G.ents) { if (u.kind !== 'u' || u.dead) continue; if (!ally(u.owner) && !visAt(u.x, u.y)) continue; m.fillStyle = u.owner === 0 ? '#7dff8a' : G.colors[u.owner]; m.fillRect(u.x / TILE - .7, u.y / TILE - .7, 1.5, 1.5); }
   m.setTransform(1, 0, 0, 1, 0, 0); m.strokeStyle = '#fff'; m.lineWidth = 3; m.strokeRect((cam.x + H * TILE) * MF, cam.y * MF, viewW() * MF, viewH() * MF);
 }
 
@@ -245,10 +247,10 @@ function hull(pts) { pts.sort((a, b) => a[0] - b[0] || a[1] - b[1]); const cr = 
 function inPoly(x, y, P) { let ins = false; for (let i = 0, j = P.length - 1; i < P.length; j = i++) { if ((P[i][1] > y) !== (P[j][1] > y) && x < (P[j][0] - P[i][0]) * (y - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0]) ins = !ins; } return ins; }
 function entAtScreen(sx, sy, ownOnly) {
   let best = null, bd = -1e9; const z = cam.z;
-  for (const u of G.ents) { if (u.kind !== 'u' || u.dead) continue; if (u.owner !== 0 && !visAt(u.x, u.y)) continue; if (ownOnly && u.owner !== 0) continue; const [fx, fy] = w2s(u.x, u.y), hw = (u.d.cls === 'cav' || u.d.cls === 'hero' || u.d.cls === 'sie' ? 20 : 12) * z; if (Math.abs(sx - fx) <= hw && sy >= fy - unitTop(u) * z && sy <= fy + 6 * z) { const k = u.x + u.y; if (k > bd) { bd = k; best = u; } } }
+  for (const u of G.ents) { if (u.kind !== 'u' || u.dead) continue; if (!ally(u.owner) && !visAt(u.x, u.y)) continue; if (ownOnly && u.owner !== 0) continue; const [fx, fy] = w2s(u.x, u.y), hw = (u.d.cls === 'cav' || u.d.cls === 'hero' || u.d.cls === 'sie' ? 16 : 10) * z; if (Math.abs(sx - fx) <= hw && sy >= fy - unitTop(u) * z && sy <= fy + 6 * z) { const k = u.x + u.y; if (k > bd) { bd = k; best = u; } } }
   if (best) return best;
   let bb = null; bd = -1e9;
-  for (const b of G.blds) { if (b.dead) continue; if (ownOnly && b.owner !== 0) continue; if (b.owner !== 0 && !expAt(b.x, b.y)) continue; const h = Math.min(BH[b.type] || 30, 70), pts = []; for (const [x, y] of [[0, 0], [b.w, 0], [b.w, b.h], [0, b.h]]) { pts.push(w2s((b.tx + x) * TILE, (b.ty + y) * TILE)); pts.push(w2s((b.tx + x) * TILE, (b.ty + y) * TILE, h)); } if (inPoly(sx, sy, hull(pts))) { const k = b.x + b.y; if (k > bd) { bd = k; bb = b; } } }
+  for (const b of G.blds) { if (b.dead) continue; if (ownOnly && b.owner !== 0) continue; if (!ally(b.owner) && !expAt(b.x, b.y)) continue; const h = Math.min(BH[b.type] || 30, 70), pts = []; for (const [x, y] of [[0, 0], [b.w, 0], [b.w, b.h], [0, b.h]]) { pts.push(w2s((b.tx + x) * TILE, (b.ty + y) * TILE)); pts.push(w2s((b.tx + x) * TILE, (b.ty + y) * TILE, h)); } if (inPoly(sx, sy, hull(pts))) { const k = b.x + b.y; if (k > bd) { bd = k; bb = b; } } }
   return bb;
 }
 function resAtScreen(sx, sy) {
@@ -263,7 +265,7 @@ function commandAt(sx, sy) {
   const g = s2w(sx, sy), sel = mySel().filter(e => e.kind === 'u'), bsel = mySel().filter(e => e.kind === 'b' && e.d.trains);
   if (!sel.length) { if (bsel.length) { const rs = resAtScreen(sx, sy); const pt = rs ? { x: rs[0] * TILE + 16, y: rs[1] * TILE + 16 } : g; for (const b of bsel) b.rally = pt; fxPing(pt.x, pt.y); } return; }
   const t = entAtScreen(sx, sy, false);
-  if (t && t.owner !== 0 && !t.d.landmark) { for (const u of sel) if (u.atk) orderAttack(u, t); else orderMove(u, t.x, t.y); fxPing(t.x, t.y, '#ff5c5c'); return; }
+  if (t && isEnemy(0, t.owner) && !t.d.landmark) { for (const u of sel) if (u.atk) orderAttack(u, t); else orderMove(u, t.x, t.y); fxPing(t.x, t.y, '#ff5c5c'); return; }
   if (t && t.owner === 0 && t.kind === 'b') {
     if (!t.built) { for (const u of sel) if (u.d.worker) orderBuild(u, t); else orderMove(u, t.x, t.y + t.h * 16 + 20); fxPing(t.x, t.y); return; }
     if (t.d.farm && sel.some(u => u.d.worker)) { for (const u of sel) if (u.d.worker) orderFarm(u, t); fxPing(t.x, t.y); return; }
@@ -363,6 +365,7 @@ addEventListener('keydown', e => {
   if (k.startsWith('arrow')) e.preventDefault();
   if (k === 'escape') { if (place) place = null; else if (amovePending) amovePending = false; else togglePause(); return; }
   if (k === 'p') { togglePause(); return; }
+  if (k === 'home') { goHome(); return; }
   if (k === 'delete') { const s = mySel().filter(e => !e.d.landmark); if (s.length) { for (const e of s) kill(e); msg(s.length + ' seçili öğe yok edildi.'); G.sel = []; cardSig = ''; } return; }
   if (k === 'b' && !cardBtns.some(x => x.key === 'b' && !x.dis)) { findIdle(true); return; }
   if (k === 'n') { findIdle(false); return; }
@@ -388,11 +391,13 @@ function findIdle(workers) {
   G.idleIdx = ((G.idleIdx || 0) + 1) % list.length; const u = list[G.idleIdx];
   if (workers) selectUnits([u]); else selectUnits(list); centerOn(u.x, u.y);
 }
+function goHome() { const b = G.blds.find(x => x.owner === 0 && x.type === 'saray') || G.blds.find(x => x.owner === 0) || G.hero; if (b) centerOn(b.x, b.y); }
+let navDir = { x: 0, y: 0 };
 function scrollCam(dt) {
-  const sp = 800 * dt / cam.z; let dx = 0, dy = 0;
+  const sp = 1000 * dt / cam.z; let dx = 0, dy = 0;
   if (keys['arrowleft']) dx -= 1; if (keys['arrowright']) dx += 1; if (keys['arrowup']) dy -= 1; if (keys['arrowdown']) dy += 1;
   if (mouse.in && !mouse.down && !place) { if (mouse.x < 6) dx -= 1; if (mouse.x > cv.width - 6) dx += 1; if (mouse.y < 6) dy -= 1; if (mouse.y > cv.height - 4) dy += 1; }
-  cam.x += dx * sp; cam.y += dy * sp * .7; clampCam();
+  dx += navDir.x; dy += navDir.y; cam.x += dx * sp; cam.y += dy * sp * .7; clampCam();
 }
 
 /* ---------- HUD ---------- */
@@ -415,7 +420,7 @@ function updateTop() {
   $('iw').textContent = G.idleW || 0; $('iwb').classList.toggle('alert', !!G.idleW); $('im').textContent = G.idleM || 0;
 }
 function btn(label, key, fn, cost, tip, dis, img) { cardBtns.push({ label, key, fn, cost, tip, dis, img }); }
-const GLYPH = { amove: '⚔', stop: '■', hold: '⛨', clear: '✕', del: '☠' };
+const GLYPH = { amove: '⚔', stop: '■', hold: '⛨', clear: '✕', del: '☠', buyw: '🪵+', buyf: '🌾+', sellw: '🪵→🪙', sellf: '🌾→🪙' };
 function buildCard() {
   cardBtns = []; const s = mySel(), p = G.players[0];
   const units = s.filter(e => e.kind === 'u'), blds = s.filter(e => e.kind === 'b'), av = G.m.avail;
@@ -429,6 +434,13 @@ function buildCard() {
     btn('Mevzi', 'g', () => { units.forEach(u => { orderStop(u); u.hold = true; }); msg('Mevzi alındı: birlikler yerinde durup menzildekilere saldırır.'); }, null, 'Yerinde dur, kovalamadan saldır', false, 'hold');
   } else if (units.length) btn('Dur', 's', () => { units.forEach(orderStop); }, null, 'Emirleri iptal et', false, 'stop');
   if (s.length) { btn('Bırak', '', () => selectUnits([]), null, 'Seçimi bırak', false, 'clear'); btn('Yok et', '', () => { const x = mySel().filter(e => !e.d.landmark); if (!x.length) return; if (!G.delArm || G.t - G.delArm > 3) { G.delArm = G.t; msg('Yok etmek için tekrar bas (Delete).', 'warn'); return; } for (const e of x) kill(e); G.sel = []; cardSig = ''; }, null, 'Seçili kendi birim/binanı yok et (iki kez bas)', false, 'del'); }
+  if (blds.length === 1 && blds[0].built && blds[0].d.market) {
+    const M = G.market, pr = k => Math.round(M[k]);
+    btn('Odun al', 'q', () => { trade(0, 'w', true); cardSig = ''; }, { g: pr('w') }, '100 odun satın al (' + pr('w') + ' altın)', p.g < pr('w'), 'buyw');
+    btn('Yiyecek al', 'w', () => { trade(0, 'f', true); cardSig = ''; }, { g: pr('f') }, '100 yiyecek satın al (' + pr('f') + ' altın)', p.g < pr('f'), 'buyf');
+    btn('Odun sat', 'e', () => { trade(0, 'w', false); cardSig = ''; }, { w: 100 }, '100 odun sat → ' + Math.round(pr('w') * .75) + ' altın', p.w < 100, 'sellw');
+    btn('Yiyecek sat', 'r', () => { trade(0, 'f', false); cardSig = ''; }, { f: 100 }, '100 yiyecek sat → ' + Math.round(pr('f') * .75) + ' altın', p.f < 100, 'sellf');
+  }
   if (blds.length === 1 && blds[0].built && blds[0].d.techs) {
     const b = blds[0], hk = ['q', 'w', 'e', 'r']; let i = 0;
     for (const id of b.d.techs) { const T = TECHS[id]; if (hasTech(0, id)) continue; const busy = G.blds.some(x => x.owner === 0 && x.queue.some(q => q.type === 'T:' + id)); btn(T.name, hk[i++], () => { queueTech(b, id); cardSig = ''; }, T.cost, T.desc + ' (' + T.time + ' sn)', busy || !afford(p, T.cost), 't|' + id); }
@@ -439,7 +451,7 @@ function buildCard() {
   }
 }
 function updateCard() {
-  const sig = G.sel.map(e => e.id).join(',') + '|' + (place ? 1 : 0) + '|' + Math.floor(G.players[0].f) + Math.floor(G.players[0].w) + Math.floor(G.players[0].g) + '|' + G.players[0].pop + '|' + G.blds.filter(b => b.owner === 0 && b.built).length;
+  const sig = G.sel.map(e => e.id).join(',') + '|' + (place ? 1 : 0) + '|' + Math.floor(G.players[0].f) + Math.floor(G.players[0].w) + Math.floor(G.players[0].g) + '|' + Math.round(G.market.w) + Math.round(G.market.f) + '|' + G.players[0].pop + '|' + G.blds.filter(b => b.owner === 0 && b.built).length;
   if (sig !== cardSig) {
     cardSig = sig; buildCard(); const el = $('card'); el.innerHTML = '';
     cardBtns.forEach(b => { const d = document.createElement('button'); d.className = 'cb' + (b.dis ? ' dis' : ''); const im = b.img && b.img.includes('|') ? icH(...b.img.split('|')) : `<span class="gl">${GLYPH[b.img] || '◆'}</span>`; d.innerHTML = `${im}<span class="k">${(b.key || '').toUpperCase()}</span><span class="lb">${b.label}</span>${b.cost ? `<small>${costShort(b.cost)}</small>` : ''}`; d.title = (b.tip || '') + (b.cost ? '\n' + sfmt(b.cost) : ''); d.onclick = () => b.fn(); el.appendChild(d); }); fillIcons(el);
@@ -474,3 +486,10 @@ function frame(ts) {
   requestAnimationFrame(frame);
 }
 function togglePause() { if (G.done) return; G.paused = !G.paused; $('pause').style.display = G.paused ? 'flex' : 'none'; }
+
+/* ---------- ekran okları (basılı tut = kaydır) ---------- */
+document.querySelectorAll('.nav[data-d]').forEach(el => {
+  const [x, y] = el.dataset.d.split(',').map(Number);
+  const on = e => { e.preventDefault(); navDir = { x, y }; }, off = () => { navDir = { x: 0, y: 0 }; };
+  el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off); el.addEventListener('pointerleave', off); el.addEventListener('pointercancel', off);
+});

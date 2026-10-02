@@ -6,11 +6,16 @@ const setProg = n => { try { localStorage.setItem('fatih_prog', String(Math.max(
 function resetProg() { try { localStorage.removeItem('fatih_prog'); } catch (e) { } buildMenu(); }
 function show(id) { for (const s of document.querySelectorAll('.screen')) s.classList.toggle('on', s.id === id); $('hud').classList.toggle('on', id === 'game'); }
 
+const getDiff = () => { try { const v = localStorage.getItem('fatih_diff'); return v == null ? 1 : +v; } catch (e) { return 1; } };
+function setDiff(v) { try { localStorage.setItem('fatih_diff', String(v)); } catch (e) { } uiDiff(); }
+function uiDiff() { const v = getDiff(); document.querySelectorAll('#diffseg button').forEach(b => b.classList.toggle('on', +b.dataset.v === v)); $('diffcap').textContent = ['Düşman yavaş toplanır, saldırıları küçük; başlangıç kaynağın fazla.', 'Tarihî denge.', 'Düşman hızlı ve kalabalık saldırır, askerleri daha dayanıklı.'][v]; }
+document.querySelectorAll('#diffseg button').forEach(b => b.onclick = () => setDiff(+b.dataset.v));
 function buildMenu() {
+  uiDiff();
   const p = prog(); $('mlist').innerHTML = '';
   MISSIONS.forEach((m, i) => {
     const d = document.createElement('div'); d.className = 'mi' + (i > p ? ' lock' : '');
-    d.innerHTML = `<div><b>${i + 1}. ${m.title}</b><small>${m.date}</small></div><span>${i < p ? '✔' : i > p ? '🔒' : '▶'}</span>`;
+    d.innerHTML = `<span class="num">${['I', 'II', 'III', 'IV', 'V', 'VI'][i]}</span><div style="flex:1"><b>${m.title}</b><small>${m.date}</small></div><span>${i < p ? '✔' : i > p ? '🔒' : '▶'}</span>`;
     d.onclick = () => showBrief(i); $('mlist').appendChild(d);
   });
   if (p >= MISSIONS.length) { const d = document.createElement('div'); d.className = 'mi'; d.innerHTML = '<div><b>Epilog</b><small>Hünkârçayırı, 1481</small></div><span>📜</span>'; d.onclick = showEpilogue; $('mlist').appendChild(d); }
@@ -28,7 +33,16 @@ function showBrief(i) {
   show('brief');
 }
 function startMission(i) {
-  curMission = i; const m = MISSIONS[i];
+  curMission = i; const m = MISSIONS[i]; m.diff = getDiff();
+  startGame(m);
+}
+let lastSkirm = null;
+function showSkirmish() { $('skdiff').value = String(getDiff()); show('skirm'); }
+function startSkirmish(again) {
+  if (!again) lastSkirm = { map: $('skmap').value, size: $('sksize').value, enemies: +$('skenemy').value, allies: +$('skally').value, diff: +$('skdiff').value, res: $('skres').value, reveal: $('skreveal').checked };
+  curMission = -1; startGame(makeSkirmish(Object.assign({}, lastSkirm)));
+}
+function startGame(m) {
   m.objectives.forEach(o => o.ok = false);
   newGame(m); G.rng = makeRng(m.seed); renderBase(); m.setup(); scatterNature(); buildTerrain();
   const q = new URLSearchParams(location.search);
@@ -40,17 +54,18 @@ function startMission(i) {
   show('game'); resize(); if (G.hero) centerOn(G.hero.x, G.hero.y); uiSpeed(); uiObjectives(); msg(m.date + ' — ' + m.title, 'good');
   lastT = performance.now(); acc = 0; if (!running) { running = true; requestAnimationFrame(frame); }
 }
-function restartMission() { $('pause').style.display = 'none'; startMission(curMission); }
+function restartMission() { $('pause').style.display = 'none'; if (curMission < 0) startSkirmish(true); else startMission(curMission); }
 function showResult() {
   running = false; const r = G.result, m = G.m, win = r.win;
-  if (win) setProg(curMission + 1);
+  if (win && curMission >= 0) setProg(curMission + 1);
   $('rtitle').textContent = win ? (r.hist ? 'Tarihî Sonuç' : 'Zafer!') : 'Yenilgi'; $('rtext').textContent = r.text;
   $('rhist').textContent = win ? m.after : 'Tarihin akışını değiştirmek için tekrar dene.';
   $('rstat').textContent = `Süre: ${fmtT(G.t)} · Düşman kaybı: ${G.stats.kills} · Kayıplarımız: ${G.stats.lost}`;
   const next = curMission + 1;
   $('rbtns').innerHTML = (win ? `<button class="btn" id="rn">${next < MISSIONS.length ? 'Sonraki Görev' : 'Epilog: Hünkârçayırı'}</button>` : '') + '<button class="btn" id="rr">Yeniden Dene</button><button class="btn" id="rm">Menü</button>';
-  if (win) $('rn').onclick = () => next < MISSIONS.length ? showBrief(next) : showEpilogue();
-  $('rr').onclick = () => startMission(curMission); $('rm').onclick = toMenu;
+  if (curMission < 0) { $('rbtns').innerHTML = '<button class="btn" id="rr">Yeni Harita</button><button class="btn" id="rs">Ayarlar</button><button class="btn" id="rm">Menü</button>'; $('rs').onclick = showSkirmish; }
+  else if (win) $('rn').onclick = () => next < MISSIONS.length ? showBrief(next) : showEpilogue();
+  $('rr').onclick = () => curMission < 0 ? startSkirmish(true) : startMission(curMission); $('rm').onclick = toMenu;
   show('result');
 }
 function showEpilogue() {
@@ -76,10 +91,15 @@ function drawMenuBg() {
   // ön planda surlar
   const wy = H * .9; x.fillStyle = '#0b0607'; x.fillRect(0, wy, W, H - wy); for (let px = 0; px < W; px += 22) x.fillRect(px, wy - 10, 12, 10); for (let k = 0; k < 6; k++) { const px = k * W / 5; x.fillRect(px - 26, wy - 52, 52, 60); for (let q = 0; q < 3; q++) x.fillRect(px - 26 + q * 20, wy - 62, 12, 10); }
   const v = x.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.6)'); x.fillStyle = v; x.fillRect(0, 0, W, H);
-  const url = c.toDataURL('image/jpeg', .85); for (const s of document.querySelectorAll('.screen')) s.style.background = `#0b0805 url(${url}) center/cover no-repeat`;
+  const url = c.toDataURL('image/jpeg', .85);
+  for (const s of document.querySelectorAll('.screen')) {
+    const img = s.id === 'menu' ? 'menu_bg.jpg' : 'camp_bg.jpg';
+    const shade = s.id === 'menu' ? 'linear-gradient(180deg,rgba(8,4,2,.15) 0%,rgba(8,4,2,.05) 40%,rgba(8,4,2,.7) 100%)' : 'linear-gradient(180deg,rgba(8,4,2,.35),rgba(8,4,2,.75))';
+    s.style.background = `${shade}, url(assets/${img}) center/cover no-repeat, #0b0805 url(${url}) center/cover no-repeat`;
+  }
 }
 drawMenuBg();
 loadBlender(() => { // Blender sprite atlasları yüklendikten sonra başla
-  if (BL.ok) Object.assign(BH, { saray: 130, ev: 52, ambar: 48, tarla: 10, kisla: 74, ahir: 62, ocak: 84, dokum: 96, kule: 112, burc: 96, sur: 46, kapi: 52, kale: 120, hisar: 130, kamp: 84, ayasofya: 112 });
+  if (BL.ok) Object.assign(BH, { pazar: 70, cami: 150, medrese: 70, saray: 130, ev: 52, ambar: 48, tarla: 10, kisla: 74, ahir: 62, ocak: 84, dokum: 96, kule: 112, burc: 96, sur: 46, kapi: 52, kale: 120, hisar: 130, kamp: 84, ayasofya: 112 });
   const q = new URLSearchParams(location.search); if (q.has('m')) startMission(+q.get('m') - 1);
 });
