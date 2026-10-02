@@ -43,6 +43,50 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 .card.sk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 22px;max-width:640px}.card.sk label{display:flex;flex-direction:column;gap:4px;font-family:var(--f-disp);color:#6d1c15;font-size:14px}.card.sk select{font:inherit;font-family:var(--f-body);font-size:16px;padding:6px;background:#fbf3df;border:1px solid #8a6a3a;color:#2a1a0c}.card.sk .chk{flex-direction:row;align-items:center;grid-column:1/-1}
 .mi .num{font-family:var(--f-disp);color:var(--gold);font-size:22px;width:34px;flex:none;text-align:center}
 @media(max-width:700px){.card.sk{grid-template-columns:1fr}}
+/* ---- AoE2 tarzı menü: sol taş panel, sağda resim ---- */
+.stone{background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(0,0,0,.05) 30%,rgba(0,0,0,.05) 70%,rgba(0,0,0,.4)),url(assets/ui/stone.jpg) center/420px auto repeat,#4a443c;box-shadow:inset 0 0 0 2px #2a2018,inset 0 0 0 4px #8a6a2a,inset 0 0 0 6px #1a120a,inset 0 0 60px rgba(0,0,0,.55),0 0 40px rgba(0,0,0,.7)}
+#menu{align-items:stretch;justify-content:flex-start;padding:0}
+.mpanel{position:relative;width:clamp(290px,31vw,430px);height:100%;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1.4vh,14px);padding:clamp(14px,3vh,34px) clamp(16px,2vw,28px);text-align:center}
+.mpanel .crest svg{width:clamp(48px,9vh,82px);height:clamp(48px,9vh,82px);filter:drop-shadow(0 4px 6px rgba(0,0,0,.7))}
+.mpanel h1{font-size:clamp(40px,8vh,78px)}
+.mpanel .sub{font-size:clamp(14px,2.3vh,19px);text-shadow:0 2px 4px #000;line-height:1.25}.mpanel .sub small{font-family:var(--f-disp);color:var(--gold);letter-spacing:.2em;font-style:normal}
+.mbtns{display:flex;flex-direction:column;gap:clamp(6px,1.4vh,12px);width:100%;margin-top:clamp(4px,2vh,18px)}
+.mbtn{display:flex;align-items:center;gap:10px;width:100%;padding:0;border:0;background:none;cursor:pointer;text-align:left;color:#fff3d6}
+.mbtn .shd{width:clamp(42px,7.4vh,62px);height:clamp(42px,7.4vh,62px);flex:none;filter:drop-shadow(0 3px 4px rgba(0,0,0,.8));transition:transform .15s}
+.mbtn span{flex:1;font-family:var(--f-disp);font-weight:700;font-size:clamp(15px,2.5vh,20px);letter-spacing:.05em;padding:clamp(7px,1.3vh,12px) 14px;background:linear-gradient(#b03a2c,#7a1f17 55%,#56140f);border:2px solid #1a0d05;box-shadow:inset 0 0 0 1px #e0b860,inset 0 2px 0 rgba(255,255,255,.25),inset 0 -3px 6px rgba(0,0,0,.4),0 3px 0 #120802;text-shadow:0 2px 2px #000}
+.mbtn span small{display:block;font-family:var(--f-body);font-weight:400;font-style:italic;letter-spacing:0;font-size:.72em;opacity:.85}
+.mbtn:hover span,.mbtn:focus-visible span{background:linear-gradient(#cf4a36,#93281d 55%,#651a12)}.mbtn:hover .shd{transform:scale(1.08) rotate(-3deg)}.mbtn:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.mdiff{width:100%;margin-top:auto;padding:10px 12px;background:rgba(14,8,4,.62);border:1px solid var(--gold-lo)}.mdiff .lbl{font-family:var(--f-disp);color:var(--gold);letter-spacing:.1em}.mdiff .mcap{font-size:14px;margin:6px 0 0}
+.linkbtn{background:none;border:0;color:var(--paper);opacity:.6;font:italic 14px var(--f-body);cursor:pointer;text-decoration:underline}.linkbtn:hover{opacity:1}
+/* ---- sefer haritası ---- */
+#camp{padding:0}
+.cwrap{display:flex;width:100%;height:100%}
+.cmap{position:relative;flex:1;min-width:0;background:#2a1c10}
+#cmapc{position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
+.ctitle{position:absolute;left:50%;top:14px;transform:translateX(-50%);font-family:var(--f-disp);font-weight:900;font-size:clamp(20px,3.4vh,32px);color:#5a1810;letter-spacing:.1em;text-align:center;pointer-events:none;text-shadow:0 1px 0 rgba(255,240,200,.6)}.ctitle small{display:block;font-size:.5em;color:#6d4a20;letter-spacing:.3em}
+.cside{width:clamp(280px,32vw,430px);display:flex;flex-direction:column;gap:8px;padding:18px 18px;overflow-y:auto;text-align:left}
+.cprev{position:relative;aspect-ratio:16/9;flex:none;border:3px solid #1a0d05;box-shadow:inset 0 0 0 1px var(--gold),0 4px 12px rgba(0,0,0,.6);background:#140b05 center/cover no-repeat}
+.cprev canvas{position:absolute;right:6px;bottom:6px;width:38%;height:auto;aspect-ratio:1;border:2px solid var(--gold-lo);box-shadow:0 2px 8px #000}
+.cnum{position:absolute;left:10px;top:4px;font-family:var(--f-disp);font-weight:900;font-size:44px;color:var(--gold-hi);text-shadow:0 2px 8px #000}
+.cside h2{font-size:clamp(20px,3vh,26px);text-shadow:0 2px 4px #000}.cdate{font-style:italic;opacity:.85;margin-top:-6px}
+.cdesc{margin:0;font-size:15px;line-height:1.45;background:rgba(14,8,4,.6);padding:8px 10px;border-left:3px solid var(--gold-lo);max-height:9.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.cside .mlist{width:100%;gap:4px}.cside .mi{padding:5px 10px;font-size:15px}.cside .mi.sel{border-color:var(--gold-hi);background:linear-gradient(90deg,rgba(120,40,20,.95),rgba(40,16,8,.85))}.cside .mi .num{font-size:17px;width:26px}
+@media(max-width:760px),(max-height:440px) and (max-width:900px){.cside .mlist{display:none}.cdesc{max-height:5em}}
+@media(max-width:640px){.mpanel{width:100%;background-size:300px auto}.cwrap{flex-direction:column}.cmap{flex:1 1 50%}.cside{width:100%;flex:1 1 50%}.cprev{display:none}}
+/* ---- bölüm sonu hikâyesi ---- */
+#story{padding:0;justify-content:flex-end;overflow:hidden}
+#sbg{position:absolute;inset:0;cursor:pointer}#sbg.kb{animation:kb 16s ease-out forwards}
+@keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.13) translate(-1.5%,-1%)}}
+#story::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,0) 25%,rgba(0,0,0,0) 50%,rgba(10,5,0,.75));box-shadow:inset 0 0 120px rgba(0,0,0,.7)}
+#sbox{position:relative;z-index:2;width:min(900px,calc(100% - 32px));margin:0 auto 4vh;padding:18px 28px 14px;text-align:left;color:#2a1a0c;background:url(assets/ui/parchment.jpg) center/cover,#e6d3a8;border:3px double #7a5a2a;box-shadow:0 0 0 5px rgba(20,10,4,.85),0 18px 50px rgba(0,0,0,.7)}
+#sbox.in{animation:sin .7s ease-out}@keyframes sin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+#skick{font-family:var(--f-disp);font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:#8e2a22}
+#sbox h2{color:#5a1810;font-size:clamp(22px,3.4vh,32px);margin:2px 0 0}#ssub{font-style:italic;color:#6d4a20}
+#stx{font-size:clamp(17px,2.4vh,21px);line-height:1.55;margin:8px 0;max-width:72ch}#sbox.prev #stx{font-style:italic}
+#sfoot{font-size:14px;opacity:.7}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+#sdots{display:flex;gap:6px}#sdots i{width:9px;height:9px;border-radius:50%;background:rgba(90,24,16,.25);border:1px solid #7a5a2a}#sdots i.on{background:#8e2a22}
+#sbtns{display:flex;gap:8px;flex-wrap:wrap}
 #hud{position:fixed;inset:0;pointer-events:none;display:none;z-index:10}
 #hud.on{display:block}
 .wood{background:linear-gradient(180deg,#5a3c22,#3a2616 40%,#2a1a0e);border:2px solid #1a0d05;box-shadow:inset 0 0 0 1px rgba(243,214,138,.35),inset 0 2px 6px rgba(255,220,160,.12)}
@@ -132,22 +176,46 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 </div>
 
 <div id="menu" class="screen on">
-  <div class="mtitle"><div class="tugra">☪</div><h1>FATİH</h1><div class="sub">Bir Sultanın Hikâyesi — Tahta Çıkıştan Vefata, 1451–1481</div></div>
-  <div class="mcols">
-    <section class="mbox">
-      <h3>Sefer-i Hümâyun</h3><div class="mcap">Fatih Sultan Mehmed'in hayatı, altı tarihî sefer</div>
-      <div class="mlist" id="mlist"></div>
-    </section>
-    <section class="mbox">
-      <h3>Serbest Savaş</h3><div class="mcap">Rastgele harita, istediğin kadar düşman ve müttefik</div>
-      <button class="btn big" onclick="showSkirmish()">⚔ Savaş Kur</button>
-      <h3 style="margin-top:18px">Zorluk</h3>
+  <nav class="mpanel stone">
+    <div class="crest"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#sh-crescent"/></svg></div>
+    <h1>FATİH</h1><div class="sub">Bir Sultanın Hikâyesi<br><small>1451 – 1481</small></div>
+    <div class="mbtns">
+      <button class="mbtn" onclick="showCamp()"><svg class="shd"><use href="#sh-crescent"/></svg><span>Sefer-i Hümâyun<small>Tarihî seferler</small></span></button>
+      <button class="mbtn" onclick="showSkirmish()"><svg class="shd"><use href="#sh-swords"/></svg><span>Serbest Savaş<small>Rastgele harita, müttefik ve düşmanlar</small></span></button>
+      <button class="mbtn" id="mepi" onclick="showEpilogue()" hidden><svg class="shd"><use href="#sh-scroll"/></svg><span>Epilog<small>Hünkârçayırı, 1481</small></span></button>
+    </div>
+    <div class="mdiff"><div class="lbl">Zorluk</div>
       <div class="seg" id="diffseg"><button data-v="0">Kolay</button><button data-v="1">Normal</button><button data-v="2">Zor</button></div>
-      <div class="mcap" id="diffcap"></div>
-      <div style="margin-top:14px"><button class="btn sm" onclick="resetProg()">İlerlemeyi sıfırla</button></div>
-    </section>
+      <div class="mcap" id="diffcap"></div></div>
+    <button class="linkbtn" onclick="if(confirm('Sefer ilerlemesi silinsin mi?'))resetProg()">İlerlemeyi sıfırla</button>
+  </nav>
+</div>
+
+<div id="camp" class="screen">
+  <div class="cwrap">
+    <div class="cmap"><canvas id="cmapc"></canvas><div class="ctitle">Fatih'in Seferleri<small>1451 – 1481</small></div></div>
+    <aside class="cside stone">
+      <div class="cprev" id="cprev"><canvas id="cpor" width="160" height="160"></canvas><span class="cnum" id="cnum"></span></div>
+      <h2 id="ctl"></h2><div class="cdate" id="cdt"></div><p class="cdesc" id="cdx"></p>
+      <button class="btn big" id="cgo">Brifinge Geç</button>
+      <div class="mlist" id="mlist"></div>
+      <button class="btn" onclick="toMenu()" style="margin-top:auto">◂ Ana Menü</button>
+    </aside>
   </div>
 </div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="shg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8362a"/><stop offset="1" stop-color="#5e140e"/></linearGradient>
+    <linearGradient id="shb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e5a8c"/><stop offset="1" stop-color="#14284a"/></linearGradient>
+    <linearGradient id="shn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d7a46"/><stop offset="1" stop-color="#173a1e"/></linearGradient>
+    <linearGradient id="shgold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".5" stop-color="#d9a83e"/><stop offset="1" stop-color="#7a5212"/></linearGradient>
+    <symbol id="sh-base" viewBox="0 0 64 64"><path d="M8 5h48v24c0 17-12 27-24 31C20 56 8 46 8 29z" fill="url(#shgold)"/><path d="M12 9h40v20c0 14-10 23-20 26.5C22 52 12 43 12 29z" fill="currentColor"/><path d="M12 9h40v8H12z" fill="#fff" opacity=".12"/></symbol>
+    <symbol id="sh-crescent" viewBox="0 0 64 64"><use href="#sh-base" style="color:#8e2a22"/><circle cx="30" cy="31" r="12" fill="#f3d68a"/><circle cx="34.5" cy="29" r="10" fill="#8e2a22"/><path d="M42 24l1.6 3.6 3.9.3-3 2.5 1 3.8-3.5-2.1-3.5 2.1 1-3.8-3-2.5 3.9-.3z" fill="#f3d68a"/></symbol>
+    <symbol id="sh-swords" viewBox="0 0 64 64"><use href="#sh-base" style="color:#1f3d63"/><g stroke="#e8e2d0" stroke-width="3" stroke-linecap="round"><path d="M20 18l24 24M44 18L20 42"/></g><g stroke="#d9b25e" stroke-width="3.4" stroke-linecap="round"><path d="M38 40l6-6M20 34l6 6M17 41l3 3M47 41l-3 3"/></g></symbol>
+    <symbol id="sh-scroll" viewBox="0 0 64 64"><use href="#sh-base" style="color:#2a5a32"/><rect x="21" y="18" width="22" height="26" rx="2" fill="#efe0bd"/><g stroke="#7a5a30" stroke-width="1.6"><path d="M25 25h14M25 30h14M25 35h10"/></g><circle cx="21" cy="18" r="3.5" fill="#c9a86a"/><circle cx="43" cy="44" r="3.5" fill="#c9a86a"/></symbol>
+  </defs>
+</svg>
 
 <div id="skirm" class="screen">
   <h2>Serbest Savaş</h2><div class="sub">Haritayı ve rakipleri seç; yapay zekâ kendi köyünü kurar, ordu basar ve saldırır.</div>
@@ -174,6 +242,12 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
   <div id="rbtns"></div>
 </div>
 
+<div id="story" class="screen">
+  <div id="sbg"></div>
+  <div id="sbox"><div id="skick"></div><h2 id="sh"></h2><div id="ssub"></div><p id="stx"></p><div id="sfoot"></div>
+    <div class="srow"><div id="sdots"></div><div id="sbtns"></div></div></div>
+</div>
+
 <div id="epi" class="screen">
   <h2 id="et"></h2><div class="card" id="el"></div>
   <div><button class="btn" onclick="toMenu()">Ana Menü</button></div>
@@ -185,6 +259,8 @@ h2{font-family:var(--f-disp);color:var(--gold);margin:0;letter-spacing:.06em;tex
 <script src="assets/sprites.js"></script>
 <script src="gfx.js"></script>
 <script src="ui.js"></script>
+<script src="assets/art/art.js"></script>
+<script src="camp.js"></script>
 <script src="main.js"></script>
 </body>
 </html>

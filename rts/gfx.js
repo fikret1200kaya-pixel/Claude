@@ -479,6 +479,11 @@ function blStatic(c, name, owner, sx, sy, z, alpha, reveal, light) {
   c.globalAlpha = 1; return true;
 }
 function blPortrait(look, owner) {
+  const art = typeof artPortrait === 'function' && artPortrait(look);
+  if (art) { // boyalı portre + takım rengi çerçeve
+    const cv = mkCanvas(96, 96), c = cv.getContext('2d'); c.drawImage(art, 0, 0, 96, 96);
+    c.strokeStyle = G.colors[owner]; c.lineWidth = 5; c.strokeRect(2.5, 2.5, 91, 91); return cv;
+  }
   const P = SPRITES.portraits, f = P && P.f[look]; if (!f) return null;
   const img = BL.imgs[P.img], mask = BL.imgs[P.mask]; if (!img || !mask || !img.naturalWidth) return null;
   const pc = blCached('P' + look + G.colors[owner], img, mask, f, G.colors[owner], mask.width / img.width);

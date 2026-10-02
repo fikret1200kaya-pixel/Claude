@@ -12,12 +12,14 @@ SCALE = 2.0
 
 def mats():
     return dict(
-        stone=M('stone', (.66, .6, .5), .85, brick=3.2, noise=8, nf=.3),
-        stone_d=M('stone_d', (.46, .43, .4), .85, brick=3.2, noise=8, nf=.3),
-        stone_w=M('stone_w', (.8, .64, .52), .85, brick=3.6, noise=8, nf=.25),
+        stone=M('stone', (.62, .57, .49), .85, brick=4.2, noise=9, nf=.35),
+        stone_d=M('stone_d', (.44, .41, .38), .85, brick=4.2, noise=9, nf=.35),
+        stone_w=M('stone_w', (.78, .62, .5), .85, brick=4.6, noise=9, nf=.3),
         plaster=M('plaster', (.86, .8, .68), .8, noise=6, nf=.22),
-        roof=M('roof', (.64, .22, .13), .7, brick=7, noise=10, nf=.25),
-        roof_d=M('roof_d', (.36, .22, .17), .75, brick=7, noise=10, nf=.25),
+        roof=M('roof', (.62, .24, .14), .75, brick=9, noise=12, nf=.3, tiles=True),
+        roof_d=M('roof_d', (.4, .26, .2), .75, brick=9, noise=12, nf=.3, tiles=True),
+        ivy=M('ivy', (.12, .3, .08), .8, noise=40, nf=.6),
+        timber=M('timber', (.2, .12, .06), .7, noise=25, nf=.3),
         lead=M('lead', (.52, .56, .6), .5, .2, noise=3, nf=.06, bump=0),
         lead_t=M('lead_t', (.3, .55, .55), .45, .15, noise=3, nf=.06, bump=0),
         wood=M('swood', (.46, .3, .16), .75, stripes=((.38, .24, .12), 18), noise=12, nf=.25),
@@ -119,6 +121,64 @@ def house_walls(S, w, d, h, mat, z0=0.):
         box(.07, .07, h, (x, y, z0 + h / 2), S['wood_d'])
 
 
+def band(x0, y0, x1, y1, z, m, h=.07):
+    """takım rengi şeridi (görünen iki yüz)"""
+    box(.025, y1 - y0, h, (x1 + .012, (y0 + y1) / 2, z), m); box(x1 - x0, .025, h, ((x0 + x1) / 2, y1 + .012, z), m)
+
+
+def timber_wall(S, x0, y0, x1, y1, z0, z1):
+    """sıva + koyu ahşap çatkı (görünen iki yüz)"""
+    box(x1 - x0, y1 - y0, z1 - z0, ((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2), S['plaster'])
+    h = z1 - z0
+    for (fx, a, b, ax) in ((x1, y0, y1, 'x'), (y1, x0, x1, 'y')):
+        L = b - a; n = max(2, round(L / .38))
+        for k in range(n + 1):
+            u = a + L * k / n
+            if ax == 'x':
+                box(.03, .05, h, (fx + .015, u, z0 + h / 2), S['timber'])
+            else:
+                box(.05, .03, h, (u, fx + .015, z0 + h / 2), S['timber'])
+        for zz in (z0 + .025, z1 - .025):
+            if ax == 'x':
+                box(.03, L, .05, (fx + .015, (a + b) / 2, zz), S['timber'])
+            else:
+                box(L, .03, .05, ((a + b) / 2, fx + .015, zz), S['timber'])
+        for k in range(n):
+            u0 = a + L * k / n; u1 = a + L * (k + 1) / n; ang = math.atan2(h, u1 - u0) * (1 if k % 2 else -1); d = math.hypot(h, u1 - u0)
+            if ax == 'x':
+                box(.03, d, .04, (fx + .016, (u0 + u1) / 2, z0 + h / 2), S['timber'], rot=(ang, 0, 0))
+            else:
+                box(d, .03, .04, ((u0 + u1) / 2, fx + .016, z0 + h / 2), S['timber'], rot=(0, -ang, 0))
+
+
+def window(face, u, z, w, h, S):
+    """kepenkli pencere"""
+    if face[0] == 'x':
+        fx = face[1]; box(.03, w, h, (fx + .01, u, z), S['dark']); box(.04, w + .06, .035, (fx + .02, u, z - h / 2 - .02), S['stone'])
+        box(.025, w * .55, h, (fx + .02, u - w * .8, z), S['wood']); box(.025, w * .55, h, (fx + .02, u + w * .8, z), S['wood'])
+    else:
+        fy = face[1]; box(w, .03, h, (u, fy + .01, z), S['dark']); box(w + .06, .04, .035, (u, fy + .02, z - h / 2 - .02), S['stone'])
+        box(w * .55, .025, h, (u - w * .8, fy + .02, z), S['wood']); box(w * .55, .025, h, (u + w * .8, fy + .02, z), S['wood'])
+
+
+def dormer(x, y, z, face, S, w=.32):
+    if face == 'x':
+        box(.3, w, .26, (x, y, z + .13), S['plaster']); box(.03, w * .55, .14, (x + .16, y, z + .12), S['dark'])
+        mesh([(x - .15, y - w / 2 - .04, z + .26), (x + .19, y - w / 2 - .04, z + .26), (x + .19, y, z + .44), (x - .15, y, z + .44), (x - .15, y + w / 2 + .04, z + .26), (x + .19, y + w / 2 + .04, z + .26)],
+             [(0, 1, 2, 3), (3, 2, 5, 4)], S['roof'])
+    else:
+        box(w, .3, .26, (x, y, z + .13), S['plaster']); box(w * .55, .03, .14, (x, y + .16, z + .12), S['dark'])
+        mesh([(x - w / 2 - .04, y - .15, z + .26), (x - w / 2 - .04, y + .19, z + .26), (x, y + .19, z + .44), (x, y - .15, z + .44), (x + w / 2 + .04, y - .15, z + .26), (x + w / 2 + .04, y + .19, z + .26)],
+             [(0, 1, 2, 3), (3, 2, 5, 4)], S['roof'])
+
+
+def ivy(S, pts, seed=0):
+    rnd = random.Random(seed)
+    for (x, y, z, r) in pts:
+        for k in range(4):
+            blob(r * (.4 + rnd.random() * .3), (x + rnd.uniform(-r, r) * .3, y + rnd.uniform(-r, r) * .3, z + rnd.uniform(-r, r) * 1.2), S['ivy'], sc=(.35, .35, .8), sub=2, disp=.9, seed=seed * 10 + k, tex_scale=9)
+
+
 # ------------------------------------------------------------ binalar
 def b_saray(S, cap):
     box(3, 3, .15, (0, 0, .075), S['stone_d'])
@@ -138,15 +198,19 @@ def b_saray(S, cap):
 
 
 def b_ev(S, cap):
-    box(1.5, 1.5, .08, (0, 0, .04), S['stone_d'])
-    box(1.3, 1.3, .7, (0, 0, .43), S['plaster'])
-    for (x, y) in ((.65, .65), (.65, -.65), (-.65, .65)):
-        box(.07, .07, .7, (x, y, .43), S['wood_d'])
-    box(1.32, .05, .06, (0, .655, .6), S['wood_d']); box(.05, 1.32, .06, (.655, 0, .6), S['wood_d'])
-    arch(S, ('x', .66), .25, .08, .26, .38, mat=S['wood_d'])
-    box(.03, .24, .2, (.66, -.3, .42), S['dark']); box(.24, .03, .2, (-.2, .66, .42), S['dark']); box(.24, .03, .2, (.25, .66, .42), S['dark'])
-    pyramid(1.7, 1.7, .62, (0, 0, .78), S['roof'])
-    box(.16, .16, .45, (-.3, .3, 1.15), S['stone'])
+    box(1.6, 1.6, .06, (0, 0, .03), S['stone_d'])
+    box(1.2, 1.2, .42, (0, 0, .27), S['stone'])                       # taş zemin kat
+    arch(S, ('x', .605), .2, .06, .24, .3, mat=S['timber'])
+    window(('y', .6), -.2, .3, .16, .16, S)
+    for k in range(5):                                                   # cumba konsolları
+        box(.05, .06, .12, (.6 + .04, -.5 + k * .25, .44), S['timber'], rot=(0, .6, 0)); box(.06, .05, .12, (-.5 + k * .25, .6 + .04, .44), S['timber'], rot=(-.6, 0, 0))
+    timber_wall(S, -.68, -.68, .68, .68, .48, .98)                       # çıkmalı ahşap üst kat
+    band(-.68, -.68, .68, .68, .5, S['team'], .05)
+    window(('x', .69), -.3, .74, .17, .2, S); window(('x', .69), .3, .74, .17, .2, S); window(('y', .69), 0, .74, .17, .2, S)
+    pyramid(1.75, 1.75, .55, (0, 0, .98), S['roof'])
+    box(1.78, 1.78, .04, (0, 0, .985), S['timber'])
+    box(.16, .16, .5, (-.35, .3, 1.3), S['stone']); box(.2, .2, .05, (-.35, .3, 1.56), S['stone_d'])
+    ivy(S, [(.62, -.55, .2, .18)], 3)
 
 
 def b_ambar(S, cap):
@@ -173,18 +237,23 @@ def b_tarla(S, cap):
 
 
 def b_kisla(S, cap):
-    box(2.7, 2.7, .1, (0, 0, .05), S['stone_d'])
-    box(2.3, 1.9, 1.0, (0, -.1, .6), S['stone'])
-    prism(2.45, 2.1, .7, (0, -.1, 1.1), S['roof_d'], S['stone'])
-    arch(S, ('x', 1.155), -.1, .1, .5, .6, mat=S['wood_d'])
-    for u in (-.7, .5):
-        arch(S, ('x', 1.155), u, .45, .16, .25)
-    for u in (-.6, 0, .6):
-        arch(S, ('y', .855), u, .45, .16, .25)
-    for k in range(5):
-        cyl(.015, 1.2, (-.8 + k * .18, 1.1, .55), S['wood'], rot=(.25, 0, 0), v=6); cyl(.03, .12, (-.8 + k * .18, 1.25, 1.12), S['iron'], r2=0, rot=(.25, 0, 0), v=6)
-    box(1.0, .06, .05, (-.45, 1.0, .9), S['wood_d'])
-    flag(S, 1.15, 1.15, .1, 1.7)
+    box(2.8, 2.8, .08, (0, 0, .04), S['stone_d'])
+    box(2.3, 1.8, .8, (0, -.15, .48), S['stone'])
+    timber_wall(S, -1.2, -1.1, 1.2, .8, .88, 1.38)
+    band(-1.15, -1.05, 1.15, .75, .86, S['team'], .08)
+    for u in (-.75, -.25, .25, .75):
+        window(('y', .76), u, .5, .14, .2, S); window(('y', .81), u, 1.13, .16, .22, S)
+    arch(S, ('x', 1.155), -.15, .08, .55, .55, mat=S['timber'])
+    for u in (-.75, .45):
+        window(('x', 1.21), u, 1.13, .16, .22, S)
+    pyramid(2.75, 2.25, .85, (0, -.15, 1.38), S['roof_d'], ridge=1.0)
+    dormer(.4, .62, 1.5, 'y', S); dormer(-.5, .62, 1.5, 'y', S); dormer(1.05, -.15, 1.5, 'x', S)
+    box(.2, .2, .6, (-.7, -.6, 2.0), S['stone'])
+    for k in range(6):
+        cyl(.015, 1.25, (-1.0 + k * .16, 1.15, .6), S['wood'], rot=(.22, 0, 0), v=6); cyl(.03, .14, (-1.0 + k * .16, 1.29, 1.22), S['iron'], r2=0, rot=(.22, 0, 0), v=6)
+    box(1.1, .06, .05, (-.6, 1.05, .9), S['timber'])
+    ivy(S, [(1.16, -.9, .3, .25), (-1.1, .78, .25, .2)], 5)
+    flag(S, 1.2, 1.2, .08, 1.9); flag(S, -1.25, -1.25, .08, 1.9)
 
 
 def b_ahir(S, cap):
@@ -228,15 +297,19 @@ def b_dokum(S, cap):
 
 
 def b_kule(S, cap):
-    cyl(.62, .2, (0, 0, .1), S['stone_d'], v=24)
-    cyl(.55, 1.9, (0, 0, 1.05), S['stone'], v=24)
-    cyl(.62, .12, (0, 0, 2.0), S['stone_d'], v=24)
-    ring_merlons(0, 0, .56, 2.06, S['stone'], 10)
-    cyl(.68, .8, (0, 0, 2.45), S['roof'], r2=0, v=24)
+    box(1.4, 1.4, .1, (0, 0, .05), S['stone_d'])
+    cyl(.55, 2.0, (0, 0, 1.1), S['stone'], v=12, smooth=False)
+    cyl(.66, .1, (0, 0, 2.1), S['stone_d'], v=12, smooth=False)
+    cyl(.64, .45, (0, 0, 2.38), S['timber'], v=12, smooth=False)        # ahşap seğirdim
+    for k in range(12):
+        a = k / 12 * 2 * PI; box(.05, .1, .45, (math.cos(a) * .66, math.sin(a) * .66, 2.38), S['wood'], rot=(0, 0, a))
+    cyl(.8, 1.0, (0, 0, 3.08), S['roof'], r2=0, v=12, smooth=False)
+    torus(.56, .035, (0, 0, 1.5), S['team'])
     for a in (.4, 1.2):
-        box(.04, .06, .25, (math.cos(a) * .56, math.sin(a) * .56, 1.3), S['dark'], rot=(0, 0, a))
-    arch(S, ('x', .56), 0, .2, .26, .35, mat=S['wood_d'])
-    flag(S, 0, 0, 2.85, .5, .8)
+        box(.04, .07, .28, (math.cos(a) * .56, math.sin(a) * .56, 1.3), S['dark'], rot=(0, 0, a))
+    arch(S, ('x', .56), 0, .1, .26, .38, mat=S['timber'])
+    ivy(S, [(.45, -.35, .4, .22)], 9)
+    flag(S, 0, 0, 3.55, .6, .8)
 
 
 def b_burc(S, cap):
@@ -267,20 +340,32 @@ def b_kapi(S, cap):
 
 
 def b_kale(S, cap):
-    box(3.9, 3.9, .1, (0, 0, .05), S['stone_d'])
-    h = 1.35
-    for (x, y, w, d) in ((0, 1.6, 3.2, .4), (0, -1.6, 3.2, .4), (1.6, 0, .4, 3.2), (-1.6, 0, .4, 3.2)):
+    box(3.95, 3.95, .1, (0, 0, .05), S['stone_d'])
+    h = 1.5
+    for (x, y, w, d) in ((0, 1.6, 3.0, .45), (0, -1.6, 3.0, .45), (1.6, 0, .45, 3.0), (-1.6, 0, .45, 3.0)):
         box(w, d, h, (x, y, h / 2), S['stone'])
-    for k in range(7):
-        t = -1.35 + k * .45
-        for (x, y) in ((1.78, t), (t, 1.78)):
-            box(.18, .18, .2, (x, y, h + .1), S['stone'])
-    arch(S, ('x', 1.805), 0, .05, .6, .75, mat=S['wood_d'])
-    box(1.5, 1.5, 2.3, (0, 0, 1.15), S['stone']); merlons(0, 0, .66, 2.3, S['stone'], 3)
-    pyramid(1.3, 1.3, .6, (0, 0, 2.3), S['roof'])
+    for k in range(9):
+        t = -1.4 + k * .35
+        for (x, y) in ((1.8, t), (t, 1.8)):
+            box(.17, .17, .2, (x, y, h + .1), S['stone'])
+    band(-1.82, -1.82, 1.82, 1.82, 1.2, S['team'], .08)
+    arch(S, ('x', 1.83), 0, .05, .65, .8, mat=S['timber']); box(.06, .9, .1, (1.86, 0, .95), S['stone_d'])
+    # iç kale: taş gövde + ahşap üst kat + dik kiremit çatı ve çatı pencereleri
+    box(1.7, 1.7, 1.9, (0, 0, .95), S['stone'])
+    timber_wall(S, -.9, -.9, .9, .9, 1.9, 2.55)
+    band(-.9, -.9, .9, .9, 1.92, S['team'], .07)
+    for u in (-.45, .2):
+        window(('x', .91), u, 2.25, .16, .24, S); window(('y', .91), u, 2.25, .16, .24, S)
+        window(('x', .86), u, 1.35, .12, .26, S); window(('y', .86), u, 1.35, .12, .26, S)
+    pyramid(2.05, 2.05, 1.25, (0, 0, 2.55), S['roof'])
+    dormer(.55, 0, 2.7, 'x', S, .3); dormer(0, .55, 2.7, 'y', S, .3)
     for (x, y) in ((1.6, 1.6), (1.6, -1.6), (-1.6, 1.6), (-1.6, -1.6)):
-        cyl(.5, 1.8, (x, y, .9), S['stone'], v=20); cyl(.56, .1, (x, y, 1.82), S['stone_d'], v=20); cyl(.6, .75, (x, y, 2.24), S['roof'], r2=0, v=20)
-    flag(S, 0, 0, 2.9, 1.0, 1.2)
+        cyl(.55, 2.1, (x, y, 1.05), S['stone'], v=20); cyl(.62, .12, (x, y, 2.1), S['stone_d'], v=20)
+        cyl(.6, .3, (x, y, 2.31), S['timber'], v=12)
+        cyl(.72, 1.1, (x, y, 3.0), S['roof'], r2=0, v=20)
+        band(x - .55, y - .55, x + .55, y + .55, 1.7, S['team'], .06) if False else None
+    ivy(S, [(1.82, -1.1, .4, .35), (-1.1, 1.82, .5, .3), (1.85, .9, .3, .25)], 7)
+    flag(S, 0, 0, 3.75, 1.0, 1.3); flag(S, 1.6, 1.6, 3.5, .7)
 
 
 def b_hisar(S, cap):

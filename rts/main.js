@@ -11,7 +11,7 @@ function setDiff(v) { try { localStorage.setItem('fatih_diff', String(v)); } cat
 function uiDiff() { const v = getDiff(); document.querySelectorAll('#diffseg button').forEach(b => b.classList.toggle('on', +b.dataset.v === v)); $('diffcap').textContent = ['Düşman yavaş toplanır, saldırıları küçük; başlangıç kaynağın fazla.', 'Tarihî denge.', 'Düşman hızlı ve kalabalık saldırır, askerleri daha dayanıklı.'][v]; }
 document.querySelectorAll('#diffseg button').forEach(b => b.onclick = () => setDiff(+b.dataset.v));
 function buildMenu() {
-  uiDiff();
+  uiDiff(); $('mepi').hidden = prog() < MISSIONS.length;
   const p = prog(); $('mlist').innerHTML = '';
   MISSIONS.forEach((m, i) => {
     const d = document.createElement('div'); d.className = 'mi' + (i > p ? ' lock' : '');
@@ -20,15 +20,15 @@ function buildMenu() {
   });
   if (p >= MISSIONS.length) { const d = document.createElement('div'); d.className = 'mi'; d.innerHTML = '<div><b>Epilog</b><small>Hünkârçayırı, 1481</small></div><span>📜</span>'; d.onclick = showEpilogue; $('mlist').appendChild(d); }
 }
-function toMenu() { running = false; if (G) G.paused = false; $('pause').style.display = 'none'; buildMenu(); show('menu'); }
+function toMenu() { running = false; $('mepi').hidden = prog() < MISSIONS.length; if (G) G.paused = false; $('pause').style.display = 'none'; buildMenu(); show('menu'); }
 function showBrief(i) {
   curMission = i; const m = MISSIONS[i];
   $('bt').textContent = (i + 1) + '. ' + m.title; $('bd').textContent = m.date + ' — Düşman: ' + m.enemy;
   $('bx').textContent = m.brief;
   $('bo').innerHTML = m.objectives.map(o => `<li>${o.text}${o.opt ? ' (isteğe bağlı)' : ''}</li>`).join('');
   $('bw').textContent = i === 5 ? 'Gedik Ahmed Paşa ölürse görev kaybedilir.' : 'Sultan (komutan) ölürse görev kaybedilir.' + (m.timeLimit ? ' Süre sınırı: ' + fmtT(m.timeLimit) + '.' : '');
-  const pc = $('bpor'); pc.hidden = true;
-  if (BL.ok && SPRITES.portraits) { const look = i === 5 ? 'sipahi' : 'fatih', f = SPRITES.portraits.f[look]; if (f) { pc.hidden = false; const c = pc.getContext('2d'); c.clearRect(0, 0, 160, 160); const g = c.createRadialGradient(80, 60, 10, 80, 80, 110); g.addColorStop(0, '#7a5530'); g.addColorStop(1, '#1a0f07'); c.fillStyle = g; c.fillRect(0, 0, 160, 160); c.drawImage(BL.imgs[SPRITES.portraits.img], f[0], f[1], f[2], f[3], 0, 0, 160, 160); } }
+  const pc = $('bpor'); pc.hidden = !drawPortrait(pc, i === 5 ? 'pasa' : 'fatih', i === 5 ? 'sipahi' : 'fatih');
+  $('brief').style.background = `linear-gradient(180deg,rgba(8,4,2,.2),rgba(8,4,2,.7)), ${artBg('brief' + (i + 1))}`;
   $('bgo').onclick = () => startMission(i);
   show('brief');
 }
@@ -57,7 +57,7 @@ function startGame(m) {
 function restartMission() { $('pause').style.display = 'none'; if (curMission < 0) startSkirmish(true); else startMission(curMission); }
 function showResult() {
   running = false; const r = G.result, m = G.m, win = r.win;
-  if (win && curMission >= 0) setProg(curMission + 1);
+  if (win && curMission >= 0) { setProg(curMission + 1); showStory(curMission, r); return; }
   $('rtitle').textContent = win ? (r.hist ? 'Tarihî Sonuç' : 'Zafer!') : 'Yenilgi'; $('rtext').textContent = r.text;
   $('rhist').textContent = win ? m.after : 'Tarihin akışını değiştirmek için tekrar dene.';
   $('rstat').textContent = `Süre: ${fmtT(G.t)} · Düşman kaybı: ${G.stats.kills} · Kayıplarımız: ${G.stats.lost}`;
@@ -93,9 +93,10 @@ function drawMenuBg() {
   const v = x.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.6)'); x.fillStyle = v; x.fillRect(0, 0, W, H);
   const url = c.toDataURL('image/jpeg', .85);
   for (const s of document.querySelectorAll('.screen')) {
-    const img = s.id === 'menu' ? 'menu_bg.jpg' : 'camp_bg.jpg';
-    const shade = s.id === 'menu' ? 'linear-gradient(180deg,rgba(8,4,2,.15) 0%,rgba(8,4,2,.05) 40%,rgba(8,4,2,.7) 100%)' : 'linear-gradient(180deg,rgba(8,4,2,.35),rgba(8,4,2,.75))';
-    s.style.background = `${shade}, url(assets/${img}) center/cover no-repeat, #0b0805 url(${url}) center/cover no-repeat`;
+    if (s.id === 'story' || s.id === 'camp') continue;
+    const img = s.id === 'menu' ? 'menu_bg.jpg' : 'camp_bg.jpg', art = artURL({ menu: 'menu', skirm: 'skirmish', epi: 'epilog' }[s.id]);
+    const shade = s.id === 'menu' ? 'linear-gradient(90deg,rgba(8,4,2,.5),rgba(8,4,2,0) 45%)' : 'linear-gradient(180deg,rgba(8,4,2,.35),rgba(8,4,2,.75))';
+    s.style.background = `${shade}, ${art ? `url(${art}) ${s.id === 'menu' ? 'right' : 'center'}/cover no-repeat, ` : ''}url(assets/${img}) center/cover no-repeat, #0b0805 url(${url}) center/cover no-repeat`;
   }
 }
 drawMenuBg();
