@@ -15,10 +15,10 @@ SRC = {
     'ayasofya': (M1 + '01a10087-f365-75c0-9472-d869d8b4b6ee/Meshy_AI_model.glb', 5, .98, None),
     'ayasofya_cap': (M1 + '01a10087-f365-75c0-9472-d869d8b4b6ee/Meshy_AI_model.glb', 5, .98, 'minarets'),
     'hisar': (M1 + '01a10088-f5fd-77da-b997-713acc4cfd2a/Meshy_AI_model.glb', 4, .98, None),
-    'sur': (M1 + '01a10088-2a51-7721-9926-bd5c7779d0bb/Meshy_AI_model.glb', 1, 1.0, 'wallcut'),
+    'sur': (None, 1, 1.0, 'proc_sur'),
     'burc': (M1 + '01a1008a-2225-7224-855a-6ce2128f97af/Meshy_AI_model.glb', 2, .98, None),
     'kale': (M1 + '01a1008a-5182-72bb-b9e8-9f9933c1a3f7/Meshy_AI_model.glb', 4, .98, None),
-    'kapi': (M1 + '01a1008a-7fc7-727b-bfb4-509da44252f8/Meshy_AI_model.glb', 1, 1.15, None),
+    'kapi': (None, 1, 1.0, 'proc_kapi'),
     'pazar': (M1 + '01a1008a-ade5-72c2-80ad-151d664a67d6/Meshy_AI_model.glb', 3, .98, None),
     'medrese': (M1 + '01a1008a-ed82-700c-bd23-b6f95905316b/Meshy_AI_model.glb', 3, .98, None),
     'cami': (M1 + '01a1008b-1a0b-7609-994b-cd7be1e933a5/Meshy_AI_model.glb', 3, .98, None),
@@ -114,22 +114,61 @@ def load_model(path, n, pad, extra):
     return o, (mx.z - mn.z) * s
 
 
+# görsel büyütme: binalar kapladıkları alandan taşabilir; küçük-orta-büyük-anıtsal kademeleri
+VIS = dict(ev=1.2, ambar=1.2, tarla=1.0, kisla=1.45, ahir=1.45, demirhane=1.45, pazar=1.45, medrese=1.45, dokum=1.45, tersane=1.45,
+           ocak=1.45, kule=1.45, burc=1.45, saray=1.7, cami=1.7, kamp=1.7, kale=2.0, hisar=2.0, ayasofya=2.0, ayasofya_cap=2.0, sur=1.0, kapi=1.0)
+WALL_H = 2.1   # sur yüksekliği (kare birimi): büyütülmüş kaleyle uyumlu
+
+
+def wall_mats():
+    return dict(st=M('wallst', (.68, .57, .42), .85, brick=4.6, noise=9, nf=.35), st_d=M('wallst_d', (.54, .45, .33), .85, brick=4.6, noise=9, nf=.35),
+                dark=M('wdark', (.04, .03, .02), .9), wood=M('wwood', (.3, .18, .09), .75, noise=14, nf=.3), iron=M('wiron', (.2, .2, .22), .45, .8))
+
+
+def proc_wall(gate):
+    W = wall_mats(); H = WALL_H
+    box(1.0, 1.0, .18, (0, 0, .09), W['st_d'])                     # taban taşı
+    box(.94, .94, H - .18, (0, 0, .18 + (H - .18) / 2), W['st'])  # gövde
+    box(1.0, 1.0, .1, (0, 0, H - .02), W['st_d'])                  # korniş
+    for k in range(3):                                             # mazgallar (dört kenar)
+        t = -.5 + (k + .5) / 3
+        for (x, y) in ((.42, t), (t, .42), (-.42, t), (t, -.42)):
+            box(.2, .2, .26, (x, y, H + .16), W['st'])
+    if gate:
+        for (fx, fy) in ((1, 0), (0, 1), (-1, 0), (0, -1)):
+            ax = fx != 0; px, py = fx * .472, fy * .472
+            if ax:
+                box(.03, .52, .9, (px, 0, .45 + .18), W['dark']); cyl(.26, .03, (px, 0, 1.08), W['dark'], rot=(0, PI / 2, 0), v=20)
+                box(.035, .46, .84, (px + fx * .005, 0, .42 + .18), W['wood']); box(.04, .03, .84, (px + fx * .01, 0, .6), W['iron'])
+            else:
+                box(.52, .03, .9, (0, py, .45 + .18), W['dark']); cyl(.26, .03, (0, py, 1.08), W['dark'], rot=(PI / 2, 0, 0), v=20)
+                box(.46, .035, .84, (0, py + fy * .005, .42 + .18), W['wood']); box(.03, .04, .84, (0, py + fy * .01, .6), W['iron'])
+        box(1.04, 1.04, .12, (0, 0, 1.42), W['st_d'])
+    return H + .3
+
+
+PI = math.pi
+
+
 def add_minarets(n, S):
-    h = 3.4
+    k = n / 5; h = 3.3 * k
     for (x, y) in ((1, 1), (1, -1), (-1, 1), (-1, -1)):
-        x *= n * .47; y *= n * .47
-        cyl(.13, h, (x, y, h / 2), S['white'], v=16); cyl(.18, .07, (x, y, h * .72), S['white'], v=16)
-        cyl(.13, .7, (x, y, h + .35), S['lead'], r2=0, v=16); cyl(.012, .25, (x, y, h + .82), S['gold'])
+        x *= n * .45; y *= n * .45
+        cyl(.13 * k, h, (x, y, h / 2), S['white'], v=16); cyl(.18 * k, .07 * k, (x, y, h * .72), S['white'], v=16)
+        cyl(.13 * k, .7 * k, (x, y, h + .35 * k), S['lead'], r2=0, v=16); cyl(.012 * k, .25 * k, (x, y, h + .82 * k), S['gold'])
 
 
 def render_one(name, outdir):
     path, n, pad, extra = SRC[name]
-    reset(); S = statics.mats()
-    o, hgt = load_model(path, n, pad, extra)
+    reset(); S = statics.mats(); v = VIS.get(name, 1.3); nv = n * v
+    if path is None:
+        hgt = proc_wall(extra == 'proc_kapi')
+    else:
+        o, hgt = load_model(path, nv, pad, extra)
     if extra == 'minarets':
-        add_minarets(n, S); hgt = max(hgt, 4.6)
+        add_minarets(nv, S); hgt = max(hgt, 4.6 * v)
     SCALE = statics.SCALE; px = PX_PER_UNIT * SCALE; margin = 70
-    res_x = int(n * 64 * SCALE + margin * 2 + 60); ground_half = n * 16 * SCALE
+    res_x = int(nv * 64 * SCALE + margin * 2 + 60); ground_half = nv * 16 * SCALE
     top = hgt * math.cos(math.radians(30)) * px + ground_half; res_y = int(top + ground_half + margin + 30)
     anchor_y = top + 30; off = anchor_y - res_y / 2
     # sahneyi kurmak her şeyi silmesin: setup_scene yalnızca ışık/kamera ekler
