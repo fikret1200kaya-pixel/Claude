@@ -239,12 +239,18 @@ function canPlace(type, tx, ty) {
   const d = BUILDS[type];
   for (let y = ty; y < ty + d.h; y++) for (let x = tx; x < tx + d.w; x++) { if (!inb(x, y)) return false; const i = idx(x, y); if (G.blkT[i] || G.occ[i] || !G.exp[i] && !G.m.noFog) return false; }
   if (d.zone) { const z = G.zone; if (!z || tx < z.x0 || ty < z.y0 || tx + d.w - 1 > z.x1 || ty + d.h - 1 > z.y1) return false; }
+  if (!d.farm && !d.zone) {   // binalar arasında en az bir kare boşluk (büyük çizimler üst üste binmesin)
+    for (let y = ty - 1; y <= ty + d.h; y++) for (let x = tx - 1; x <= tx + d.w; x++) {
+      if (x >= tx && x < tx + d.w && y >= ty && y < ty + d.h) continue; if (!inb(x, y)) continue;
+      const b = G.occ[idx(x, y)] && G.byId.get(G.occ[idx(x, y)]); if (b && !b.d.wall && !b.d.farm) return false;
+    }
+  }
   if (d.dock) { let w = 0; for (let x = tx - 1; x <= tx + d.w; x++) for (let y = ty - 1; y <= ty + d.h; y++) if (inb(x, y) && G.terrain[idx(x, y)] === 1) w++; if (w < 2) return false; }
   return true;
 }
 function tryPlace(shift) {
   const t = place.type, d = BUILDS[t], p = G.players[0];
-  if (!place.ok) { msg(d.zone ? 'Hisar yalnızca işaretli alana kurulabilir.' : d.dock ? 'Tersane kıyıya, suya bitişik kurulmalı.' : 'Buraya inşa edilemez.', 'warn'); return; }
+  if (!place.ok) { msg(d.zone ? 'Hisar yalnızca işaretli alana kurulabilir.' : d.dock ? 'Tersane kıyıya, suya bitişik kurulmalı.' : 'Buraya inşa edilemez (binalar arasında bir kare boşluk bırak).', 'warn'); return; }
   if (!afford(p, d.cost)) { msg('Yetersiz kaynak!', 'warn'); return; }
   const vills = G.sel.filter(e => e.kind === 'u' && e.d.worker && e.owner === 0); if (!vills.length) { place = null; return; }
   pay(p, d.cost); const b = addBuilding(t, 0, place.tx, place.ty, { built: false });

@@ -115,8 +115,8 @@ def load_model(path, n, pad, extra):
 
 
 # görsel büyütme: binalar kapladıkları alandan taşabilir; küçük-orta-büyük-anıtsal kademeleri
-VIS = dict(ev=1.2, ambar=1.2, tarla=1.0, kisla=1.45, ahir=1.45, demirhane=1.45, pazar=1.45, medrese=1.45, dokum=1.45, tersane=1.45,
-           ocak=1.45, kule=1.45, burc=1.45, saray=1.7, cami=1.7, kamp=1.7, kale=2.0, hisar=2.0, ayasofya=2.0, ayasofya_cap=2.0, sur=1.0, kapi=1.0)
+VIS = dict(ev=1.2, ambar=1.2, tarla=1.0, kisla=1.3, ahir=1.3, demirhane=1.3, pazar=1.3, medrese=1.3, dokum=1.3, tersane=1.3,
+           ocak=1.3, kule=1.45, burc=1.45, saray=2.4, cami=2.4, kamp=1.7, kale=2.0, hisar=2.0, ayasofya=2.0, ayasofya_cap=2.0, sur=1.0, kapi=1.0)
 WALL_H = 2.1   # sur yüksekliği (kare birimi): büyütülmüş kaleyle uyumlu
 
 
