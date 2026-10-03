@@ -673,7 +673,7 @@ def pose(look, kind, J, act, f, root):
 
 # ------------------------------------------------------------ render
 USCALE = 1.2
-FRAME = {k: int(v * USCALE) // 2 * 2 for k, v in {'kadirga': 280, 'bastarda': 330, 'balikci': 150, 'sahi': 208, 'top': 160, 'sipahi': 176, 'sovalye': 176, 'fatih': 160, 'komutan': 160, 'akinci': 160, 'reaya': 128, 'azap': 128, 'okcu': 128, 'yeniceri': 128, 'molla': 128}.items()}
+FRAME = {k: int(v * USCALE) // 2 * 2 for k, v in {'kadirga': 280, 'bastarda': 330, 'balikci': 150, 'sahi': 208, 'top': 160, 'sipahi': 176, 'sovalye': 176, 'fatih': 176, 'komutan': 176, 'akinci': 176, 'reaya': 128, 'azap': 128, 'okcu': 128, 'yeniceri': 128, 'molla': 128, 'avr_piyade': 140, 'avr_okcu': 128}.items()}
 LOOKS = ['reaya', 'azap', 'okcu', 'yeniceri', 'sipahi', 'sovalye', 'fatih', 'komutan', 'top', 'sahi', 'molla', 'akinci', 'balikci', 'kadirga', 'bastarda']
 
 

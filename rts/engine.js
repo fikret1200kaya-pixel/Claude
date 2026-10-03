@@ -26,6 +26,10 @@ const UNITS = {
   kadirga: { name: 'Kadırga', look: 'kadirga', cls: 'ship', hp: 280, atk: 9, at: 'g', range: 192, speed: 86, rate: 1.6, ma: 2, pa: 4, cost: { w: 180, g: 60 }, pop: 3, time: 30, vision: 8, r: 22, naval: true, proj: 'shot', bonus: { ship: 6 }, bm: .4, str: 'Gemiler, kıyıdaki birlikler', weak: 'Baştarda, Kuleler', desc: 'Kürekli savaş gemisi. Pruva topu ve tüfeklerle hızlı saldırır.' },
   bastarda: { name: 'Baştarda', look: 'bastarda', cls: 'ship', hp: 450, atk: 32, at: 's', range: 256, speed: 70, rate: 4.5, ma: 3, pa: 6, cost: { w: 300, g: 200 }, pop: 4, time: 45, vision: 9, r: 26, naval: true, proj: 'ball', splash: 28, bm: 2.2, bonus: { ship: 14 }, str: 'Binalar, Gemiler', weak: 'Kadırga sürüsü', desc: 'Büyük amiral gemisi. Üç pruva topuyla kıyı tahkimatını döver.' },
 };
+// Hristiyan (✚) düşmanların piyade ve okçusu Avrupa kıyafetiyle görünür
+const EURO_LOOK = { azap: 'avr_piyade', okcu: 'avr_okcu' };
+const isEuro = o => o && (G.m.factions ? (G.m.factions[o] && G.m.factions[o].sym === '✚') : (G.m.sym === '✚' && G.team[o] !== G.team[0]));
+const lookOf = u => (isEuro(u.owner) && EURO_LOOK[u.type] && typeof SPRITES !== 'undefined' && SPRITES.units && SPRITES.units[EURO_LOOK[u.type]]) ? EURO_LOOK[u.type] : u.d.look;
 const CLSN = { civ: 'işçi', spear: 'mızraklı', arc: 'okçu', gun: 'tüfekli', cav: 'atlı', sie: 'top', hero: 'komutan', ship: 'gemi' };
 
 const BUILDS = {
@@ -226,7 +230,7 @@ function kill(e, src) {
     if (!e.d.landmark) G.fx.push({ k: 'rubble', x: e.x, y: e.y, t: 0, life: 40, tx: e.tx, ty: e.ty, w: e.w, h: e.h, id: e.id });
     for (let k = 0; k < 14; k++) G.fx.push({ k: 'puff', x: e.x + (Math.random() - .5) * e.w * TILE, y: e.y + (Math.random() - .5) * e.h * TILE, t: 0, life: .8 + Math.random() * .6, r: 8 + Math.random() * 14 });
   } else {
-    G.fx.push({ k: 'corpse', x: e.x, y: e.y, t: 0, life: 9, look: e.d.look, owner: e.owner, face: e.face || 0 });
+    G.fx.push({ k: 'corpse', x: e.x, y: e.y, t: 0, life: 9, look: lookOf(e), owner: e.owner, face: e.face || 0 });
     if (e.owner === 0) G.stats.lost++; else G.stats.kills++;
   }
   if (e.owner === 0 && e.kind === 'b' && e.d.drop) { /* kaynak teslim noktası kaybı */ }

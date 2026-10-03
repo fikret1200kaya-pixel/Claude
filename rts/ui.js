@@ -71,8 +71,8 @@ function drawUnit(c, u) {
   const [sx, sy] = w2s(u.x, u.y), [act, fr] = unitAct(u);
   if (u.d.hero && u.owner === 0) { c.strokeStyle = 'rgba(231,185,58,.7)'; c.lineWidth = 2; c.beginPath(); c.ellipse(sx, sy, 17 * cam.z, 8.5 * cam.z, 0, 0, 7); c.stroke(); }
   if (u.owner !== 0 && ally(u.owner)) { c.fillStyle = 'rgba(255,215,90,.25)'; c.beginPath(); c.ellipse(sx, sy, 9 * cam.z, 4.5 * cam.z, 0, 0, 7); c.fill(); }
-  if (BL.ok && blUnit(c, u.d.look, u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z * UZ)) { if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; blUnit(c, u.d.look, u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z * UZ, .3); c.globalCompositeOperation = 'source-over'; } }
-  else { const spr = unitSprite(u.d.look, u.owner, facingDir(u.face || 0), act, fr);
+  if (BL.ok && blUnit(c, lookOf(u), u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z * UZ)) { if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; blUnit(c, lookOf(u), u.owner, facingDir(u.face || 0), act, fr, sx, sy, cam.z * UZ, .3); c.globalCompositeOperation = 'source-over'; } }
+  else { const spr = unitSprite(lookOf(u), u.owner, facingDir(u.face || 0), act, fr);
   drawSpr(c, spr, sx, sy, 64, 86); if (u.hit > 0) { c.globalCompositeOperation = 'lighter'; drawSpr(c, spr, sx, sy, 64, 86, .35); c.globalCompositeOperation = 'source-over'; } }
   if (u.carry && u.carry.amt > 0 && u.d.worker) { c.fillStyle = ['', '#8a5a2a', '#f2c230', '#c0405a'][u.carry.type]; c.beginPath(); c.arc(sx - 7 * cam.z, sy - 18 * cam.z, 3.4 * cam.z, 0, 7); c.fill(); c.strokeStyle = OUT; c.lineWidth = 1; c.stroke(); }
 }
