@@ -114,7 +114,7 @@ def build(glb, look, ref):
     R = REF[look]
     paint(me, arm, ref, R)
     root = joint('root'); ROOT[0] = root; s = R['H'] / me.dimensions.z
-    arm.parent = root; arm.scale = (arm.scale[0] * s,) * 3; arm.rotation_euler.z += PI / 2
+    piv = joint("pivot", (0, 0, 0), root, rot=(0, 0, float(os.environ.get("MROT", PI / 2)))); piv.scale = (s, s, s); arm.parent = piv
     # en durgun kare: ayakların en yakın olduğu yürüyüş karesi
     act_ = arm.animation_data.action; lf, rf = arm.pose.bones['mixamorig:LeftFoot'], arm.pose.bones['mixamorig:RightFoot']
     a, b = act_.frame_range; best = (9, a)
@@ -125,7 +125,7 @@ def build(glb, look, ref):
     # tüfek 1: sağ elde dik taşınır
     g = joint('gunhand', (0, 0, 0)); g.parent = arm; g.parent_type = 'BONE'; g.parent_bone = 'mixamorig:RightHand'
     bpy.context.view_layer.update()
-    k = 1 / (arm.scale[0])
+    k = 1 / s
     gun = units.musket(g, S); gun.scale = (k * .95,) * 3; gun.rotation_euler = (-PI / 2, 0, 0); gun.location = (0, -.02 * k, 0)
     # tüfek 2: nişan alırken omuzdan ileri
     aim = joint('gunaim', (.16, -.13, 1.18), root); aim.rotation_euler = (0, -PI / 2 + .05, 0)
