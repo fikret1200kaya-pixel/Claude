@@ -101,6 +101,6 @@ function drawMenuBg() {
 }
 drawMenuBg();
 loadBlender(() => { // Blender sprite atlasları yüklendikten sonra başla
-  if (BL.ok) Object.assign(BH, {'demirhane': 74, 'tersane': 103, 'pazar': 68, 'cami': 75, 'medrese': 64, 'saray': 160, 'ev': 90, 'ambar': 82, 'tarla': 23, 'kisla': 148, 'ahir': 106, 'ocak': 91, 'dokum': 123, 'kule': 146, 'burc': 138, 'sur': 62, 'kapi': 62, 'kale': 268, 'hisar': 70, 'kamp': 76, 'ayasofya': 136});
+  if (BL.ok) Object.assign(BH, {demirhane: 66, tersane: 92, pazar: 61, cami: 106, medrese: 57, saray: 226, ev: 90, ambar: 82, tarla: 23, kisla: 133, ahir: 95, ocak: 82, dokum: 110, kule: 146, burc: 138, sur: 62, kapi: 62, kale: 268, hisar: 70, kamp: 76, ayasofya: 136});
   const q = new URLSearchParams(location.search); if (q.has('m')) startMission(+q.get('m') - 1);
 });
