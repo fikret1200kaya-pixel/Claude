@@ -239,11 +239,16 @@ def render(look, outdir, test=False):
     kind, path, size, weapon, rot = CFG[look]; rot += ROT.get(look, 0)
     reset(); S = units.mats()
     root = joint('root'); ROOT[0] = root
-    arm = body = gunner = None
+    arm = body = gunner = rig = None
     if kind == 'foot':
         arm = setup_foot(root, path, size, rot, S, weapon); fk = root['kind']
     else:
         body = setup_static(root, path, size, kind, rot)
+        rig = None
+        if kind == 'ride' and os.environ.get('RIG', '1') == '1':
+            import meshy_rider
+            meshes = [o for o in body.children_recursive if o.type == 'MESH']
+            rig, _ = meshy_rider.build_rig(body, meshes)
         if kind in ('ship', 'gun'):   # ağız ateşi
             L = root['len']; fl = joint('flash', (L * .5 + .1, 0, root['h'] * (.55 if kind == 'gun' else .45)), body)
             ball(.09 + .02 * L, (0, 0, 0), S['flash'], fl, sc=(1.8, 1, 1)); fl.scale = (.001,) * 3
@@ -261,6 +266,11 @@ def render(look, outdir, test=False):
             if arm:
                 pose_foot(arm, fk, act, f)
                 if act == 'dead': root.rotation_euler.x = PI / 2 * .97; root.location.z = .16
+            elif kind == 'ride' and rig:
+                import meshy_rider
+                body.location = (0, 0, 0); body.rotation_euler = (0, 0, 0)
+                meshy_rider.pose_rider(rig, act, f)
+                if act == 'dead': body.rotation_euler.x = PI / 2 * .9; body.location.z = .3
             else:
                 pose_static(root, body, kind, act, f, None)
                 if gunner: pose_foot(gunner, 'pray', 'walk' if act == 'walk' else 'idle', f)
