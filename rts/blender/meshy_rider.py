@@ -30,10 +30,11 @@ def build_rig(body, meshes):
     for _ in range(25):
         a = ((low[:, None, :2] - c[None]) ** 2).sum(-1).argmin(1)
         c = np.array([low[a == k, :2].mean(0) if (a == k).any() else c[k] for k in range(4)])
-    names = ['FL', 'FR', 'BL', 'BR']
-    order = []   # FL: önde, sol(+Y)
-    for k in range(4):
-        f = 'F' if c[k, 0] > 0 else 'B'; s = 'L' if c[k, 1] > 0 else 'R'; order.append(f + s)
+    # her küme bir çeyreğe: önce x'e göre ön/arka çiftlerine, sonra y'ye göre sol/sağa ayır
+    ix = np.argsort(-c[:, 0]); order = [None] * 4
+    for pair, f in ((ix[:2], 'F'), (ix[2:], 'B')):
+        a_, b_ = pair if c[pair[0], 1] >= c[pair[1], 1] else pair[::-1]
+        order[a_] = f + 'L'; order[b_] = f + 'R'
     legc = {order[k]: c[k] for k in range(4)}
     # leg radius
     rad = {}
