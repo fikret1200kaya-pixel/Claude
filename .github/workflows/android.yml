@@ -1,0 +1,63 @@
+name: Android APK
+
+# APK sürümü beklemede: yalnızca elle başlatılır (Actions > Android APK > Run workflow)
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK lisansları
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Oyun dosyalarını APK içine kopyala
+        run: |
+          mkdir -p android/app/src/main/assets/rts
+          cp rts/index.html rts/*.js android/app/src/main/assets/rts/
+          cp -r rts/assets android/app/src/main/assets/rts/
+          # Telefonda yalnızca %60 ölçekli (_l) atlaslar kullanılır; tam boyutluları APK'ya koyma
+          cd android/app/src/main/assets/rts/assets
+          for f in u_*.png static.png; do case "$f" in *_m.png|*_l.png) ;; *) rm -f "$f" ;; esac; done
+          ls -la
+
+      - name: APK derle
+        working-directory: android
+        env:
+          VERSION_CODE: ${{ github.run_number }}
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: APK'yı adlandır
+        run: cp android/app/build/outputs/apk/release/app-release.apk Fatih-v1.0.${{ github.run_number }}.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Fatih-APK
+          path: Fatih-v1.0.${{ github.run_number }}.apk
+
+      - name: GitHub Release olarak yayınla
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-v1.0.${{ github.run_number }}
+          name: Fatih APK v1.0.${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          body: |
+            Fatih — Bir Sultanın Hikâyesi (Android)
+            Telefona kurmak için aşağıdaki .apk dosyasını indirip açın ("Bilinmeyen kaynaklardan yükleme" izni gerekebilir).
+            Kontroller: dokun = seç / emir ver · basılı tut = sağ tık · tek parmakla sürükle = kutu seçimi · iki parmak = kaydır / yakınlaştır.
+          files: Fatih-v1.0.${{ github.run_number }}.apk
